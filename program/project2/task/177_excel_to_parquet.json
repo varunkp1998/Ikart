@@ -1,0 +1,52 @@
+{
+    "project_id": "1234",		
+    "project_name": "intellikart",	
+    "task": {
+        "source": {	
+            "source_type": "excelfile_read",
+            "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
+            "source_file_name": "sales",				
+            "skip_header":" ",
+            "skip_footer":" ",
+            "sheet_name":0
+        },
+        "target": {	
+            "target_type": "parquetfile_write",
+            "target_file_path": "/app/intel_new/Program/Project/Pipeline/Task/target_files/",
+            "target_file_name": "sales_excel5.parquet",
+            "encoding": " "
+        },
+        "data_quality_execution":{
+            "pre_check_enable":"N",
+            "post_check_enable":"N"
+        },
+        "data_quality_features":{
+            "dq_process_rejected_records": "N",
+            "dq_perform_qc_on_corrected_file": "N",
+            "dq_auto_correction_required":"N",
+            "dq_auto_correct_columns": {"county":"county_nm", "state":"stt"},
+            "dq_lkup_key_column": {"zip":"zip_code"},
+            "dq_lookup_file_path":"C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
+            "data_masking_required": "N",
+            "data_masking_columns":{"msk_date":"0,DateOfBirth", 
+                                    "msk_alpha":"x,PersonalEmail,IBAN", 
+                                    "msk_numeric":"*,BSNNumber,account_no" },
+            "data_encryption_required":"N",
+            "data_decryption_required":"N",
+            "data_encryption_columns":"LastName, IBAN, PersonalEmail",
+            "data_decryption_columns":"LastName, PersonalEmail"
+        },
+    "data_quality": [
+        {
+          "dq_id": "1",
+          "check": "column_values_to_not_be_null",
+          "parameters": {"column": "ORDERNUMBER"},
+          "active": "Y",
+          "ignore_bad_records": "Y",
+          "threshold_bad_records": 40,
+          "type": "pre_check"
+        }
+    ],
+    "on_failure": ""
+    }
+    }   

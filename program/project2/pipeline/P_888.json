@@ -1,0 +1,15 @@
+{
+    "program_id":"1234",
+    "project_id":"",
+    "pipeline_id":"P_888",
+    "pipeline_name":"",
+    "tasks_details":{
+        "100_snow_to_csv":0,
+		"111_csv_to_snowflake":0,
+        "222_snowflake_to_snowflake":["100_snow_to_csv"],
+        "177_excel_to_parquet":["222_snowflake_to_snowflake","111_csv_to_snowflake"],
+        "128_csv_to_xml":0
+
+    }
+     
+}
