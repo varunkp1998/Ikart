@@ -5,23 +5,23 @@
         "source": {	
             "source_type": "csv_read",
             "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
-            "source_file_name": "sales_data",
+            "source_file_name": "organizations-2000000",
             "delimiter":",",
             "skip_header":" ",
             "skip_footer":" ",
             "quote_char": " ",
             "escape_char":" ",
             "alias_columns":" ",
-            "select_columns": " ",
-            "chunk_size":1000,				
+            "select_columns": "Organization_Id,Name,Website,Country,Description,Founded,Industry,Number_of_employees",
+            "chunk_size":15000,				
             "encoding": "utf-8"
         },
-         "target": {	
+        "target": {	
             "target_type": "snowflake_write",
             "connection_name": "snowflake_1",
-            "table_name": "teraxyz",
+            "table_name": "organizations_details",
             "schema": "public",
-            "operation":"append",
+            "operation":"create",
             "audit_columns":  "active"
         },
 		"data_quality_execution":{
@@ -29,16 +29,16 @@
             "post_check_enable":"N"
 		},
         "data_quality_features":{
+            "data_masking_required": "Y",
+            "data_masking_columns":{"msk_date":"", 
+                                    "msk_alpha":"x,Website", 
+                                    "msk_numeric":"" },
             "dq_process_rejected_records": "N",
             "dq_perform_qc_on_corrected_file": "N",
             "dq_auto_correction_required":"N",
             "dq_auto_correct_columns": {"county":"county_nm", "state":"stt"},
             "dq_lkup_key_column": {"zip":"zip_code"},
-            "dq_lookup_file_path":"C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
-            "data_masking_required": "N",
-            "data_masking_columns":{"msk_date":"0,DateOfBirth", 
-                                    "msk_alpha":"x,PersonalEmail,IBAN", 
-                                    "msk_numeric":"*,BSNNumber,account_no" },
+            "dq_lookup_file_path":" ",
             "data_encryption_required":"N",
             "data_decryption_required":"N",
             "data_encryption_columns":"LastName, IBAN, PersonalEmail",
@@ -47,13 +47,40 @@
     "data_quality": [
         {
           "dq_id": "1",
-          "check": "column_values_to_not_be_null",
-          "parameters": {"column": "ORDERNUMBER"},
+          "check": "column_values_to_be_between",
+          "parameters": {"column": "Number_of_employees","min":"1000", "max":"None"},
           "active": "Y",
           "ignore_bad_records": "Y",
-          "threshold_bad_records": 40,
+          "threshold_bad_records": 0,
           "type": "pre_check"
-        }
+        },
+        {
+            "dq_id": "2",
+            "check": "column_values_to_be_unique",
+            "parameters": {"column": "Organization_Id"},
+            "active": "Y",
+            "ignore_bad_records": "Y",
+            "threshold_bad_records": 0,
+            "type": "pre_check"
+          },
+          {
+            "dq_id": "3",
+            "check": "column_value_lengths_to_equal",
+            "parameters": {"column": "Organization_Id", "value":15},
+            "active": "Y",
+            "ignore_bad_records": "Y",
+            "threshold_bad_records": 0,
+            "type": "pre_check"
+          },
+          {
+            "dq_id": "4",
+            "check": "column_values_to_not_be_null",
+            "parameters": {"column": "Founded"},
+            "active": "Y",
+            "ignore_bad_records": "Y",
+            "threshold_bad_records": 0,
+            "type": "pre_check"
+          }
     ],
     "on_failure": ""
     }
