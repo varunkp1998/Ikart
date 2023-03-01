@@ -4,7 +4,7 @@
     "task": {
         "source": {	
             "source_type": "csv_read",
-            "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
+            "source_file_path": "/app/intel_new_1/Program/intellikart/Pipeline/Task/source_files/",
             "source_file_name": "organizations-2000000",
             "delimiter":",",
             "skip_header":" ",

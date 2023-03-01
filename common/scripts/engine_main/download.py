@@ -4,6 +4,7 @@ import subprocess
 import logging
 import os
 import json
+import requests
 
 log1 = logging.getLogger('log1')
 log2 = logging.getLogger('log2')
@@ -105,10 +106,10 @@ def download_pipeline_json(prj_nm,pipeline_name:str,paths_data:str):
         path_check = pipeline_json_path+pipeline_name+'.json'
         is_exist = os.path.exists(path_check)
         log1.info('pipeline.json file exists: %s', is_exist)
+        log1.info("pipeline_path:%s",paths_data["projects"][prj_nm]["GH_pipeline_path"]+pipeline_name+'.json')
         if is_exist is False:
-
             dwn_json = ['curl', '-o',pipeline_json_path+pipeline_name+'.json',
-            paths_data["GH_pipeline_path"]+pipeline_name+'.json']
+            paths_data["projects"][prj_nm]["GH_pipeline_path"]+pipeline_name+'.json']
             subprocess.call(dwn_json)
             log1.info("downloading pipeline.json:%s from Github completed", pipeline_name)
             log1.info('#####################################################')
@@ -206,6 +207,18 @@ def task_json_download(prj_nm,task_name:str, paths_data:str):
     """Function to download Task JSON from Github to server"""
     try:
         log2.info("downloading %s.json from Github started..", task_name)
+        url=paths_data["projects"][prj_nm]["GH_task_jsons_path"]+task_name+'.json'
+        response = requests.get(url)
+        # log1.info(response.status_code)
+        if response.status_code == 200:
+            url_exists = bool(response.status_code)
+            log1.info("The json file exists in the  GITHUB repository.")
+        else:
+            url_exists = bool(not response.status_code)
+            log1.info("The json file DOES NOT exists in the  GITHUB repository")
+        if url_exists is False  :
+            log1.info("PROCESS got ABORTED")
+            sys.exit()
         json_path= paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
         paths_data["task_json_path"]
         log2.info("%s.json location: %s", task_name,json_path)
@@ -213,7 +226,7 @@ def task_json_download(prj_nm,task_name:str, paths_data:str):
         is_exist = os.path.exists(path_check)
         log2.info('%s.json exists: %s', task_name,is_exist)
         if is_exist is False:
-            dwn_json =  ['curl', '-o', json_path+task_name+'.json',paths_data["GH_task_jsons_path"]
+            dwn_json =  ['curl', '-o', json_path+task_name+'.json',paths_data["projects"][prj_nm]["GH_task_jsons_path"]
             +task_name+'.json']
             subprocess.call(dwn_json)
             log2.info("downloading %s.json from Github completed",task_name)

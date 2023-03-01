@@ -392,9 +392,12 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
                     task_status_list.append(row['Job_Status'])
             result = all(x == "SUCCESS" for x in task_status_list)
             if result is False:
-                log1.info("Task Execution failed.")
+                log1.info("Task %s Execution failed.",task_nm)
+                log1.handlers.clear()
+                # log1.shutdown()
             else:
-                log1.info("Task Execution ended sucessfully.")
+                log1.info("Task %s Execution ended sucessfully.",task_nm)
+                log1.handlers.clear()
         else:
             # log1.info("***entered into pip***")
             audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
@@ -402,16 +405,19 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
             if len(STATUS_LIST)==0:
                 audit(audit_json_path,json_data, pip_nm,run_id,'STATUS',
                 'FAILED DUE TO CYCLIC DEPENDENCY')
-                log1.info("pipeline Execution FAILED DUE TO CYCLIC DEPENDENCY")
+                log1.info("pipeline %s Execution FAILED DUE TO CYCLIC DEPENDENCY", pip_nm)
+                log1.handlers.clear()
             else:
                 result = all(x == "SUCCESS" for x in STATUS_LIST)
                 # log1.info(result)
                 if result is False:
                     audit(audit_json_path,json_data, pip_nm,run_id,'STATUS','FAILED')
-                    log1.info("pipeline Execution failed.")
+                    log1.info("pipeline %s Execution failed.", pip_nm)
+                    log1.handlers.clear()
                 else:
                     audit(audit_json_path,json_data, pip_nm,run_id,'STATUS','COMPLETED')
-                    log1.info("pipeline Execution ended sucessfully.")
+                    log1.info("pipeline %s Execution ended sucessfully.", pip_nm)
+                    log1.handlers.clear()
 
                 #combining the task jsons into pipeline jsons
                 df_2 =pd.read_csv(file_path, sep='\t')
@@ -428,3 +434,5 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
                     paths_data["audit_path"]+j+'_audit_'+run_id+'.json',audit_json_path)
                     os.remove(paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
                     paths_data["audit_path"]+j+'_audit_'+run_id+'.json')
+                if result is False:
+                    sys.exit()

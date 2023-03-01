@@ -92,7 +92,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm):
             log2.info("reading TASK JSON data started %s",task_id)
             json_data = json.load(jsonfile)
             log2.info("reading TASK JSON data completed")
-            # write_to_txt1(task_id,'STARTED',run_id,paths_data)
+            write_to_txt1(prj_nm,task_id,'STARTED',run_id,paths_data)
             audit(audit_json_path,json_data, task_id,run_id,'STATUS','STARTED')
     except Exception as error:
         log2.exception("error in reading json %s.", str(error))

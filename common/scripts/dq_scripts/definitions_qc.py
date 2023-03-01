@@ -103,17 +103,17 @@ main_json_file,prj_nm,task_id,run_id, paths_data):
             else:
                 #pass
                 checks_name = control_table_df.at[index, "check"]
-                if main_json_file['task']['source']['source_type'] in {'postgres_read',
-                'mysql_read'}:
-                    src_file_name = main_json_file['task']['source']['table_name']
-                else:
-                    src_file_name = main_json_file['task']['source']['source_file_name']
+                # if main_json_file['task']['source']['source_type'] in {'postgres_read',
+                # 'mysql_read'}:
+                #     src_file_name = main_json_file['task']['source']['table_name']
+                # else:
+                src_file_name = main_json_file['task']['source']['source_file_name']
                 #Reconciliation checks(avg, count, min, max, sum)
                 if checks_name in ('reconciliation', 'column_count_comparison'):
                     # s_path = paths_data["folder_path"]+paths_data["source_files_path"]+paths_data[
                     #     "source_files_name"]+'.csv'
-                    s_path = main_json_file['task']['source']['source_file_path']+main_json_file[
-                        'task']['source']['source_file_name']+'.csv'
+                    s_path = main_json_file['task']['source']['source_file_path']+ \
+                    src_file_name+ '.csv'
                     # logging.info(s_path)
                     # list_of_files = glob.glob(f'{s_path}*.csv')
                     # list_of_good_files = list(filter(lambda f: f.startswith(
@@ -210,10 +210,8 @@ main_json_file,prj_nm,task_id,run_id, paths_data):
                     output_df.at[index, 'end_time'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                 #Schema Comparision
                 elif checks_name == 'schema_comparison':
-                    # spath = paths_data["folder_path"]+paths_data["source_files_path"]+paths_data[
-                    #     "source_files_name"]+'.csv'
-                    spath = main_json_file['task']['source']['source_file_path']+main_json_file[
-                        'task']['source']['source_file_name']+'.csv'
+                    spath = main_json_file['task']['source']['source_file_path']+ \
+                    src_file_name+'.csv'
                     # list_of_files = glob.glob(f'{spath}*.csv')
                     # list_of_precheck_files = list(filter(lambda f: f.startswith(
                     #     f'{spath}{src_file_name}'), list_of_files))
@@ -321,7 +319,7 @@ main_json_file,prj_nm,task_id,run_id, paths_data):
                     #multi to one mapping
                     elif checks_name == 'multi_to_one_mapping':
                         sr_df = main_json_file['task']['source']['source_file_path']+ \
-                        main_json_file['task']['source']['source_file_name']+'.csv'
+                        src_file_name+'.csv'
                         source_df1 = pd.read_csv(sr_df, na_filter=False)
                         source_df1['compound_check_column'] = source_df1[inputs_required[0]]+'|'+ \
                         source_df1[inputs_required[1]]
@@ -519,13 +517,15 @@ loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq
             #     dq_output_loc + src_file_name +'_'+ check_type + '_accepted_records_' +
             #     datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + '.csv', index=False)
         resultset['good_records_file'] = dq_output_loc +\
-             src_file_name + '_'+ check_type +'_accepted_records_' + datetime.now().strftime(
-            "%d_%m_%Y_%H_%M_%S") + '.csv'
+            src_file_name + '_' + datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + '.csv'
+            # src_file_name + '_'+ check_type +'_accepted_records_' + datetime.now().strftime(
+            # "%d_%m_%Y_%H_%M_%S") + '.csv'
         resultset['bad_records_file'] = dq_output_loc +\
-             src_file_name + '_' + check_type +'_rejected_records_' + datetime.now().strftime(
-            "%d_%m_%Y_%H_%M_%S") + '.csv'
+            src_file_name + '_' + datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + '.csv'
+            # src_file_name + '_' + check_type +'_rejected_records_' + datetime.now().strftime(
+            # "%d_%m_%Y_%H_%M_%S") + '.csv'
         resultset = resultset.drop(
-        columns = ['unexpected_index_list', 'threshold_voilated_flag'])
+        columns = ['unexpected_index_list', 'threshold_voilated_flag', 'run_flag'])
         return resultset
     except Exception as error:
         log2.exception("error in qc_check function %s.", str(error))
