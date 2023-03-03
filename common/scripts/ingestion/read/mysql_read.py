@@ -1,0 +1,87 @@
+""" importing modules """
+import logging
+import os
+import sys
+import sqlalchemy
+import pandas as pd
+
+from utility import get_config_section,decrypt
+
+log2 = logging.getLogger('log2')
+
+def establish_conn(json_data: dict, json_section: str,config_file_path:str) -> bool:
+    """establishes connection for the mysql database
+       you pass it through the json"""
+    try:
+        connection_details = get_config_section(config_file_path+json_data["task"][json_section]
+        ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
+        password = decrypt(connection_details["password"])
+        conn1 = sqlalchemy.create_engine(f'mysql://{connection_details["user"]}'
+        f':{password.replace("@", "%40")}@{connection_details["host"]}'
+        f':{int(connection_details["port"])}/{connection_details["database"]}', encoding='utf-8')
+        # logging.info("connection established")
+        return conn1
+    except Exception as error:
+        log2.exception("establish_conn() is %s", str(error))
+        raise error
+    
+def write_to_txt(prj_nm,task_id,status,run_id,paths_data):
+    """Generates a text file with statuses for orchestration"""
+    place=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
+    paths_data["status_txt_file_path"]+run_id+".txt"
+    is_exist = os.path.exists(place )
+    if is_exist is True:
+        data_fram =  pd.read_csv(place, sep='\t')
+        data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
+        data_fram.to_csv(place ,mode='w', sep='\t',index = False, header=True)
+    else:
+        log2.info("pipeline txt file does not exist")
+
+def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,pip_nm) -> bool:
+    """ function for reading data from mysql table"""
+    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
+    paths_data["audit_path"]+task_id+\
+                '_audit_'+run_id+'.json'
+    try:
+        engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
+        sys.path.insert(0, engine_code_path)
+        #importing audit function from orchestrate script
+        from engine_code import audit
+        conn3 = establish_conn(json_data, 'source',config_file_path)
+        log2.info('reading data from mysql started')
+        connection = conn3.raw_connection()
+        cursor = connection.cursor()
+        sql = f'SELECT count(0) from {json_data["task"]["source"]["table_name"]};'
+        cursor.execute(sql)
+        myresult = cursor.fetchall()
+        audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+        log2.info('the number of records present in source table before ingestion:%s',
+        myresult[-1][-1])
+        count1 = 0
+        if json_data["task"]["source"]["query"] == " ":
+            log2.info("reading from mysql table: %s",
+            json_data["task"]["source"]["table_name"])
+            default_columns = None if json_data["task"]["source"]["select_columns"]==" "\
+            else list(json_data["task"]["source"]["select_columns"].split(","))
+            for query in pd.read_sql_table(json_data["task"]["source"]["table_name"], conn3,\
+            columns = default_columns, \
+            chunksize = json_data["task"]["source"]["chunk_size"]):
+                count1+=1
+                log2.info('%s iteration' , str(count1))
+                yield query
+        else:
+            log2.info("reading from sql query")
+            log2.info('sql_query: %s',json_data["task"]["source"]["query"])
+            for query in pd.read_sql(json_data["task"]["source"]["query"],
+            conn3, chunksize = json_data["task"]["source"]["chunk_size"]):
+                count1+=1
+                log2.info('%s iteration' , str(count1))
+                yield query
+        conn3.dispose()
+        return True
+    except Exception as error:
+        status = 'FAILED'
+        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        log2.exception("read_data_from_mysql() is %s", str(error))
+        raise error
