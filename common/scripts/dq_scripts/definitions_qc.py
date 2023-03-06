@@ -436,7 +436,7 @@ loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq
                     'Total number of records present in above table are %s', myresult[-1][-1])
             elif ing_type in {'mysql_read', 'mysql_write'}:
                 password = decrypt(conn_str['password'])
-                conn = sqlalchemy.create_engine(f'mysql://{conn_str["user"]}'
+                conn = sqlalchemy.create_engine(f'mysql+pymysql://{conn_str["user"]}'
                 f':{password.replace("@", "%40")}@{conn_str["host"]}'
                 f':{int(conn_str["port"])}/{conn_str["database"]}', encoding='utf-8')
                 pd_df = pd.read_sql(f'select * from {loc}', conn)
