@@ -930,6 +930,13 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
             'mysql_write', 'snowflake_write'}:
                 post_check_result = qc_check(
                     prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
+                        'table_name'],'post_check', main_json_file['task'][
+                        'target']['target_type'], main_json_file['task']['target'][
+                        'table_name'], default_encoding, default_sheetnum,
+                        tgt_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+            elif main_json_file['task']['target']['target_type'] in {'snowflake_write'}:
+                post_check_result = qc_check(
+                    prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
                     'table_name'],'post_check', main_json_file['task'][
                     'target']['target_type'], tgt_conn_str["database"]+'.'+main_json_file[
                     'task']['target']['schema']+'.'+main_json_file['task']['target'][
