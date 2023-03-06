@@ -56,7 +56,7 @@
         {
             "dq_id": "2",
             "check": "column_values_to_not_be_null",
-            "parameters": {"column": "ordernumber"},
+            "parameters": {"column": "ORDERNUMBER"},
             "active": "Y",
             "ignore_bad_records": "Y",
             "threshold_bad_records": 40,
