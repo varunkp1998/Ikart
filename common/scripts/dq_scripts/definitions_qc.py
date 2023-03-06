@@ -927,7 +927,7 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
                     'target_file_name'], default_encoding, default_sheetnum,
                     tgt_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
             elif main_json_file['task']['target']['target_type'] in {'postgres_write',
-            'mysql_write', 'snowflake_write'}:
+            'mysql_write'}:
                 post_check_result = qc_check(
                     prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
                         'table_name'],'post_check', main_json_file['task'][
