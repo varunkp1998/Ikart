@@ -1,0 +1,324 @@
+  {
+  "project_id": "1234",		
+  "project_name": "intellikart",	
+  "task": {
+    "src_archive_required":"Y",
+    "tgt_archive_required":"N",
+    "source": {
+        "source_type": "csv_read",
+        "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+        "source_file_name": "sales_data",
+        "delimiter":",",
+        "skip_header":" ",
+        "skip_footer":" ",
+        "quote_char": " ",
+        "escape_char":" ",
+        "alias_columns":" ",
+        "select_columns": " ",
+        "chunk_size":1000,				
+        "encoding": "utf-8"
+    },
+    "target": {	
+      "target_type": "mysql_write",
+      "connection_name": "mysql_1",
+      "table_name": "sales_18",
+      "operation":"create",
+      "audit_columns":  "inactive"
+    },
+	"data_quality_execution":{
+            "pre_check_enable":"Y",
+            "post_check_enable":"Y"
+        },
+    "data_quality_features":{
+        "dq_process_rejected_records": "N",
+        "dq_perform_qc_on_corrected_file": "N",
+        "dq_auto_correction_required":"N",
+        "dq_auto_correct_columns": {"county":"county_nm", "state":"stt"},
+        "dq_lkup_key_column": {"zip":"zip_code"},
+        "dq_lookup_file_path":"C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
+        "data_masking_required": "N",
+        "data_masking_columns":{"msk_date":"0,DateOfBirth", 
+                                "msk_alpha":"x,PersonalEmail,IBAN", 
+                                "msk_numeric":"*,BSNNumber,account_no" },
+        "data_encryption_required":"N",
+        "data_decryption_required":"N",
+        "data_encryption_columns":"LastName, IBAN, PersonalEmail",
+        "data_decryption_columns":"LastName, PersonalEmail"
+    },
+  "data_quality": [
+    {
+        "s.no": "1",
+        "check": "column_values_to_be_unique",
+        "parameters": {"col":"SALES"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "2",
+        "check": "column_values_to_be_between",
+        "parameters": {"col":"SALES", "min":"0", "max":"20000"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 30,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "3",
+        "check": "column_values_to_not_be_null",
+        "parameters": {"col":"ORDERNUMBER"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 10,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "4",
+        "check": "column_values_to_be_null",
+        "parameters": {"col":"STATE"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "5",
+        "check": "table_row_count_to_equal",
+        "parameters": {"val":"2000"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "6",
+        "check": "column_values_to_be_of_type",
+        "parameters": {"col":"ORDERNUMBER", "d_type":"int64"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 0,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "7",
+        "check": "column_values_to_be_in_set",
+        "parameters": {"col":"TERRITORY", "set":"['NA','EMEA']"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 30,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "8",
+        "check": "column_to_exist",
+        "parameters": {"col":"STATUS"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+      },
+      {
+        "s.no": "9",
+        "check": "table_columns_to_match_ordered_list",
+        "parameters": {"list":"['ORDERNUMBER', 'QUANTITYORDERED', 'PRICEEACH', 'ORDERLINENUMBER', 'SALES']"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+        },
+        {
+        "s.no": "10",
+        "check": "table_row_count_to_be_between",
+        "parameters": {"min":"0", "max":"2000"},
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+        },
+        {
+          "s.no": "11",
+          "check": "column_values_to_be_in_type_list",
+          "parameters": {"col":"ADDRESSLINE1", "type_list":"['int', 'string']"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+        },
+        {
+          "s.no": "12",
+          "check": "column_values_to_be_increasing",
+          "parameters": {"col":"ORDERNUMBER"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 30,
+        "type": "pre_check"
+        },
+        {
+          "s.no": "13",
+          "check": "column_values_to_be_decreasing",
+          "parameters": {"col":"ORDERNUMBER"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 10,
+        "type": "pre_check"
+        },
+        {
+          "s.no": "14",
+          "check": "column_value_lengths_to_be_between",
+          "parameters": {"col":"DEALSIZE", "min":"1", "max":"6"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+        },
+        {
+          "s.no": "15",
+          "check": "column_value_lengths_to_equal",
+          "parameters": {"col":"STATUS", "val":"7"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+        },
+        {
+          "s.no": "16",
+          "check": "column_values_to_match_strftime_format",
+          "parameters": {"col":"ORDERDATE", "format":"%m/%d/%y"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+          },
+          {
+          "s.no": "17",
+          "check": "column_distinct_values_to_be_in_set",
+          "parameters": {"col":"QTR_ID", "set":"[1, 2, 3, 4]"},
+          "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 20,
+        "type": "pre_check"
+          },
+          {
+            "s.no": "18",
+            "check": "column_mean_to_be_between",
+            "parameters": {"col":"QUANTITYORDERED", "min":"0.0", "max":"35.0"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "pre_check"
+          },
+          {
+            "s.no": "19",
+            "check": "column_median_to_be_between",
+            "parameters": {"col":"QUANTITYORDERED","min":"0","max":"35"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 30,
+            "type": "pre_check"
+          },
+          {
+            "s.no": "20",
+            "check": "column_unique_value_count_to_be_between",
+            "parameters": {"col":"ORDERNUMBER","min":"10100","max":"10500"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 10,
+            "type": "pre_check"
+          },
+          {
+            "s.no": "21",
+            "check": "column_most_common_value_to_be_in_set",
+            "parameters": {"col":"PRICEEACH", "set":"['95', '100']"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "pre_check"
+          },
+          {
+            "s.no": "22",
+            "check": "column_max_to_be_between",
+            "parameters": {"col":"QTR_ID","min":"1","max":"4"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "pre_check"
+          },
+          {
+            "s.no": "23",
+            "check": "column_min_to_be_between",
+            "parameters": {"col":"qtr_id","min":"1","max":"4"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 0,
+            "type": "post_check"
+          },
+          {
+            "s.no": "24",
+            "check": "column_sum_to_be_between",
+            "parameters": {"col":"qtr_id","min":"0","max":"6000"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 0,
+            "type": "post_check"
+          },
+          {
+            "s.no": "25",
+            "check": "select_column_values_to_be_unique_within_record",
+            "parameters": {"col_vals":"['ordernumber', 'phone']"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "post_check"
+          },
+          {
+            "s.no": "26",
+            "check": "multicolumn_sum_to_equal",
+            "parameters": {"multi_col":"['qtr_id', 'month_id']","val":"6000"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "post_check"
+            },
+            {
+            "s.no": "27",
+            "check": "column_pair_values_A_to_be_greater_than_B",
+            "parameters": {"col_A":"sales", "col_B":"priceeach"},
+            "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "post_check"
+            },
+            {
+              "s.no": "28",
+              "check": "column_values_to_match_regex",
+              "parameters": {"col":"status","regex":"^S"},
+              "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "post_check"
+              },
+              {
+              "s.no": "29",
+              "check": "column_values_to_not_match_regex",
+              "parameters": {"col":"status","regex":"^S"},
+              "active": "Y",
+            "ignore_bad_records": "N",
+            "threshold_bad_records": 20,
+            "type": "post_check"
+              },
+              {
+                "s.no": "30",
+                "check": "column_values_to_match_regex_list",
+                "parameters": {"col":"status","regex_lst":"['^S', '^I', '^D', '^C', '^O', '^R']"},
+                "active": "Y",
+                "ignore_bad_records": "N",
+                "threshold_bad_records": 20,
+                "type": "post_check" 
+            }
+    ],
+    "on_failure": ""
+    }
+    }   
+  
+  
