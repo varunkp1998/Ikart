@@ -338,7 +338,8 @@ def download_task_files(prj_nm,task_name:str, paths_data:str):
         log2.exception("error in download_task_files %s.", str(error))
         raise error
 
-def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:str,run_id:str,log_file_name):
+def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:str,run_id:str,
+    log_file_path,log_file_name):
     """executes pipeline flow"""
     try:
         # initiate_logging('log',r"D:\\")
@@ -354,7 +355,7 @@ def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:
         import orchestrate
         log1.info("calling the orchestrate_calling function")
         orchestrate.orchestrate_calling(prj_nm,paths_data,task_name,pipeline_name,run_id,
-        log_file_name)
+        log_file_path,log_file_name)
         # return begin
     except Exception as error:
         log1.exception("error in execute_pipeline_download %s.", str(error))
