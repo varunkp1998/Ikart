@@ -66,7 +66,7 @@ def create_folder_structure(prj_nm,path: str):
         os.chdir(path+'Program/'+prj_nm+'/')
         if not os.path.exists('Pipeline'):
             os.makedirs('Pipeline')
-        os.chdir(path+'Program/'+prj_nm+'/Pipeline')        
+        os.chdir(path+'Program/'+prj_nm+'/Pipeline')
         if not os.path.exists('Task'):
             os.makedirs('Task')
         if not os.path.exists('json'):
@@ -106,7 +106,8 @@ def download_pipeline_json(prj_nm,pipeline_name:str,paths_data:str):
         path_check = pipeline_json_path+pipeline_name+'.json'
         is_exist = os.path.exists(path_check)
         log1.info('pipeline.json file exists: %s', is_exist)
-        log1.info("pipeline_path:%s",paths_data["projects"][prj_nm]["GH_pipeline_path"]+pipeline_name+'.json')
+        log1.info("pipeline_path:%s",paths_data["projects"][prj_nm]["GH_pipeline_path"]+
+        pipeline_name+'.json')
         if is_exist is False:
             dwn_json = ['curl', '-o',pipeline_json_path+pipeline_name+'.json',
             paths_data["projects"][prj_nm]["GH_pipeline_path"]+pipeline_name+'.json']
@@ -226,8 +227,8 @@ def task_json_download(prj_nm,task_name:str, paths_data:str):
         is_exist = os.path.exists(path_check)
         log2.info('%s.json exists: %s', task_name,is_exist)
         if is_exist is False:
-            dwn_json =  ['curl', '-o', json_path+task_name+'.json',paths_data["projects"][prj_nm]["GH_task_jsons_path"]
-            +task_name+'.json']
+            dwn_json =  ['curl', '-o', json_path+task_name+'.json',paths_data["projects"][prj_nm]
+            ["GH_task_jsons_path"]+task_name+'.json']
             subprocess.call(dwn_json)
             log2.info("downloading %s.json from Github completed",task_name)
             log2.info('#####################################################')
@@ -245,7 +246,7 @@ def download_task_files(prj_nm,task_name:str, paths_data:str):
             paths_data["task_json_path"]
             +task_name+".json","r",
             encoding='utf-8') as jsonfile:
-                config_json = json.load(jsonfile)            
+                config_json = json.load(jsonfile)
         except FileNotFoundError as exc:
             log2.warning("the %s.json path or folder specified does not exists",task_name)
             raise exc
@@ -253,6 +254,18 @@ def download_task_files(prj_nm,task_name:str, paths_data:str):
         if (config_json['task']['source']['source_type'])  not in ("csv_read","csvfile_read",
         "excelfile_read","parquetfile_read","jsonfile_read","xmlfile_read","textfile_read"):
             source_conn_file = config_json['task']['source']['connection_name']
+            url=paths_data["GH_config_file_path"]+source_conn_file+'.json'
+            response = requests.get(url)
+            # log1.info(response.status_code)
+            if response.status_code == 200:
+                url_exists = bool(response.status_code)
+                log1.info("The source connection json file exists in the  GITHUB repository.")
+            else:
+                url_exists = bool(not response.status_code)
+                log1.info("The source connection file DOES NOT exists in the GITHUB repository")
+            if url_exists is False  :
+                log1.info("PROCESS got ABORTED")
+                sys.exit()
             source_path_check = paths_data["folder_path"]+paths_data["config_path"]+\
             source_conn_file+'.json'
             is_exist = os.path.exists(source_path_check)
@@ -270,6 +283,18 @@ def download_task_files(prj_nm,task_name:str, paths_data:str):
         "parquetfile_write","excelfile_write","jsonfile_write","xmlfile_write","textfile_write"):
             #curl command for downloading the target connection JSON
             target_conn_file = config_json['task']['target']['connection_name']
+            url=paths_data["GH_config_file_path"]+target_conn_file+'.json'
+            response = requests.get(url)
+            # log1.info(response.status_code)
+            if response.status_code == 200:
+                url_exists = bool(response.status_code)
+                log1.info("The target connection json file exists in the  GITHUB repository.")
+            else:
+                url_exists = bool(not response.status_code)
+                log1.info("The target connection file DOES NOT exists in the GITHUB repository")
+            if url_exists is False  :
+                log1.info("PROCESS got ABORTED")
+                sys.exit()
             target_path_check = paths_data["folder_path"]+paths_data["config_path"]+\
             target_conn_file+'.json'
             # Check whether the specified path exists or not
@@ -313,7 +338,7 @@ def download_task_files(prj_nm,task_name:str, paths_data:str):
         log2.exception("error in download_task_files %s.", str(error))
         raise error
 
-def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:str,run_id:str):
+def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:str,run_id:str,log_file_name):
     """executes pipeline flow"""
     try:
         # initiate_logging('log',r"D:\\")
@@ -328,7 +353,8 @@ def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:
         sys.path.insert(0, orchestration_script)
         import orchestrate
         log1.info("calling the orchestrate_calling function")
-        orchestrate.orchestrate_calling(prj_nm,paths_data,task_name,pipeline_name,run_id)
+        orchestrate.orchestrate_calling(prj_nm,paths_data,task_name,pipeline_name,run_id,
+        log_file_name)
         # return begin
     except Exception as error:
         log1.exception("error in execute_pipeline_download %s.", str(error))

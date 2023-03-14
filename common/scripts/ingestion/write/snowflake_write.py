@@ -198,7 +198,7 @@ def drop(json_data: dict, conn: dict,conn_details) -> bool:
             conn.execution_options(autocommit=True).execute(drop_query)
             log2.info("snowflake dropping table completed")
             # sys.exit()
-            return "Fail"
+            return "drop_Pass"
             # log2.info(" table drop finished, started inserting data into
             #  %s table", json_data["table"])
             # for chunk in dataframe:
@@ -288,13 +288,6 @@ def write(prj_nm,json_data, datafram ,counter,config_file_path,task_id,run_id,pa
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+\
                 '_audit_'+run_id+'.json'
-    # if pip_nm == "-9999":
-    #     #declaring audit json path for auditing purpose
-    #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+task_id+\
-    #             '_audit_'+run_id+'.json'
-    # else:
-    #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+pip_nm+\
-    #             '_audit_'+run_id+'.json'
     try:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
@@ -320,16 +313,19 @@ def write(prj_nm,json_data, datafram ,counter,config_file_path,task_id,run_id,pa
         elif json_data["task"]["target"]["operation"] not in ("create", "append","truncate",
             "drop","replace"):
             log2.error("give proper input for operation to be performed on table")
-            sys.exit()
-        connection = conn2.raw_connection()
-        cursor = connection.cursor()
-        schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
-        sql = f'SELECT count(0) from  {schema_name}.{json_data["task"]["target"]["table_name"]};'
-        cursor.execute(sql)
-        myresult = cursor.fetchall()
-        audit(audit_json_path,json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1])
-        log2.info('the number of records present in target table after ingestion:%s',
-        myresult[-1][-1])
+            # sys.exit()
+            status = "Fail"
+        if json_data["task"]["target"]["operation"] in ("create", "append","truncate",
+            "replace"):
+            connection = conn2.raw_connection()
+            cursor = connection.cursor()
+            schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
+            sql = f'SELECT count(0) from {schema_name}.{json_data["task"]["target"]["table_name"]};'
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+            audit(audit_json_path,json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1])
+            log2.info('the number of records present in target table after ingestion:%s',
+            myresult[-1][-1])
         conn2.dispose()
         return status
     except ProgrammingError : #to handle table not found issue

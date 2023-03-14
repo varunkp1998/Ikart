@@ -3,7 +3,9 @@ import logging
 import os
 import sys
 import sqlalchemy
+import pymysql
 import pandas as pd
+
 
 from utility import get_config_section,decrypt
 
@@ -16,7 +18,7 @@ def establish_conn(json_data: dict, json_section: str,config_file_path:str) -> b
         connection_details = get_config_section(config_file_path+json_data["task"][json_section]
         ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
         password = decrypt(connection_details["password"])
-        conn1 = sqlalchemy.create_engine(f'mysql://{connection_details["user"]}'
+        conn1 = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["user"]}'
         f':{password.replace("@", "%40")}@{connection_details["host"]}'
         f':{int(connection_details["port"])}/{connection_details["database"]}', encoding='utf-8')
         # logging.info("connection established")
@@ -51,16 +53,16 @@ def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,
         log2.info('reading data from mysql started')
         connection = conn3.raw_connection()
         cursor = connection.cursor()
-        sql = f'SELECT count(0) from {json_data["task"]["source"]["table_name"]};'
-        cursor.execute(sql)
-        myresult = cursor.fetchall()
-        audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
-        log2.info('the number of records present in source table before ingestion:%s',
-        myresult[-1][-1])
         count1 = 0
         if json_data["task"]["source"]["query"] == " ":
             log2.info("reading from mysql table: %s",
             json_data["task"]["source"]["table_name"])
+            sql = f'SELECT count(0) from {json_data["task"]["source"]["table_name"]};'
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            log2.info('the number of records present in source table before ingestion:%s',
+            myresult[-1][-1])
             default_columns = None if json_data["task"]["source"]["select_columns"]==" "\
             else list(json_data["task"]["source"]["select_columns"].split(","))
             for query in pd.read_sql_table(json_data["task"]["source"]["table_name"], conn3,\
@@ -71,6 +73,13 @@ def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,
                 yield query
         else:
             log2.info("reading from sql query")
+            sql = f'SELECT count(0) from ({json_data["task"]["source"]["query"]}) as d;'
+            log2.info(sql)
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            log2.info('the number of records present in source table before ingestion:%s',
+            myresult[-1][-1])
             log2.info('sql_query: %s',json_data["task"]["source"]["query"])
             for query in pd.read_sql(json_data["task"]["source"]["query"],
             conn3, chunksize = json_data["task"]["source"]["chunk_size"]):
@@ -79,6 +88,12 @@ def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,
                 yield query
         conn3.dispose()
         return True
+    except pymysql.err.ProgrammingError: #to handle table not found issue
+        log2.error("the table name or connection specified in the task is incorrect/doesnot exists")
+        status = 'FAILED'
+        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        sys.exit()
     except Exception as error:
         status = 'FAILED'
         write_to_txt(prj_nm,task_id,status,run_id,paths_data)

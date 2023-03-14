@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy.exc import OperationalError
 import sqlalchemy
 import pandas as pd
+import pymysql
 from utility import get_config_section,decrypt
 
 log2 = logging.getLogger('log2')
@@ -17,7 +18,7 @@ def establish_conn(json_data: dict, json_section: str,config_file_path:str) -> b
         connection_details = get_config_section(config_file_path+json_data["task"][json_section]\
         ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
         password = decrypt(connection_details["password"])
-        conn = sqlalchemy.create_engine(f'mysql://{connection_details["user"]}'
+        conn = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["user"]}'
         f':{password.replace("@", "%40")}@{connection_details["host"]}'
         f':{int(connection_details["port"])}/{connection_details["database"]}', encoding='utf-8')
         # logging.info("connection established")
@@ -70,9 +71,19 @@ def create(json_data: dict, conn, datafram,conn_details:str)-> bool:
             json_data["task"]["target"]["table_name"])
             # sys.exit()
             return "Fail"
-    except Exception as error:
-        log2.exception("create() is %s", str(error))
-        raise error
+    except OperationalError as error:
+        if 'Duplicate column name' in str(error):
+            log2.error("there are duplicate column names in the target table")
+            # status = 'FAILED'
+            # write_to_txt(prj_nm,task_id,'FAILED',run_id,paths_data)
+            # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+            # # return "Fail"
+            sys.exit()
+        else:
+            log2.info("else")
+            # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
+            log2.exception("create() is %s", str(error))
+            raise error
 
 def append(json_data: dict, conn: dict, dataframe, conn_details) -> bool:
     """if table exists, it will append"""
@@ -229,7 +240,7 @@ def drop(json_data: dict, conn: dict) -> bool:
             conn.execution_options(autocommit=True).execute(drop_query)
             log2.info("mysql dropping table completed")
             # sys.exit()
-            return "Fail"
+            return "drop_Pass"
             # log2.info(" table drop finished, started inserting data into
             #  %s table", json_data["table"])
             # for chunk in dataframe:
@@ -285,27 +296,40 @@ def write(prj_nm,json_data: dict, datafram, counter: int,config_file_path:str,ta
             status=truncate(json_data, conn, datafram, counter,conn_details)
         elif json_data["task"]["target"]["operation"] == "drop":
             status=drop(json_data, conn)
+            # log2.info(status)
         elif json_data["task"]["target"]["operation"] == "replace":
             status=replace(json_data, conn, datafram, counter,conn_details)
         elif json_data["task"]["target"]["operation"] not in ("create", "append",
             "truncate", "drop","replace"):
             log2.error("give propper input for operation condition")
-            sys.exit()
-        connection = conn.raw_connection()
-        cursor = connection.cursor()
-        sql = f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};'
-        cursor.execute(sql)
-        myresult = cursor.fetchall()
-        audit(audit_json_path,json_data, task_id,'TRGT_RECORD_COUNT',myresult[-1][-1])
-        log2.info('the number of records present in target table after ingestion:%s',
-        myresult[-1][-1])
+            status = "Fail"
+            # sys.exit()
+        if json_data["task"]["target"]["operation"] != "drop":
+            connection = conn.raw_connection()
+            cursor = connection.cursor()
+            sql = f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};'
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+            audit(audit_json_path,json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1])
+            log2.info('the number of records present in target table after ingestion:%s',
+            myresult[-1][-1])
         conn.dispose()
         # return myresult[-1][-1]
         return status
+    # except OperationalError:
+    #     # log2.error("there are duplicate column names in the target table")
+    #     status = 'FAILED'
+    #     write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+    #     audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+    #     sys.exit()
+    # except pymysql.err.ProgrammingError: #to handle table not found issue
+    #     log2.error("the table name or connection specified in the task is incorrect/doesnot exists")
+    #     status = 'FAILED'
+    #     write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+    #     audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+    #     sys.exit()
     except Exception as error:
-        status = 'FAILED'
-        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+        write_to_txt(prj_nm,task_id,'FAILED',run_id,paths_data)
         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         log2.exception("write() is %s", str(error))
         raise error
-    

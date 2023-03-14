@@ -4,7 +4,6 @@ import logging
 import sys
 import os
 from datetime import datetime
-# from multiprocessing import RLock
 from os import path
 import pandas as pd
 
@@ -27,8 +26,6 @@ def write_to_txt1(prj_nm,task_id,status,run_id,paths_data):
 
 def audit(json_file_path,json_data, task_name,run_id,status,value):
     """ create audit json"""
-    # audit_data = []
-    # file_lock=RLock()
     try:
         if path.isfile(json_file_path) is False:
             log2.info('audit started')
@@ -80,12 +77,6 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm):
     import definitions_qc as dq
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+'_audit_'+run_id+'.json'
-    # if pip_nm == "-9999":
-    #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+task_id+\
-    #             '_audit_'+run_id+'.json'
-    # else:
-    #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+pip_nm+\
-    #             '_audit_'+run_id+'.json'
     try:
         with open(r""+paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
         paths_data["task_json_path"]+task_id+".json","r",encoding='utf-8') as jsonfile:
@@ -97,7 +88,6 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm):
     except Exception as error:
         log2.exception("error in reading json %s.", str(error))
         raise error
-
     try:
         with open(r""+paths_data["folder_path"]+paths_data["dq_scripts_path"]+\
         "checks_mapping.json","r",encoding='utf-8') as json_data_new:
@@ -214,6 +204,11 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm):
                         write_to_txt1(prj_nm,task_id,'FAILED',run_id,paths_data)
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         log2.warning("%s  got failed engine", task_id)
+                        return False
+                    if value=='drop_Pass':
+                        write_to_txt1(prj_nm,task_id,'SUCCESS',run_id,paths_data)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','COMPLETED')
+                        log2.info('Task %s Execution Completed',task_id)
                         return False
                 else:
                     value=write(json_data, i,counter)

@@ -86,6 +86,7 @@ if __name__ == "__main__":
                         LOGGING_PATH=PATH + paths_data["Program"]+prj_nm+\
                         paths_data["pipeline_log_path"]
                         setup_logger('log1', LOGGING_PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log')
+                        LOG_NAME = str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log'
                         log1 = logging.getLogger('log1')
                         log1.info("logging operation started.")
                         logging.info("The json file %s exists in the GITHUB repository",arg_job_nm)
@@ -103,7 +104,7 @@ if __name__ == "__main__":
                         import download
                         log1.info("Master execution started")
                         download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
-                        arg_job_pip_nm,RUN_ID)
+                        arg_job_pip_nm,RUN_ID,LOG_NAME)
             else: #if log folder structure does not exists already
                 if (arg_job_pip_nm == -9999) or (arg_job_nm !=-9999 and arg_job_pip_nm !=-9999) or \
                 (str(arg_job_nm) != "-9999"):
@@ -118,6 +119,7 @@ if __name__ == "__main__":
                         RUN_ID= str(datetime.now().strftime("%Y%m%d%H%M%S") +'_'+ str(random.
                         randint(1,999)))
                         setup_logger('log1', PATH+str(arg_job_nm)+"_PipelineLog_"+RUN_ID+'.log')
+                        LOG_NAME = str(arg_job_nm)+"_PipelineLog_"+RUN_ID+'.log'
                         log1 = logging.getLogger('log1')
                         log1.info("logging operation started...")
                         log1.info("The json file %s exists in the  GITHUB repository",arg_job_nm)
@@ -135,7 +137,7 @@ if __name__ == "__main__":
                         import download
                         log1.info("Master execution started")
                         download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
-                        arg_job_pip_nm,RUN_ID)
+                        arg_job_pip_nm,RUN_ID,LOG_NAME)
         elif arg_job_pip_nm != -9999:
             #if pipeline name exists
             # print("entered into pipeline or task")
@@ -168,6 +170,7 @@ if __name__ == "__main__":
                             # initiate_logging(str(arg_job_nm)+"_TaskLog_"+RUN_ID,LOGGING_PATH)
                             setup_logger('log1',LOGGING_PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+
                             '.log')
+                            LOG_NAME = str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log'
                             log1 = logging.getLogger('log1')
                             log1.info("logging operation started.")
                             log1.info("The json file %s exists in the  GITHUB repository.",
@@ -186,7 +189,7 @@ if __name__ == "__main__":
                             import download
                             log1.info("Master execution started")
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
-                            arg_job_pip_nm,RUN_ID)
+                            arg_job_pip_nm,RUN_ID,LOG_NAME)
                     else:
                         url=paths_data["projects"][arg_prj_nm]["GH_pipeline_path"]+arg_job_pip_nm+ \
                         '.json'
@@ -205,6 +208,7 @@ if __name__ == "__main__":
                             randint(1,999)))
                             setup_logger('log1',LOGGING_PATH+str(arg_job_pip_nm)+"_PipelineLog_"+
                             RUN_ID+'.log')
+                            LOG_NAME = str(arg_job_pip_nm)+"_PipelineLog_"+RUN_ID+'.log'
                             log1 = logging.getLogger('log1')
                             log1.info("logging operation started..")
                             log1.info("The json file %s exists in the  GITHUB repository.",
@@ -223,7 +227,7 @@ if __name__ == "__main__":
                             import download
                             log1.info("Master execution started")
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
-                            arg_job_pip_nm,RUN_ID)
+                            arg_job_pip_nm,RUN_ID,LOG_NAME)
                 else: #if log folder structure does not exists already
                     if (arg_job_pip_nm == -9999) or (arg_job_nm !=-9999 and
                     arg_job_pip_nm !=-9999) or (str(arg_job_nm) != "-9999"):
@@ -239,6 +243,7 @@ if __name__ == "__main__":
                             RUN_ID=str(datetime.now().strftime("%Y%m%d%H%M%S") +'_'+ str(random.
                             randint(1,999)))
                             setup_logger('log1', PATH+str(arg_job_nm)+"_PipelineLog_"+RUN_ID+'.log')
+                            LOG_NAME = str(arg_job_nm)+"_PipelineLog_"+RUN_ID+'.log'
                             log1 = logging.getLogger('log1')
                             log1.info("logging operation started...")
                             log1.info("The json file %s exists in the  GITHUB repository.",
@@ -257,7 +262,7 @@ if __name__ == "__main__":
                             import download
                             log1.info("Master execution started")
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
-                            arg_job_pip_nm, RUN_ID)
+                            arg_job_pip_nm, RUN_ID,LOG_NAME)
                     else:
                         url=paths_data["projects"][arg_prj_nm]["GH_pipeline_path"]+arg_job_pip_nm+ \
                         '.json'
@@ -273,6 +278,7 @@ if __name__ == "__main__":
                             randint(1,999)))
                             setup_logger('log1', PATH+str(arg_job_pip_nm)+"_PipelineLog_"+RUN_ID+
                             '.log')
+                            LOG_NAME = str(arg_job_pip_nm)+"_PipelineLog_"+RUN_ID+'.log'
                             log1 = logging.getLogger('log1')
                             log1.info("logging operation started....")
                             log1.info("The json file %s exists in the  GITHUB repository.",
@@ -291,7 +297,7 @@ if __name__ == "__main__":
                             import download
                             log1.info("Master execution started")
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
-                            arg_job_pip_nm,RUN_ID)
+                            arg_job_pip_nm,RUN_ID,LOG_NAME)
     except Exception as error:
         log1.error("exception occured")
         # print("exception occured")

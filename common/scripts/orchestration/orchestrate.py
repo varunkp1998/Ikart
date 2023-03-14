@@ -4,8 +4,12 @@ import logging
 import time
 import sys
 import os
-from os import path
+import smtplib
 from datetime import datetime
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from os import path
 import multiprocessing as mp
 import pandas as pd
 import download
@@ -325,7 +329,53 @@ def copy(src_path,target_path):
         log1.exception("error in copying json json %s.", str(error))
         raise error
 
-def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
+def send_mail(message, prj_nm,paths_data,name,log_file_name):
+    """Function to send emails for notyfying users on job status"""
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = paths_data["from_addr"]
+        msg['To'] = paths_data["to_addr"]
+        if message == "FAILED":
+            msg['Subject'] = f"{name} execution Failed on {str(datetime.now())}"
+            body = f"""<p>Hi Team,</p>
+                       <p style="color:red;">The {name} in {prj_nm}'s project Execution Failed.</p>
+                       <p>Thanks and Regards,</p>
+                       <p>{paths_data["team_nm"]}</p>"""
+        elif message == "STARTED":
+            msg['Subject'] = f"{name} execution Started on {str(datetime.now())}"
+            body = f"""<p>Hi Team,</p>
+                       <p style="color:green;"> The {name} in {prj_nm}'s project has been Started.</p>
+                       <p>Thanks and Regards,</p>
+                       <p>{paths_data["team_nm"]}</p>"""
+        elif message == "COMPLETED":
+            msg['Subject'] = f"{name} execution Finished on {str(datetime.now())}"
+            body = f"""<p>Hi Team,</p>
+                       <p style="color:green;"> The {name} in {prj_nm}'s project  has been completed.</p>
+                       <p>Thanks and Regards,</p>
+                       <p>{paths_data["team_nm"]}</p>"""
+        msg.attach(MIMEText(body, 'html'))
+        if message != "STARTED":
+            # path_log = f"/app/intel_new_1/+{prj_nm}+/ingestion_kart/Pipeline/logs/"
+            path_log = paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
+            paths_data["pipeline_log_path"]
+            # log_file = "321_excel_to_csv_TaskLog_20230313142543_673.log"
+            with open(path_log+log_file_name, "rb") as log_data:
+                attachment = MIMEApplication(log_data.read(), _subtype="txt")
+                attachment.add_header('Content-Disposition', 'attachment',
+                                      filename=log_file_name)
+                msg.attach(attachment)
+        server = smtplib.SMTP(paths_data["EMAIL_SMTP"],paths_data["EMAIL_PORT"])
+        server.starttls()
+        text = msg.as_string()
+        server.login(paths_data["email_user_name"],paths_data["email_password"])
+        server.sendmail(paths_data["from_addr"], paths_data["to_addr"].split(','), text)
+        log1.info('mail sent')
+        server.quit()
+    except Exception as error:
+        log1.exception("Connection to mail server failed %s", str(error))
+        raise error
+
+def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id,log_file_name):
     """executes the orchestration at task or
     pipeline level based on the command given"""
 # if __name__ == "__main__":
@@ -365,19 +415,23 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
             df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
         if task_nm != -9999 and pip_nm != -9999:
             log1.info("execution at task level")
+            send_mail('STARTED', prj_nm,paths_data,task_nm,log_file_name)
             execute_job(prj_nm,paths_data,task_nm,pip_nm,run_id)
             # log1.info("executing the task")
         elif task_nm != -9999: #pip_nm == -9999
             log1.info("execution at task level")
+            send_mail('STARTED', prj_nm,paths_data,task_nm,log_file_name)
             execute_job(prj_nm,paths_data,task_nm,str(pip_nm),run_id)
         elif task_nm == -9999 and pip_nm != -9999:
             log1.info("execution at pipeline level")
+            send_mail('STARTED', prj_nm,paths_data,pip_nm,log_file_name)
             main_job(prj_nm,paths_data,pip_nm,run_id)
             STATUS_LIST=orchestration_execution(prj_nm,paths_data,pip_nm,run_id)
         else:
             log1.info("Please enter the correct command")
     except Exception as error:
         audit(audit_json_path,json_data, pip_nm,run_id,'STATUS','FAILED')
+        send_mail("FAILED", prj_nm,paths_data,pip_nm,log_file_name)
         log1.exception("error in orchestrate_calling %s.", str(error))
         raise error
     finally:
@@ -393,10 +447,12 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
             result = all(x == "SUCCESS" for x in task_status_list)
             if result is False:
                 log1.info("Task %s Execution failed.",task_nm)
+                send_mail("FAILED", prj_nm,paths_data,task_nm,log_file_name)
                 log1.handlers.clear()
                 # log1.shutdown()
             else:
                 log1.info("Task %s Execution ended sucessfully.",task_nm)
+                send_mail("COMPLETED", prj_nm,paths_data,task_nm,log_file_name)
                 log1.handlers.clear()
         else:
             # log1.info("***entered into pip***")
@@ -406,6 +462,7 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
                 audit(audit_json_path,json_data, pip_nm,run_id,'STATUS',
                 'FAILED DUE TO CYCLIC DEPENDENCY')
                 log1.info("pipeline %s Execution FAILED DUE TO CYCLIC DEPENDENCY", pip_nm)
+                send_mail("FAILED", prj_nm,paths_data,pip_nm,log_file_name)
                 log1.handlers.clear()
             else:
                 result = all(x == "SUCCESS" for x in STATUS_LIST)
@@ -413,10 +470,12 @@ def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id):
                 if result is False:
                     audit(audit_json_path,json_data, pip_nm,run_id,'STATUS','FAILED')
                     log1.info("pipeline %s Execution failed.", pip_nm)
+                    send_mail("FAILED", prj_nm,paths_data,pip_nm,log_file_name)
                     log1.handlers.clear()
                 else:
                     audit(audit_json_path,json_data, pip_nm,run_id,'STATUS','COMPLETED')
                     log1.info("pipeline %s Execution ended sucessfully.", pip_nm)
+                    send_mail("COMPLETED", prj_nm,paths_data,pip_nm,log_file_name)
                     log1.handlers.clear()
 
                 #combining the task jsons into pipeline jsons

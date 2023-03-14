@@ -37,21 +37,10 @@ def read(prj_nm,json_data: dict,task_id,run_id,pip_nm,paths_data,delimiter = ","
         audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
         paths_data["audit_path"]+task_id+\
                 '_audit_'+run_id+'.json'
-        # if pip_nm == "-9999":
-        #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+task_id+\
-        #         '_audit_'+run_id+'.json'
-        # else:
-        #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+pip_nm+\
-        #         '_audit_'+run_id+'.json'
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
             json_data["task"]["source"]["source_file_name"])
             status1= 'FAILED'
-            # engine_code_path=path+'/Common/Scripts/engine_main/'
-            # log2.info(engine_code_path)
-            # sys.path.insert(0, engine_code_path)
-            # import engine_code
-            # log2.info("engine code imported")
             write_to_txt(prj_nm,task_id,status1,run_id,paths_data)
             audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
             sys.exit()
@@ -73,35 +62,74 @@ def read(prj_nm,json_data: dict,task_id,run_id,pip_nm,paths_data,delimiter = ","
             default_encoding = "utf-8" if json_data["task"]["source"]["encoding"]==" " else\
             json_data["task"]["source"]["encoding"]
             # print(default_alias_cols)
-            default_header ='infer' if json_data["task"]["source"]["alias_columns"] == " " else None
             count = 0
             # df = pd.DataFrame()
             for file in all_files:
                 count +=1
                 data = pd.read_csv(filepath_or_buffer = file,encoding=default_encoding,
                 low_memory=False)
-                # print(type(data))
                 audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',data.shape[0])
                 row_count = data.shape[0]-default_skip_header-default_skip_footer
                 count1 = 0
-                # print(row_count)
-                for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
-                header = default_header,sep = default_delimiter, usecols = default_select_cols,
-                skiprows = default_skip_header,nrows = row_count,
-                chunksize = json_data["task"]["source"]["chunk_size"],
-                quotechar = default_quotechar, escapechar = default_escapechar,
-                encoding = default_encoding):
-                    # print(type(chunk))
-                    # chunk['inserted_by']=pd.Series("etl_user")
-                    # chunk['inserted_timestamp']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    # chunk['updated_by']=pd.Series("etl_user")
-                    # chunk['updated_timestamp']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    # chunk = chunk.fillna("etl_user")
-                    count1 = 1 + count1
-                    log2.info('%s iteration' , str(count1))
-                    # print(list(chunk.columns))
-                    yield chunk
+                if json_data["task"]["source"]["select_columns"] != " " and \
+                json_data["task"]["source"]["alias_columns"] != " ":
+                    default_header = 0
+                    # print(row_count)
+                    for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
+                    header = default_header,engine='python',sep = default_delimiter,
+                    usecols = default_select_cols, skiprows = default_skip_header,nrows = row_count,
+                    chunksize = json_data["task"]["source"]["chunk_size"],
+                    quotechar = default_quotechar, escapechar = default_escapechar,
+                    encoding = default_encoding):
+                        count1 = 1 + count1
+                        log2.info('%s iteration' , str(count1))
+                        # print(list(chunk.columns))
+                        yield chunk
+                elif json_data["task"]["source"]["select_columns"] != " " and \
+                json_data["task"]["source"]["alias_columns"] == " ":
+                    default_header = 'infer' if json_data["task"]["source"]["alias_columns"]\
+                    == " " else 0
+                    # print(row_count)
+                    for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
+                    header = default_header,sep = default_delimiter, usecols = default_select_cols,
+                    skiprows = default_skip_header,nrows = row_count,
+                    chunksize = json_data["task"]["source"]["chunk_size"],
+                    quotechar = default_quotechar, escapechar = default_escapechar,
+                    encoding = default_encoding):
+                        count1 = 1 + count1
+                        log2.info('%s iteration' , str(count1))
+                        # print(list(chunk.columns))
+                        yield chunk
+                elif json_data["task"]["source"]["select_columns"] == " " and \
+                json_data["task"]["source"]["alias_columns"] != " ":
+                    default_header ='infer' if json_data["task"]["source"]["alias_columns"]\
+                     == " " else 0
+                    # print(row_count)
+                    for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
+                    header = default_header,sep = default_delimiter, usecols = default_alias_cols,
+                    skiprows = default_skip_header,nrows = row_count,
+                    chunksize = json_data["task"]["source"]["chunk_size"],
+                    quotechar = default_quotechar, escapechar = default_escapechar,
+                    encoding = default_encoding):
+                        count1 = 1 + count1
+                        log2.info('%s iteration' , str(count1))
+                        # print(list(chunk.columns))
+                        yield chunk
+                elif json_data["task"]["source"]["select_columns"] == " " and \
+                json_data["task"]["source"]["alias_columns"] == " ":
+                    default_header ='infer' if json_data["task"]["source"]["alias_columns"] ==\
+                     " " else None
+                    # print(row_count)
+                    for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
+                    header = default_header,sep = default_delimiter, usecols = default_select_cols,
+                    skiprows = default_skip_header,nrows = row_count,
+                    chunksize = json_data["task"]["source"]["chunk_size"],
+                    quotechar = default_quotechar, escapechar = default_escapechar,
+                    encoding = default_encoding):
+                        count1 = 1 + count1
+                        log2.info('%s iteration' , str(count1))
+                        # print(list(chunk.columns))
+                        yield chunk
     except Exception as error:
         log2.exception("reading_csv() is %s", str(error))
         raise error
-        

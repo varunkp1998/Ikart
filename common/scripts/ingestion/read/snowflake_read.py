@@ -45,13 +45,6 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+\
                 '_audit_'+run_id+'.json'
-    # if pip_nm == "-9999":
-    #     #declaring audit json path for auditing purpose
-    #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+task_id+\
-    #             '_audit_'+run_id+'.json'
-    # else:
-    #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+pip_nm+\
-    #             '_audit_'+run_id+'.json'
     try:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
@@ -61,18 +54,19 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
         log2.info('reading data from snowflake started')
         connection = conn3.raw_connection()
         cursor = connection.cursor()
-        schema_name =conn_details["database"]+'.'+ json_data["task"]["source"]["schema"]
-        sql = f'SELECT count(0) from  {schema_name}.{json_data["task"]["source"]["table_name"]};'
-        # sql = f'SELECT count(0) from  {json_data["task"]["source"]["table_name"]};'
-        cursor.execute(sql)
-        myresult = cursor.fetchall()
-        audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
-        log2.info('the number of records present in source table before ingestion:%s',
-        myresult[-1][-1])
         count1 = 0
         if json_data["task"]["source"]["query"] == " ":
+            #if query is empty it will go to table name execution
             log2.info("reading from snowflake table: %s",
-            json_data["task"]["source"]["table_name"])
+            json_data["task"]["source"]["table_name"])            
+            schema_name =conn_details["database"]+'.'+ json_data["task"]["source"]["schema"]
+            sql = f'SELECT count(0) from {schema_name}.{json_data["task"]["source"]["table_name"]};'
+            # sql = f'SELECT count(0) from  {json_data["task"]["source"]["table_name"]};'
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            log2.info('the number of records present in source table before ingestion:%s',
+            myresult[-1][-1])
             query = (f'select * from {conn_details["database"]}.'
                      f'{json_data["task"]["source"]["schema"]}.'
                      f'{json_data["task"]["source"]["table_name"]}')
@@ -85,7 +79,13 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
                 # log2.info(query)
                 yield query
         else:
+            #if query is  not empty, goes for query execution
             log2.info("reading from sql query")
+            sql = f'SELECT count(0) from ({json_data["task"]["source"]["query"]}) as d;'
+            # log2.info(sql)
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
             log2.info('sql_query: %s',json_data["task"]["source"]["query"])
             for query in pd.read_sql(json_data["task"]["source"]["query"],
             conn3, chunksize = json_data["task"]["source"]["chunk_size"]):
@@ -95,7 +95,7 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
         conn3.dispose()
         return True
     except ProgrammingError : #to handle table not found issue
-        log2.error("the table or connection specified in the command is incorrect")
+        log2.error("the table name or connection specified in the command is incorrect")
         status = 'FAILED'
         write_to_txt(prj_nm,task_id,status,run_id,paths_data)
         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
