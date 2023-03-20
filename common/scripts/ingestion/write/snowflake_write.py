@@ -6,7 +6,7 @@ import os
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 import pandas as pd
-from snowflake.connector.errors import ProgrammingError
+# from snowflake.connector.errors import ProgrammingError
 from utility import get_config_section,decrypt
 
 log2 = logging.getLogger('log2')
@@ -81,6 +81,11 @@ def create(json_data: dict, conn, datafram, conn_details) -> bool:
             json_data["task"]["target"]["table_name"])
             # sys.exit()
             return "Fail"
+    # except ProgrammingError:
+    #     # if 'column "CRTD_BY" of relation' in str(error):
+    #     log2.error("duplicate columns found")
+    #         # sys.exit()
+    #     return "Fail"
     except Exception as error:
         log2.exception("create() is %s", str(error))
         raise error
@@ -115,15 +120,18 @@ def append(json_data: dict, conn: dict, datafram,conn_details) -> bool:
             json_data["task"]["target"]["table_name"])
             # sys.exit()
             return "Fail"
-    except ProgrammingError as error:
-        if 'column "CRTD_BY" of relation' in str(error):
-            log2.error("audit columns not found in the table previously to append")
+    except ProgrammingError:
+        # if 'column "CRTD_BY" of relation' in str(error):
+        log2.error("audit columns not found in the table previously to append")
             # sys.exit()
-            return "Fail"
+        return "Fail"
             # raise Exception("audit columns not found in the table previously") from error
-        else:
-            log2.exception("append() is %s", str(error))
-            raise error
+        # else:
+        #     log2.exception("append() is %s", str(error))
+        #     raise error
+    except Exception as error:
+        log2.exception("append() is %s", str(error))
+        raise error
 
 def truncate(json_data: dict, conn: dict,datafram,counter: int, conn_details) -> bool:
     """if table exists, it will truncate"""
@@ -175,15 +183,23 @@ def truncate(json_data: dict, conn: dict,datafram,counter: int, conn_details) ->
             json_data["task"]["target"]["table_name"])
             # sys.exit()
             return "Fail"
-    except ProgrammingError as error:
-        if 'column "inserted_by" of relation' in str(error):
-            log2.error("audit columns not found in the table previously to insert data")
+    except ProgrammingError:
+        # if 'column "CRTD_BY" of relation' in str(error):
+        log2.error("audit columns not found in the table previously to append")
             # sys.exit()
-            return "Fail"
-            # raise Exception("audit columns not found in the table previously") from error
-        else:
-            log2.exception("append() is %s", str(error))
-            raise error
+        return "Fail"
+    except Exception as error:
+        log2.exception("truncate() is %s", str(error))
+        raise error
+    # except ProgrammingError as error:
+    #     if 'column "inserted_by" of relation' in str(error):
+    #         log2.error("audit columns not found in the table previously to insert data")
+    #         # sys.exit()
+    #         return "Fail"
+    #         # raise Exception("audit columns not found in the table previously") from error
+    #     else:
+    #         log2.exception("append() is %s", str(error))
+    #         raise error
 
 def drop(json_data: dict, conn: dict,conn_details) -> bool:
     """if table exists, it will drop"""
