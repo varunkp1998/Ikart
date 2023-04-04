@@ -1,0 +1,32 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 14,
+  "task_name": "mysql_to_mysql",
+  "task_description": "mysql_to_mysql create in target",
+  "task_type": "create mysql",
+  "task_sequence": "5",
+  "task": {
+    "source": {
+      "schema_name": "INFORMATION_SCHEMA1",
+      "source_type": "mysql_read",
+      "table_name": " ",
+      "query": "select * from sales_18",
+      "chunk_size": "1000",
+      "connection_name": "mysql_1",
+      "select_columns": " "
+    },
+    "target": {
+      "schema_name": "INFORMATION_SCHEMA1",
+      "target_type": "mysql_write",
+      "table_name": "sales_32",
+      "connection_name": "mysql_1",
+      "operation": "create",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
