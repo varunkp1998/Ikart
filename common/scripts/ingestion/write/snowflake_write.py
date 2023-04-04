@@ -6,7 +6,7 @@ import os
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 import pandas as pd
-# from snowflake.connector.errors import ProgrammingError
+from snowflake.connector.errors import ProgrammingError
 from utility import get_config_section,decrypt
 
 log2 = logging.getLogger('log2')
@@ -81,11 +81,6 @@ def create(json_data: dict, conn, datafram, conn_details) -> bool:
             json_data["task"]["target"]["table_name"])
             # sys.exit()
             return "Fail"
-    # except ProgrammingError:
-    #     # if 'column "CRTD_BY" of relation' in str(error):
-    #     log2.error("duplicate columns found")
-    #         # sys.exit()
-    #     return "Fail"
     except Exception as error:
         log2.exception("create() is %s", str(error))
         raise error
@@ -122,6 +117,7 @@ def append(json_data: dict, conn: dict, datafram,conn_details) -> bool:
             return "Fail"
     except ProgrammingError:
         # if 'column "CRTD_BY" of relation' in str(error):
+        # if "invalid identifier 'CRTD_BY'" in str(error):
         log2.error("audit columns not found in the table previously to append")
             # sys.exit()
         return "Fail"
@@ -129,9 +125,6 @@ def append(json_data: dict, conn: dict, datafram,conn_details) -> bool:
         # else:
         #     log2.exception("append() is %s", str(error))
         #     raise error
-    except Exception as error:
-        log2.exception("append() is %s", str(error))
-        raise error
 
 def truncate(json_data: dict, conn: dict,datafram,counter: int, conn_details) -> bool:
     """if table exists, it will truncate"""
@@ -183,23 +176,15 @@ def truncate(json_data: dict, conn: dict,datafram,counter: int, conn_details) ->
             json_data["task"]["target"]["table_name"])
             # sys.exit()
             return "Fail"
-    except ProgrammingError:
-        # if 'column "CRTD_BY" of relation' in str(error):
-        log2.error("audit columns not found in the table previously to append")
+    except ProgrammingError as error:
+        if 'column "inserted_by" of relation' in str(error):
+            log2.error("audit columns not found in the table previously to insert data")
             # sys.exit()
-        return "Fail"
-    except Exception as error:
-        log2.exception("truncate() is %s", str(error))
-        raise error
-    # except ProgrammingError as error:
-    #     if 'column "inserted_by" of relation' in str(error):
-    #         log2.error("audit columns not found in the table previously to insert data")
-    #         # sys.exit()
-    #         return "Fail"
-    #         # raise Exception("audit columns not found in the table previously") from error
-    #     else:
-    #         log2.exception("append() is %s", str(error))
-    #         raise error
+            return "Fail"
+            # raise Exception("audit columns not found in the table previously") from error
+        else:
+            log2.exception("append() is %s", str(error))
+            raise error
 
 def drop(json_data: dict, conn: dict,conn_details) -> bool:
     """if table exists, it will drop"""
@@ -287,19 +272,23 @@ def replace(json_data: dict, conn: dict, datafram,counter: int, conn_details: li
         log2.exception("replace() is %s", str(error))
         raise error
 
-def write_to_txt(prj_nm,task_id,status,run_id,paths_data):
+def write_to_txt(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
-    place=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-    paths_data["status_txt_file_path"]+run_id+".txt"
-    is_exist = os.path.exists(place )
-    if is_exist is True:
-        data_fram =  pd.read_csv(place, sep='\t')
-        data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
-        data_fram.to_csv(place ,mode='w', sep='\t',index = False, header=True)
-    else:
-        log2.info("pipeline txt file does not exist")
+    try:
+        is_exist = os.path.exists(file_path)
+        if is_exist is True:
+            # log2.info("txt getting called")
+            data_fram =  pd.read_csv(file_path, sep='\t')
+            data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
+            data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
+        else:
+            log2.info("pipeline txt file does not exist")
+    except Exception as error:
+        log2.exception("write_to_txt: %s.", str(error))
+        raise error
 
-def write(prj_nm,json_data, datafram ,counter,config_file_path,task_id,run_id,paths_data, pip_nm) -> bool:
+def write(prj_nm,json_data, datafram,counter,config_file_path,task_id,run_id,paths_data,
+          file_path) -> bool:
     """ function for ingesting data to snowflake based on the operation in json"""
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+\
@@ -346,13 +335,11 @@ def write(prj_nm,json_data, datafram ,counter,config_file_path,task_id,run_id,pa
         return status
     except ProgrammingError : #to handle table not found issue
         log2.error("the table or connection specified in the command is incorrect")
-        status = 'FAILED'
-        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        # write_to_txt(task_id,'FAILED',file_path)
+        # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         sys.exit()
     except Exception as error:
-        status = 'FAILED'
-        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        # write_to_txt(task_id,'FAILED',file_path)
+        # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         log2.exception("ingest_data_to_snowflake() is %s", str(error))
         raise error

@@ -1,6 +1,5 @@
 {
     "program_id":"1234",
-    "project_id":"6789",
     "pipeline_id":"123",
     "pipeline_name":"P_123",
     "tasks_details":{

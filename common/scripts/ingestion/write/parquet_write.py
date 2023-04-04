@@ -18,4 +18,4 @@ def write(json_data: dict, datafram ) -> bool:
         return True
     except Exception as error:
         log2.exception("converting_to_parquet() is %s", str(error))
-        raise Exception("converting_to_parquet(): " + str(error)) from error
+        raise error

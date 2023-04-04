@@ -1,5 +1,5 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
@@ -20,7 +20,6 @@
             "target_type": "mysql_write",
             "connection_name": "mysql_1",
             "table_name": "my_sales",
-            "schema": "public",
             "operation":"create",
             "audit_columns":  "active"
         },

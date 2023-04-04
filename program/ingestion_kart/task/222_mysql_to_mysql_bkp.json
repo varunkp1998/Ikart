@@ -3,29 +3,24 @@
     "project_name": "intellikart",	
     "task": {
         "source": {	
-            "source_type": "csvfile_read",
-            "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
-            "source_file_name": "sales_data",
-            "delimiter":",",
-            "skip_header":" ",
-            "skip_footer":" ",
-            "quote_char": " ",
-            "escape_char":" ",
-            "alias_columns":" ",
-            "select_columns": " ",
-            "chunk_size":1000,				
-            "encoding": "utf-8"
+            "source_type": "mysql_read",
+            "table_name": " ",
+            "connection_name":"mysql_1",
+            "query": "select * from sales_18",
+            "chunk_size":1000,	
+            "select_columns": " "
         },
         "target": {	
-            "target_type": "parquetfile_write",
-            "target_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
-            "target_file_name": "sales.parquet",
-            "encoding": " "
+            "target_type": "mysql_write",
+            "connection_name": "mysql_1",
+            "table_name": "sales_32",
+            "operation":"append",
+            "audit_columns":  "inactive"
         },
 		"data_quality_execution":{
             "pre_check_enable":"N",
             "post_check_enable":"N"
-        },
+		},
         "data_quality_features":{
             "dq_process_rejected_records": "N",
             "dq_perform_qc_on_corrected_file": "N",

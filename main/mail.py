@@ -1,3 +1,4 @@
+'''Importing Modules'''
 import smtplib
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -45,10 +46,10 @@ def send_start_mail(message, arg_prj_nm):
         server.sendmail(from_addr, to_addr.split(','), text)
         print('mail sent')
         server.quit()
-    except Exception as e:
-        print("Connection to mail server failed %s", str(e))
-        raise Exception
-    
+    except Exception as err:
+        print("Connection to mail server failed %s", str(err))
+        raise err
+
 # send_start_mail("started", "Intellikart")
 send_start_mail("Failed", "Intellikart")
 # send_start_mail("sucess", "Intellikart")

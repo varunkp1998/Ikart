@@ -1,16 +1,16 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
             "source_type": "parquetfile_read",
-            "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
+            "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
             "source_file_name": "sales.parquet"
         },
         "target": {	
             "target_type": "csvfile_write",
             "file_delimiter": ",",
-            "target_file_path": "/app/intel_new/Program/Project/Pipeline/Task/target_files/sales_p_to_csv1.csv",
+            "target_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/sales_p_to_csv1.csv",
             "encoding": "utf-8",
             "header": "True",
             "index":"False",

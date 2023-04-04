@@ -6,6 +6,8 @@ import logging
 import os
 import sys
 import base64
+import json
+from os import path
 import glob
 import great_expectations as ge
 import sqlalchemy
@@ -21,29 +23,74 @@ def encrypt(data):
     crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
     crypto_iv= 'rBEssDfxofOveRxR'
     block_size=16
-
     key = bytes(crypto_key, 'utf-8')
     key2 = bytes(crypto_iv, 'utf-8')
-
     aes = AES.new(key, AES.MODE_CBC, key2)
     encrypted = aes.encrypt(pad(data.encode(), block_size))
     # Make sure to strip "=" padding since urlsafe-base64 node module strips "=" as well
     return base64.urlsafe_b64encode(encrypted).decode("utf-8").rstrip("=")
 
-
-def write_to_txt1(prj_nm, task_id,status,run_id,paths_data):
+def write_to_txt1(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
-    place=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-    paths_data["status_txt_file_path"]+run_id+".txt"
-    is_exist = os.path.exists(place )
-    if is_exist is True:
-        data_fram =  pd.read_csv(place, sep='\t')
-        data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
-        data_fram.to_csv(place ,mode='w', sep='\t',index = False, header=True)
+    try:
+        is_exist = os.path.exists(file_path)
+        if is_exist is True:
+            # log2.info("txt getting called")
+            data_fram =  pd.read_csv(file_path, sep='\t')
+            data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
+            data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
+    except Exception as error:
+        log2.exception("write_to_txt1: %s.", str(error))
+        raise error
 
+def audit(json_file_path,json_data, task_name,run_id,status,value):
+    """ create audit json"""
+    try:
+        if path.isfile(json_file_path) is False:
+            log2.info('audit started')
+            # Data to be written
+            audit_data = [{
+                "pipeline_id": json_data["pipeline_id"],
+                "task/pipeline_name": task_name,
+                "run_id": run_id,
+                "iteration": "1",
+                "audit_type": status,
+                "audit_value": value,
+                "process_dttm" : datetime.now()
+            }]
+            # Serializing json
+            json_object = json.dumps(audit_data, indent=4, default=str)
+            # Writing to sample.json
+            with open(json_file_path, "w", encoding='utf-8') as outfile:
+                outfile.write(json_object)
+            # outfile.close()
+            log2.info("audit json file created and audit done")
+        else:
+            with open(json_file_path, "r+", encoding='utf-8') as audit1:
+                audit_data = json.load(audit1)
+                audit_data.append(
+                    {
+                    "pipeline_id": json_data["pipeline_id"],
+                    "task/pipeline_name": task_name,
+                    "run_id": run_id,
+                    "iteration": "1",
+                    "audit_type": status,
+                    "audit_value": value,
+                    "process_dttm" : datetime.now()
+                    })
+                audit1.seek(0)
+                json.dump(audit_data, audit1, indent=4, default=str)
+                # audit1.close()
+                log2.info('Audit of an event has been made')
+    except Exception as error:
+        log2.exception("error in auditing json %s.", str(error))
+        raise error
+
+# def run_checks_in_parallel(index, cols, control_table_df, checks_mapping_df, ge_df,
+# main_json_file,prj_nm,task_id,run_id, paths_data, file_path,audit_json_path):
 
 def run_checks_in_parallel(index, cols, control_table_df, checks_mapping_df, ge_df,
-main_json_file,prj_nm,task_id,run_id, paths_data):
+main_json_file,task_id,run_id, file_path,audit_json_path):
     """Running all the checks specified in control table in parallel"""
     try:
         output_df = pd.DataFrame(
@@ -352,16 +399,18 @@ main_json_file,prj_nm,task_id,run_id, paths_data):
         return output_df
     except ValueError:
         log2.error("func name(check_name) mentioned in the json is incorrect please check it.")
-        status = 'FAILED'
-        write_to_txt1(prj_nm,task_id,status,run_id,paths_data)
+        write_to_txt1(task_id,'FAILED',file_path)
+        audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
         sys.exit()
     except Exception as error:
+        write_to_txt1(task_id,'FAILED',file_path)
+        audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
         log2.exception("error in run_checks_in_parallel function %s.", str(error))
         raise error
 
-
 def qc_check(prj_nm,control_table_df, checks_mapping_df, src_file_name, check_type, ing_type,
-loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq_output_loc=None):
+loc,encoding,sheetnum, conn_str,main_json_file,task_id,run_id, paths_data,file_path,audit_json_path,
+dq_output_loc=None):
     """Extaracting qc_check related details"""
     try:
         control_table_df = control_table_df[control_table_df[
@@ -381,6 +430,7 @@ loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq
                 ge_df = ge.from_pandas(pd_df)
                 shape_of_records1 = ge_df.shape
                 log2.info('Reading csv file started at %s', loc)
+                log2.info("printing file path:%s",file_path)
                 log2.info(
                 'Total number of records present in above path are %s', shape_of_records1)
             elif ing_type in {'parquet_read', 'parquet_write'}:
@@ -409,10 +459,9 @@ loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq
                 log2.info(
                     'Total number of records present in above path are %s', shape_of_records5)
         except FileNotFoundError:
-            log2.error("the path specified in the command for "
-            "folder creation does not exists")
-            status = 'FAILED'
-            write_to_txt1(prj_nm,task_id,status,run_id,paths_data)
+            log2.error("the input source file  does not exists or not found")
+            write_to_txt1(task_id,'FAILED',file_path)
+            audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
             sys.exit()
         try:
             decrypt_path=paths_data["folder_path"]+paths_data["ingestion_path"]
@@ -468,18 +517,26 @@ loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq
         except sqlalchemy.exc.ProgrammingError:
             log2.error("the table or connection specified in the command "
             " is incorrect")
+            write_to_txt1(task_id,'FAILED',file_path)
+            audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
+            sys.exit()
         except sqlalchemy.exc.OperationalError:
             log2.error("The details provided inside the connection file path "
             " is incorrect")
-            status = 'FAILED'
-            write_to_txt1(prj_nm,task_id,status,run_id,paths_data)
+            write_to_txt1(task_id,'FAILED',file_path)
+            audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
             sys.exit()
+        except Exception as error:
+            write_to_txt1(task_id,'FAILED',file_path)
+            audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
+            log2.exception("error in qc_check function %s.", str(error))
+            raise error
         #else:
             #raise Exception("Not a valid ingestion type")
         datasets = pool.map(
             lambda x:run_checks_in_parallel(
-            x, cols, control_table_df, checks_mapping_df, ge_df, main_json_file,prj_nm, task_id,
-            run_id, paths_data["folder_path"]), row_val)
+            x, cols, control_table_df, checks_mapping_df, ge_df, main_json_file, task_id,
+            run_id,file_path,audit_json_path), row_val)
         pool.close()
         for datas in datasets:
             resultset = pd.concat([resultset, datas])
@@ -528,9 +585,10 @@ loc, encoding, sheetnum, conn_str, main_json_file,task_id,run_id, paths_data, dq
         columns = ['unexpected_index_list', 'threshold_voilated_flag', 'run_flag'])
         return resultset
     except Exception as error:
+        write_to_txt1(task_id,'FAILED',file_path)
+        audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
         log2.exception("error in qc_check function %s.", str(error))
         raise error
-
 
 def auto_correction(main_json_file):
     '''function to perform auto correction'''
@@ -565,7 +623,6 @@ def auto_correction(main_json_file):
     # list_of_files = glob.glob(f'{output_loc}*.csv')
     # latest_file = max(list_of_files, key=os.path.getctime, default='None')
     log2.info("Auto correction process ended")
-
 
 def data_masking(main_json_file):
     '''Function to perform data_masking'''
@@ -612,7 +669,6 @@ def data_masking(main_json_file):
     #data_masking_file = max(list_of_files, key=os.path.getctime, default='None')
     log2.info("generates data_masking_file at: %s", output_loc)
     log2.info("Data masking Operation Ended")
-
 
 def data_encryption(main_json_file):
     '''function to perform data_encryption'''
@@ -663,8 +719,8 @@ def data_encryption(main_json_file):
 #     list_of_files = glob.glob(f'{output_loc}*.csv')
 #     data_decrypted_file = max(list_of_files, key=os.path.getctime, default='None')
 
-
-def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path,task_id,run_id):
+def qc_pre_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path,task_id,run_id,
+                 file_path,audit_json_path):
     """Function to perform pre_check operation"""
     try:
         #To read task json file to extract important deatils
@@ -688,7 +744,8 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
                 src_file_name = main_json_file['task']['source']['source_file_name']
         except KeyError:
             log2.error('Connection name might incorrect check once')
-            #write_to_txt1(task_id,status1,run_id,path)
+            #write_to_txt1(task_id,status1,run_id,path,)
+            # write_to_txt1(task_id,status,file_path)
             sys.exit()
         if main_json_file['task']['source']['source_type'] in {'csv_read', 'json_read'}:
             default_encoding = 'utf-8' if main_json_file['task']['source']['encoding']==' ' else \
@@ -723,17 +780,17 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                          'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm,control_table, checks_mapping, main_json_file['task']['source'][
-                    'source_file_name'],'pre_check', main_json_file['task'][
-                    'source']['source_type'], def_loc, default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm,control_table, checks_mapping, main_json_file['task']['source'][
+                'source_file_name'],'pre_check', main_json_file['task']['source']['source_type'],
+                def_loc, default_encoding, default_sheetnum,src_conn_str,main_json_file,task_id,
+                run_id,paths_data,file_path,audit_json_path,output_loc)
             elif main_json_file['task']['source']['source_type'] in {'postgres_read', 'mysql_read'}:
                 pre_check_result = qc_check(
                     prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
                     'table_name'],'pre_check', main_json_file['task'][
                     'source']['source_type'], main_json_file['task']['source'][
                     'table_name'],default_encoding, default_sheetnum, src_conn_str,
-                    main_json_file,task_id,run_id,paths_data, output_loc)
+                    main_json_file,task_id,run_id,paths_data,file_path,audit_json_path,output_loc)
             elif main_json_file['task']['source']['source_type'] in {'snowflake_read'}:
                 pre_check_result = qc_check(
                     prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
@@ -741,7 +798,7 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
                     'source']['source_type'], src_conn_str["database"]+'.'+main_json_file[
                     'task']['source']['schema']+'.'+main_json_file['task']['source'][
                     'table_name'],default_encoding, default_sheetnum, src_conn_str,
-                    main_json_file,task_id,run_id,paths_data, output_loc)
+                    main_json_file,task_id,run_id,paths_data,file_path,audit_json_path,output_loc)
         #both auto_correction, data_masking and data_encryption enabling
         if main_json_file['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
             and main_json_file['task']['data_quality_features']['data_masking_required'] == 'Y' \
@@ -752,10 +809,10 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                 'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
-                    main_json_file['task']['source']['source_type'], def_loc,
-                    default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
+                main_json_file['task']['source']['source_type'], def_loc,
+                default_encoding, default_sheetnum,src_conn_str, main_json_file,task_id,
+                run_id, paths_data,file_path,audit_json_path,output_loc)
         # Auto correction process
         # both auto_correction and data_masking enabling
         elif main_json_file['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
@@ -765,10 +822,10 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                 'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
-                    main_json_file['task']['source']['source_type'], def_loc,
-                    default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
+                main_json_file['task']['source']['source_type'], def_loc,
+                default_encoding, default_sheetnum,src_conn_str,main_json_file,task_id,
+                run_id, paths_data,file_path,audit_json_path,output_loc)
         #both auto_correction and data_encryption enabling
         elif main_json_file['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
             and main_json_file['task']['data_quality_features']['data_encryption_required'] == 'Y':
@@ -777,11 +834,10 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                 'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
-                    main_json_file['task']['source']['source_type'], def_loc,
-                    default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
-
+                prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
+                main_json_file['task']['source']['source_type'], def_loc,
+                default_encoding, default_sheetnum,src_conn_str, main_json_file,task_id,
+                run_id, paths_data,file_path,audit_json_path,output_loc)
         elif main_json_file['task']['data_quality_features']['dq_auto_correction_required'] == 'Y':
             # calling auto_correction function
             auto_correction(main_json_file)
@@ -789,10 +845,10 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                 'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
-                    main_json_file['task']['source']['source_type'], def_loc,
-                    default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, src_file_name,'pre_check',
+                main_json_file['task']['source']['source_type'], def_loc,
+                default_encoding, default_sheetnum,src_conn_str, main_json_file,task_id,
+                run_id, paths_data,file_path,audit_json_path,output_loc)
             #elif main_json_file['task']['source']['source_type'] in {
             # 'postgres_read', 'mysql_read'}:
             #     pre_check_result = qc_check(
@@ -800,7 +856,7 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             #         'table_name'],'pre_check', main_json_file['task'][
             #         'source']['source_type'], main_json_file['task']['source'][
             #         'table_name'], default_encoding, default_sheetnum, src_conn_str,
-            #         main_json_file,task_id,status,run_id,path, output_loc)
+            #         main_json_file,task_id,status,run_id,path,audit_json_path,output_loc)
             log2.info("Pre-Check Operation completed")
         # Reprocessing of bad records file
         elif main_json_file['task']['data_quality_features']['dq_process_rejected_records']=='Y' \
@@ -812,19 +868,18 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                 'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
-                    'source_file_name'],'pre_check', reprocessing_source_type,
-                    main_json_file['task']['source'][
-                    'source_file_path']+main_json_file['task']['source'][
-                    'source_file_name']+'.csv', default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id,paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
+                'source_file_name'],'pre_check', reprocessing_source_type,
+                main_json_file['task']['source']['source_file_path']+main_json_file['task']
+                ['source']['source_file_name']+'.csv',default_encoding,default_sheetnum,src_conn_str
+                ,main_json_file,task_id,run_id,paths_data,file_path,audit_json_path,output_loc)
             elif main_json_file['task']['source']['source_type'] in {'postgres_read', 'mysql_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
-                    'table_name'],'pre_check', main_json_file['task'][
-                    'source']['source_type'], main_json_file['task']['source'][
-                    'table_name'], default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
+                'table_name'],'pre_check', main_json_file['task'][
+                'source']['source_type'], main_json_file['task']['source'][
+                'table_name'], default_encoding, default_sheetnum,src_conn_str, 
+                main_json_file,task_id,run_id, paths_data,file_path,audit_json_path,output_loc)
         elif main_json_file['task']['data_quality_features']['dq_process_rejected_records']=='Y' \
         and main_json_file['task']['data_quality_features'][
         'dq_perform_qc_on_corrected_file']=='N':
@@ -838,10 +893,10 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             if main_json_file['task']['source']['source_type'] in {'csv_read', 'parquet_read', \
                 'excel_read', 'xml_read', 'json_read'}:
                 pre_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
-                    'source_file_name'],'pre_check', main_json_file['task'][
-                    'source']['source_type'], def_loc, default_encoding, default_sheetnum,
-                    src_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['source'][
+                'source_file_name'],'pre_check', main_json_file['task'][
+                'source']['source_type'], def_loc, default_encoding, default_sheetnum,src_conn_str,
+                main_json_file,task_id,run_id, paths_data,file_path,audit_json_path,output_loc)
             #elif main_json_file['task']['source']['source_type'] in {'postgres_read',
             # 'mysql_read'}:
             #     pre_check_result = qc_check(
@@ -849,7 +904,7 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
             #         'table_name'],'pre_check', main_json_file['task'][
             #         'source']['source_type'], main_json_file['task']['source'][
             #         'table_name'], default_encoding, default_sheetnum,
-            #         src_conn_str, main_json_file,task_id,run_id, path, output_loc)
+            #         src_conn_str, main_json_file,task_id,run_id, path, output_loc,file_path)
             log2.info("Pre-Check Operation completed")
         #Data Encryption
         elif main_json_file['task']['data_quality_features']['data_encryption_required']=='Y':
@@ -862,23 +917,24 @@ def qc_pre_check(prj_nm,main_json_file, cm_json_file,paths_data,config_file_path
                     'source_file_name'],'pre_check', main_json_file['task'][
                     'source']['source_type'], def_loc, default_encoding,
                     default_sheetnum, src_conn_str, main_json_file,task_id,run_id,
-                    paths_data, output_loc)
+                    paths_data,file_path,audit_json_path, output_loc)
             # elif main_json_file['task']['source']['source_type'] in {'postgres_read',
             # 'mysql_read'}:
             #     pre_check_result = qc_check(
-            #         control_table, checks_mapping, main_json_file['task']['source']['table_name'],
-            #         'pre_check', main_json_file['task']['source']['source_type'], main_json_file[
-            #         'task']['source']['table_name'], default_encoding, default_sheetnum,
-            #         src_conn_str, main_json_file,task_id,run_id,path,output_loc)
+            #     control_table, checks_mapping, main_json_file['task']['source']['table_name'],
+            #     'pre_check', main_json_file['task']['source']['source_type'], main_json_file[
+            #     'task']['source']['table_name'], default_encoding, default_sheetnum,src_conn_str,
+            #      main_json_file,task_id,run_id,path,file_path,audit_json_path, output_loc)
             log2.info("Pre_check operation completed")
         return pre_check_result
     except Exception as error:
+        write_to_txt1(task_id,'FAILED',file_path)
+        audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
         log2.exception("error in qc_pre_check function %s.", str(error))
         raise error
 
-
-
-def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path, task_id,run_id):
+def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path, task_id,run_id,
+                  file_path,audit_json_path):
     """Function to perform post_check operation"""
     try:
         control_table = pd.DataFrame(main_json_file['task']['data_quality'])
@@ -920,28 +976,28 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
             if main_json_file['task']['target']['target_type'] in {'csv_write',
             'parquet_write', 'excel_write', 'xml_write', 'json_write'}:
                 post_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
-                    'target_file_name'],'post_check', main_json_file['task'][
-                    'target']['target_type'], main_json_file['task']['target'][
-                    'target_file_path']+main_json_file['task']['target'][
-                    'target_file_name'], default_encoding, default_sheetnum,
-                    tgt_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
+                'target_file_name'],'post_check', main_json_file['task'][
+                'target']['target_type'], main_json_file['task']['target'][
+                'target_file_path']+main_json_file['task']['target'][
+                'target_file_name'], default_encoding, default_sheetnum,tgt_conn_str, 
+                main_json_file,task_id,run_id, paths_data,file_path,audit_json_path, output_loc)
             elif main_json_file['task']['target']['target_type'] in {'postgres_write',
             'mysql_write'}:
                 post_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
-                        'table_name'],'post_check', main_json_file['task'][
-                        'target']['target_type'], main_json_file['task']['target'][
-                        'table_name'], default_encoding, default_sheetnum,
-                        tgt_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
+                'table_name'],'post_check', main_json_file['task'][
+                'target']['target_type'], main_json_file['task']['target'][
+                'table_name'], default_encoding, default_sheetnum,tgt_conn_str,
+                main_json_file,task_id,run_id, paths_data,file_path,audit_json_path,output_loc)
             elif main_json_file['task']['target']['target_type'] in {'snowflake_write'}:
                 post_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
-                    'table_name'],'post_check', main_json_file['task'][
-                    'target']['target_type'], tgt_conn_str["database"]+'.'+main_json_file[
-                    'task']['target']['schema']+'.'+main_json_file['task']['target'][
-                    'table_name'], default_encoding, default_sheetnum, tgt_conn_str,
-                    main_json_file,task_id,run_id,paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
+                'table_name'],'post_check', main_json_file['task'][
+                'target']['target_type'], tgt_conn_str["database"]+'.'+main_json_file[
+                'task']['target']['schema']+'.'+main_json_file['task']['target'][
+                'table_name'], default_encoding, default_sheetnum, tgt_conn_str,
+                main_json_file,task_id,run_id,paths_data,file_path,audit_json_path,output_loc)
         elif main_json_file['task']['data_quality_features'][
         'dq_process_rejected_records'] == 'Y':
             list_of_files = glob.glob(f'{output_loc}*.csv')
@@ -950,20 +1006,20 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
             if main_json_file['task']['target']['target_type'] in {'csv_write', 'parquet_write', \
                 'excel_write', 'xml_write', 'json_write'}:
                 post_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
-                        'target_file_name'],'post_check', main_json_file['task'][
-                        'target']['target_type'], main_json_file['task']['target'][
-                        'target_file_path']+main_json_file['task']['target'][
-                        'target_file_name']+'.csv', default_encoding, default_sheetnum,
-                        tgt_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
+                'target_file_name'],'post_check', main_json_file['task'][
+                'target']['target_type'], main_json_file['task']['target'][
+                'target_file_path']+main_json_file['task']['target'][
+                'target_file_name']+'.csv', default_encoding, default_sheetnum,tgt_conn_str,
+                main_json_file,task_id,run_id, paths_data,file_path,audit_json_path,output_loc)
             elif main_json_file['task']['target']['target_type'] in {'postgres_write',
             'mysql_write', 'snowflake_write'}:
                 post_check_result = qc_check(
-                    prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
-                        'table_name'],'post_check', main_json_file['task'][
-                        'target']['target_type'], main_json_file['task']['target'][
-                        'table_name'], default_encoding, default_sheetnum,
-                        tgt_conn_str, main_json_file,task_id,run_id, paths_data, output_loc)
+                prj_nm, control_table, checks_mapping, main_json_file['task']['target'][
+                'table_name'],'post_check', main_json_file['task'][
+                'target']['target_type'], main_json_file['task']['target'][
+                'table_name'], default_encoding, default_sheetnum,tgt_conn_str,
+                main_json_file,task_id,run_id, paths_data,file_path,audit_json_path,output_loc)
         if main_json_file['task']['data_quality_features']['data_decryption_required']=='N':
             pass
         elif main_json_file['task']['data_quality_features']['data_decryption_required']=='Y':
@@ -971,13 +1027,13 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
                 'data_decryption_columns']
             cols=cols_required
             src_file_name = main_json_file['task']['source']['source_file_nmae']
-            path = main_json_file['task']['data_quality_features']['dq_output_file_path']
-            list_of_files = glob.glob(f'{path}*.csv')
+            output_file_path =main_json_file['task']['data_quality_features']['dq_output_file_path']
+            list_of_files = glob.glob(f'{output_file_path}*.csv')
             list_of_encrypted_files = list(filter(lambda f: f.startswith(
-                f'{path}{src_file_name}'), list_of_files))
+                f'{output_file_path}{src_file_name}'), list_of_files))
             source_file = max(list_of_encrypted_files, key=os.path.getctime, default=None)
             decrypt_df = pd.read_csv(source_file)
-            decrypt_path=path+paths_data["engine_path"]
+            decrypt_path=output_file_path+paths_data["engine_path"]
             sys.path.insert(0, decrypt_path)
             from utility import decrypt
             for val in cols.split(','):
@@ -997,22 +1053,25 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
                     'target_file_name'],'post_check', main_json_file['task'][
                     'target']['target_type'], data_decrypted_file, default_encoding,
                     default_sheetnum, tgt_conn_str, main_json_file,task_id,run_id,
-                    path, output_loc)
+                    output_file_path,file_path,audit_json_path,output_loc)
             elif main_json_file['task']['target']['target_type'] in {'postgres_write',
             'mysql_write', 'snowflake_write'}:
                 post_check_result = qc_check(
-                    control_table, checks_mapping, main_json_file['task']['target'][
-                        'table_name'],'post_check', main_json_file['task'][
-                        'target']['target_type'], main_json_file['task']['target'][
-                        'table_name'], default_encoding, default_sheetnum,
-                        tgt_conn_str, main_json_file,task_id,run_id, path, output_loc)
+                control_table, checks_mapping, main_json_file['task']['target'][
+                'table_name'],'post_check', main_json_file['task'][
+                'target']['target_type'], main_json_file['task']['target'][
+                'table_name'], default_encoding, default_sheetnum,tgt_conn_str,
+                main_json_file,task_id,run_id,output_file_path,file_path,audit_json_path,output_loc)
         log2.info("Post_check operation completed")
         return post_check_result
     except Exception as error:
+        write_to_txt1(task_id,'FAILED',file_path)
+        audit(audit_json_path,main_json_file, task_id,run_id,'STATUS','FAILED')
         log2.error("error in qc_post_check function %s.", str(error))
         raise error
 
-def qc_report(pre_check_result, post_check_result, new_path):
+def qc_report(pre_check_result,post_check_result,new_path,file_path,audit_json_path,json_data,
+              task_id,run_id):
     """Function to generate qc_report"""
     try:
         #Concatinating the pre_check and post_check results into final_check_result
@@ -1024,5 +1083,7 @@ def qc_report(pre_check_result, post_check_result, new_path):
         log2.info("qc_report generated")
         return final_check_result
     except Exception as error:
+        write_to_txt1(task_id,'FAILED',file_path)
+        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         log2.exception("error in qc_report function %s.", str(error))
         raise error

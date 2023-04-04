@@ -1,24 +1,23 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
             "source_type": "mysql_read",
-            "table_name": "my_sales",
+            "table_name": "sales_18",
             "connection_name":"mysql_1",
             "query": " ",
-            "chunk_size":1000,					
+            "chunk_size":10000,					
             "encoding": "utf-8",
             "select_columns": " "
-
         },
         "target": {	
             "target_type": "snowflake_write",
             "connection_name": "snowflake_1",
-            "table_name": "tweet_a",
+            "table_name": "tweet_b1", 
             "schema": "public",
-            "operation":"create",
-            "audit_columns":  "inactive"
+            "operation":"append",
+            "audit_columns":  "active"
         },
 		"data_quality_execution":{
             "pre_check_enable":"N",

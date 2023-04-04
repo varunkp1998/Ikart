@@ -1,13 +1,15 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
+        "src_archive_required":"N",
+        "tgt_archive_required":"Y",
         "source": {	
             "source_type": "snowflake_read",
-            "table_name": "teraxyz_1",
+            "table_name": "teraxyz",
             "connection_name":"snowflake_1",
             "schema": "public",
-            "query": "select * from test.public.teraxyz_1",
+            "query": "select * from test.public.teraxyz",
             "alias_columns":" ",
             "select_columns": " ",
             "chunk_size":1000,					
@@ -21,8 +23,7 @@
             "encoding": "utf-8",
             "header": "True",
             "index":"False",
-            "audit_columns": "inactive",
-            "archive_required":"Y"
+            "audit_columns": "inactive"
         },
 		"data_quality_execution":{
             "pre_check_enable":"Y",

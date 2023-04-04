@@ -1,11 +1,11 @@
 {
-  "project_id": "1234",		
+  "pipeline_id": "1234",		
   "project_name": "intellikart",	
   "task": {
       "source": {	
           "source_type": "csv_read",
           "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
-          "source_file_name": "sales",
+          "source_file_name": "sales_data",
           "delimiter":",",
           "skip_header":" ",
           "skip_footer":" ",

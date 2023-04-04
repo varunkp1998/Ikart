@@ -13,7 +13,7 @@
 	"pipeline_json_path": "/Pipeline/json/",
 	"rejected_path": "/Pipeline/Task/rejected/",
 	"task_json_path": "/Pipeline/Task/json/",
-	"status_txt_file_path": "/Pipeline/logs/flatfile",
+	"status_txt_file_path": "/Pipeline/logs/",
 	"source_files_path":"/Pipeline/Task/source_files/",
 	"qc_reports_path": "/Pipeline/Task/reports/",
 	"audit_path": "/Pipeline/Task/audit/",

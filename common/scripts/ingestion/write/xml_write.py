@@ -14,4 +14,4 @@ def write(json_data: dict, chunk) -> bool:
         return True
     except Exception as error:
         log2.exception("convert_csv_to_xml() is %s", str(error))
-        raise Exception("convert_csv_to_xml(): " + str(error)) from error
+        raise error

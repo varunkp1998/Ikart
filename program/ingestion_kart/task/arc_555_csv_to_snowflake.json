@@ -1,5 +1,5 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
@@ -15,7 +15,7 @@
             "select_columns": " ",
             "chunk_size":1000,				
             "encoding": "utf-8",
-            "archive_required":" "
+            "archive_required":"Y"
         },
         "target": {	
             "target_type": "mysql_write",

@@ -28,19 +28,22 @@ def establish_conn(json_data: dict, json_section: str,connection_file_path:str) 
         log2.exception("establish_conn() is %s", str(error))
         raise error
 
-def write_to_txt(prj_nm,task_id,status,run_id,paths_data):
+def write_to_txt(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
-    place=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-    paths_data["status_txt_file_path"]+run_id+".txt"
-    is_exist = os.path.exists(place )
-    if is_exist is True:
-        data_fram =  pd.read_csv(place, sep='\t')
-        data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
-        data_fram.to_csv(place ,mode='w', sep='\t',index = False, header=True)
-    else:
-        log2.info("pipeline txt file does not exist")
+    try:
+        is_exist = os.path.exists(file_path)
+        if is_exist is True:
+            # log2.info("txt getting called")
+            data_fram =  pd.read_csv(file_path, sep='\t')
+            data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
+            data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
+        else:
+            log2.error("pipeline txt file does not exist")
+    except Exception as error:
+        log2.exception("write_to_txt: %s.", str(error))
+        raise error
 
-def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, pip_nm) -> bool:
+def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,file_path) -> bool:
     """ function for reading data from snowflake table"""
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+\
@@ -58,7 +61,7 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
         if json_data["task"]["source"]["query"] == " ":
             #if query is empty it will go to table name execution
             log2.info("reading from snowflake table: %s",
-            json_data["task"]["source"]["table_name"])            
+            json_data["task"]["source"]["table_name"])
             schema_name =conn_details["database"]+'.'+ json_data["task"]["source"]["schema"]
             sql = f'SELECT count(0) from {schema_name}.{json_data["task"]["source"]["table_name"]};'
             # sql = f'SELECT count(0) from  {json_data["task"]["source"]["table_name"]};'
@@ -96,8 +99,7 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
         return True
     except ProgrammingError : #to handle table not found issue
         log2.error("the table name or connection specified in the command is incorrect")
-        status = 'FAILED'
-        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+        write_to_txt(task_id,'FAILED',file_path)
         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         sys.exit()
     # except sqlalchemy.exc.OperationalError:
@@ -106,8 +108,7 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data, 
     #     write_to_txt(task_id,status,run_id,paths_data)
     #     sys.exit()
     except Exception as error:
-        status = 'FAILED'
-        write_to_txt(prj_nm,task_id,status,run_id,paths_data)
+        write_to_txt(task_id,'FAILED',file_path)
         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         log2.exception("read_data_from_snowflake() is %s", str(error))
         raise error

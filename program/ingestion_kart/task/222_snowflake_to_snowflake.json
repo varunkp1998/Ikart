@@ -1,5 +1,5 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
@@ -16,7 +16,7 @@
             "connection_name": "snowflake_1",
             "table_name": "tweet",
             "schema": "public",
-            "operation":"replace",
+            "operation":"append",
             "audit_columns":  "inactive"
         },
 		"data_quality_execution":{

@@ -1,5 +1,5 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
@@ -7,20 +7,20 @@
             "table_name": "sales",
             "connection_name":"snowflake_1",
             "schema": "public",
-            "query": " ",
+            "query": "select * from TEST.PUBLIC.TWEET_B",
             "chunk_size":1000,					
             "encoding": "utf-8"
         },
         "target": {	
             "target_type": "mysql_write",
             "connection_name": "mysql_1",
-            "table_name": "sales_2",
+            "table_name": "sales_000",
             "operation":"create",
-            "audit_columns":  "inactive"
+            "audit_columns":  "active"
         },
 		"data_quality_execution":{
-            "pre_check_enable":"Y",
-            "post_check_enable":"Y"
+            "pre_check_enable":"N",
+            "post_check_enable":"N"
         },
         "data_quality_features":{
             "dq_process_rejected_records": "N",
@@ -47,7 +47,16 @@
           "ignore_bad_records": "Y",
           "threshold_bad_records": 40,
           "type": "pre_check"
-        }
+        },
+        {
+            "dq_id": "2",
+            "check": "column_values_to_not_be_null",
+            "parameters": {"column": "ordernumber"},
+            "active": "Y",
+            "ignore_bad_records": "Y",
+            "threshold_bad_records": 40,
+            "type": "post_check"
+          }
     ],
     "on_failure": ""
     }

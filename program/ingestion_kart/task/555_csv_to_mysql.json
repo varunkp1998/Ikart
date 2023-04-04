@@ -1,10 +1,10 @@
 {
-    "project_id": "1234",		
+    "pipeline_id": "1234",		
     "project_name": "intellikart",	
     "task": {
         "source": {	
             "source_type": "csv_read",
-            "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
+            "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
             "source_file_name": "sales_data",
             "delimiter":",",
             "skip_header":" ",
@@ -14,18 +14,19 @@
             "alias_columns":" ",
             "select_columns": " ",
             "chunk_size":1000,				
-            "encoding": "utf-8"
+            "encoding": "utf-8",
+            "archive_required":" "
         },
         "target": {	
             "target_type": "mysql_write",
             "connection_name": "mysql_1",
-            "table_name": "sales_3",
-            "operation":"create",
+            "table_name": "sales_18",
+            "operation":"append",
             "audit_columns":  "inactive"
         },
 		"data_quality_execution":{
-            "pre_check_enable":"Y",
-            "post_check_enable":"Y"
+            "pre_check_enable":"N",
+            "post_check_enable":"N"
         },
         "data_quality_features":{
             "dq_process_rejected_records": "N",
