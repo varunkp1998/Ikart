@@ -1,0 +1,38 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 14,
+  "task_name": "csv_to_snowflake",
+  "task_description": "csv_to_snowflake desc",
+  "task_type": "write to snowflake",
+  "task_sequence": "22",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "csv_read",
+      "file_type": "csv",
+      "encoding": "utf-8",
+      "alias_columns": " ",
+      "select_columns": " ",
+      "escape_char": "none",
+      "quote_char": "none",
+      "skip_footer": " ",
+      "skip_header": " ",
+      "file_path": "/home/rperuman/python/intel_new_1/Program/Project/Pipeline/Task/source_files/",
+      "file_name": "sales_data",
+      "delimiter": ","
+    },
+    "target": {
+      "schema_name": "public",
+      "target_type": "snowflake_write",
+      "table_name": "sales_data1",
+      "connection_name": "ORDMSDB16",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
