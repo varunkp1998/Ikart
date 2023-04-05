@@ -13,7 +13,7 @@
       "table_name": "sales_18",
       "query": " ",
       "chunk_size": 1000,
-      "connection_name": "ORDMSDB12",
+      "connection_name": "mysql_1",
       "select_columns": "ORDERNUMBER,SHIPDATE,STATUS,QTR_ID,MONTH_ID,YEAR_ID,PRODUCTLINE,MSRP,PRODUCTCODE,CUSTOMERNAME,PHONE,ADDRESSLINE1,ADDRESSLINE2,CITY,STATE,POSTALCODE,COUNTRY"
     },
     "target": {
