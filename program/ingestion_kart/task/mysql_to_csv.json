@@ -1,0 +1,36 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "mysql_to_csv",
+  "task_description": "mysql_to_csv desc",
+  "task_type": "csv_create",
+  "task_sequence": "15",
+  "task": {
+    "source": {
+      "schema_name": "INFORMATION_SCHEMA1",
+      "source_type": "mysql_read",
+      "table_name": "sales_18",
+      "query": " ",
+      "chunk_size": 1000,
+      "connection_name": "ORDMSDB12",
+      "select_columns": "ORDERNUMBER,SHIPDATE,STATUS,QTR_ID,MONTH_ID,YEAR_ID,PRODUCTLINE,MSRP,PRODUCTCODE,CUSTOMERNAME,PHONE,ADDRESSLINE1,ADDRESSLINE2,CITY,STATE,POSTALCODE,COUNTRY"
+    },
+    "target": {
+      "file_type": "csv",
+      "target_type": "csv_write",
+      "delimiter": ",",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
+      "file_name": "mysql_to_csv.csv",
+      "encoding": "utf-8",
+      "header": "True",
+      "audit_columns": "inactive",
+      "index": "False",
+      "quote_char": "none"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
