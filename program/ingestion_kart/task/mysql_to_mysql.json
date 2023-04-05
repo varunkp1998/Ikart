@@ -13,13 +13,13 @@
       "table_name": " ",
       "query": "select * from sales_18",
       "chunk_size": 1000,
-      "connection_name": "ORDMSDB",
+      "connection_name": "mysql_1",
       "select_columns": " "
     },
     "target": {
       "table_name": " sales_32",
       "target_type": "mysql_write",
-      "connection_name": "mysql_doc_connection",
+      "connection_name": "mysql_1",
       "operation": "create",
       "audit_columns": "inactive",
       "schema_name": "INFORMATION_SCHEMA1"
