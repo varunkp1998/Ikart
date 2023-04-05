@@ -1,0 +1,38 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "csv_to_mysql",
+  "task_description": "csv_to_mysql description",
+  "task_type": "mysql_writing",
+  "task_sequence": "17",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "csv_read",
+      "file_type": "csv",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+      "file_name": "sales_data",
+      "delimiter": ",",
+      "skip_header": "  ",
+      "skip_footer": "  ",
+      "quote_char": "none",
+      "escape_char": "none",
+      "encoding": "utf-8",
+      "alias_columns": "  ",
+      "select_columns": " "
+    },
+    "target": {
+      "table_name": "my_sales",
+      "target_type": "mysql_write",
+      "schema_name": "INFORMATION_SCHEMA1",
+      "connection_name": "mysql_doc_connection",
+      "operation": "create",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
