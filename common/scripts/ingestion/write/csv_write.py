@@ -19,14 +19,14 @@ def write(json_data: dict,datafram, counter) -> bool:
                 json_data["task"]["target"]["target_file_name"],
                 sep=json_data["task"]["target"]["file_delimiter"], header=literal_eval(
                 json_data["task"]["target"]["header"]),
-                index=literal_eval(json_data["task"]["target"]["index"]), mode='w',
+                index=literal_eval(json_data["task"]["target"]["index"]), mode='a',
                 encoding=json_data["task"]["target"]["encoding"])
             else:
                 datafram.to_csv(json_data["task"]["target"]["target_file_path"]+
                 json_data["task"]["target"]["target_file_name"],
                 sep=json_data["task"]["target"]["file_delimiter"], header=literal_eval(
                 json_data["task"]["target"]["header"]),
-                index=literal_eval(json_data["task"]["target"]["index"]), mode='w',
+                index=literal_eval(json_data["task"]["target"]["index"]), mode='a',
                 encoding=json_data["task"]["target"]["encoding"])
         else:
             if json_data["task"]["target"]["audit_columns"] == "active":
@@ -38,13 +38,13 @@ def write(json_data: dict,datafram, counter) -> bool:
                 json_data["task"]["target"]["target_file_name"],
                 sep=json_data["task"]["target"]["file_delimiter"], header=False,
                 index=literal_eval(json_data["task"]["target"]["index"]),
-                mode='w', encoding=json_data["task"]["target"]["encoding"])
+                mode='a', encoding=json_data["task"]["target"]["encoding"])
             else:
                 datafram.to_csv(json_data["task"]["target"]["target_file_path"]+
                 json_data["task"]["target"]["target_file_name"],
                 sep=json_data["task"]["target"]["file_delimiter"], header=False,
                 index=literal_eval(json_data["task"]["target"]["index"]),
-                mode='w', encoding=json_data["task"]["target"]["encoding"])
+                mode='a', encoding=json_data["task"]["target"]["encoding"])
         return True
     except Exception as error:
         log2.exception("ingest_data_to_csv() is %s", str(error))

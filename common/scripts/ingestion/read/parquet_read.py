@@ -27,11 +27,11 @@ def read(prj_nm,json_data : dict,task_id,run_id,paths_data,file_path) -> bool:
     try:
         log2.info("parquet reading started")
         # Reading the data from Parquet File
-        file_path = json_data["task"]["source"]["source_file_path"]+\
+        file_path1 = json_data["task"]["source"]["source_file_path"]+\
             json_data["task"]["source"]["source_file_name"]
         log2.info("list of files which were read")
-        log2.info(file_path)
-        is_exists = os.path.exists(file_path)
+        log2.info(file_path1)
+        is_exists = os.path.exists(file_path1)
         #importing audit from orchestrate
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
