@@ -1,0 +1,12 @@
+{
+  "project_id": 33,
+  "connection_type": "Cloud DB",
+  "connection_subtype": "Snowflake",
+  "connection_name": "snowflake_connection",
+  "connection_details": {
+    "account": "aatjerp-cv54141",
+    "database": "test",
+    "password": "SILh8ZcDgpIyD34E9-Mq6w",
+    "username": "aatjerp-cv54141"
+  }
+}
