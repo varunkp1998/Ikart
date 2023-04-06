@@ -23,10 +23,10 @@
       "select_columns": " "
     },
     "target": {
-      "table_name": "my_sales",
+      "table_name": "my_sales_1",
       "target_type": "mysql_write",
-      "schema_name": "INFORMATION_SCHEMA1",
-      "connection_name": "mysql_doc_connection",
+      "schema": "INFORMATION_SCHEMA1",
+      "connection_name": "mysql_1",
       "operation": "create",
       "audit_columns": "active"
     },
