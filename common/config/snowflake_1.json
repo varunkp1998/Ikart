@@ -2,7 +2,7 @@
   "project_id": 4,
   "connection_type": "Cloud DB",
   "connection_subtype": "Snowflake",
-  "connection_name": "new_snowflake_connection",
+  "connection_name": "snowflake_1",
   "connection_details": {
     "role": "accountadmin",
     "account": "hyetltj-ow85217",
