@@ -1,0 +1,38 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "csv to test quote char 2",
+  "task_description": "csv to test quote char 2",
+  "task_type": "test",
+  "task_sequence": "45",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "csv_read",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+      "file_name": "sales_data",
+      "delimiter": ",",
+      "escape_char": "\"'\"",
+      "file_type": "csv",
+      "encoding": "utf-8",
+      "alias_columns": " ",
+      "select_columns": " ",
+      "quote_char": "custom",
+      "skip_footer": " ",
+      "skip_header": " "
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "mysql_1",
+      "connection_name": "RDS_MYSQL_ingest",
+      "operation": "create",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
