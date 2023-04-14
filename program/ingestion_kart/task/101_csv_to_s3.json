@@ -23,11 +23,12 @@
       "select_columns": " "
     },
         "target": {
-            "file_name": "my_sales_1.csv",
+            "file_name": "sales_1.csv",
             "target_type": "s3",
             "file_path": "'test1/sales1/'",
             "audit_columns": "inactive",
-            "bucket_name" : "pg-mystoreinventory-6135"
+            "bucket_name" : "pg-mystoreinventory-6135",
+            "connection_name" : "s3"
           },
           "data_quality_execution": {
             "pre_check_enable": "N",
