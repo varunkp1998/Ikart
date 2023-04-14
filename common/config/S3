@@ -1,0 +1,12 @@
+{
+  "project_id": 6,
+  "connection_type": "S3",
+  "connection_subtype": "S3",
+  "connection_name": "S3",
+  "connection_details": {
+    "aws_access_key_id" : "AKIAY5XHGTOGSHHITVCL",
+    "aws_secret_access_key" : "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",
+    "service_name": "s3",
+    "region_name" :"ap-south-1"
+  }
+}
