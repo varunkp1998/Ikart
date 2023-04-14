@@ -27,7 +27,8 @@
             "target_type": "s3",
             "path": "'test/sales/'",
             "audit_columns": "inactive",
-            "bucket_name" : "pg-mystoreinventory-6135"
+            "bucket_name" : "pg-mystoreinventory-6135",
+            "header": "True"
           },
           "data_quality_execution": {
             "pre_check_enable": "N",
