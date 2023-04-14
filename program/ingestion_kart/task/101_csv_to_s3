@@ -1,0 +1,38 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "csv_to_s3",
+  "task_description": "csv_to_s3 description",
+  "task_type": "S3_writing",
+  "task_sequence": "17",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "csv_read",
+      "file_type": "csv",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+      "file_name": "sales_data",
+      "delimiter": ",",
+      "skip_header": " ",
+      "skip_footer": " ",
+      "quote_char": " ",
+      "escape_char": "none",
+      "encoding": "utf-8",
+      "alias_columns": " ",
+      "select_columns": " "
+    },
+        "target": {
+            "file_name": "my_sales_1",
+            "target_type": "s3",
+            "path": "'test/sales/'",
+            "audit_columns": "inactive",
+            "bucket_name" : "pg-mystoreinventory-6135"
+          },
+          "data_quality_execution": {
+            "pre_check_enable": "N",
+            "post_check_enable": "N"
+          }
+        }
+      }
+    
