@@ -1,0 +1,14 @@
+{
+  "project_id": 4,
+  "connection_type": "Cloud DB",
+  "connection_subtype": "Snowflake",
+  "connection_name": "SnowFlake_Connection_01",
+  "connection_details": {
+    "role": "JunkRole",
+    "account": "LZFXMGN-AA23817",
+    "database": "CORE1",
+    "password": "ZWs6qS2mXpTQp05RruJgJnzkC0j2m3o73xra5268rGU",
+    "username": "Thrinu",
+    "warehouse": "COMPUTE_WH"
+  }
+}
