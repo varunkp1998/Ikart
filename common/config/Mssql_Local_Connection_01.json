@@ -1,0 +1,13 @@
+{
+  "project_id": 34,
+  "connection_type": "RDBMS DB",
+  "connection_subtype": "MSSQL",
+  "connection_name": "Mssql_Local_Connection_01",
+  "connection_details": {
+    "port": "1433",
+    "database": "core1",
+    "hostname": "localhost",
+    "password": "3K7BBCeWYX2B-k9cv0zCvj_GeKUvwtD0ODdMGRGDak8",
+    "username": "SA"
+  }
+}
