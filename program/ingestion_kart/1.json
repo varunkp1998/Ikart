@@ -1,0 +1,16 @@
+{
+  "created_dttm": {
+    "val": "CURRENT_TIMESTAMP"
+  },
+  "updated_dttm": {
+    "val": "CURRENT_TIMESTAMP"
+  },
+  "id": 35,
+  "program_id": 6,
+  "project_name": "1",
+  "project_description": "pgm",
+  "project_manager": "admin",
+  "project_lead": "admin",
+  "is_active": "Y",
+  "created_by": "system"
+}
