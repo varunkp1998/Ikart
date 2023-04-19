@@ -1,0 +1,32 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "TaskForIngestion",
+  "task_description": "TaskForIngestion",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_option",
+      "query": "select * from tbl_configuration_option",
+      "chunk_size": 0,
+      "connection_name": "MySQLUpdatecopy",
+      "select_columns": "0"
+    },
+    "target": {
+      "schema": "public",
+      "target_type": "snowflake_write",
+      "table_name": "Ing",
+      "connection_name": "snowflake_connection",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
