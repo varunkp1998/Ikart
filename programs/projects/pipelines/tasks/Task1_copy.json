@@ -1,0 +1,36 @@
+{
+  "id": null,
+  "project_name": "Sales",
+  "pipeline_id": 59,
+  "pipeline_name": "pipeline_test_to_upload",
+  "task_description": "jfjuidnvghb",
+  "task_type": "Ingestion",
+  "task_name": "Task1_copy",
+  "task_sequence": "1",
+  "source": "MySQL",
+  "target": "Snowflake",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "Ing",
+      "query": "select * from Ing",
+      "chunk_size": 0,
+      "connection_name": "MySQLUpdatecopy",
+      "select_columns": "100000"
+    },
+    "target": {
+      "schema": "public",
+      "target_type": "mysql_write",
+      "table_name": "Ing",
+      "connection_name": "snowflake_connection",
+      "operation": "replace",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
