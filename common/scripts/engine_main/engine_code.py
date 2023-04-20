@@ -8,6 +8,7 @@ from os import path
 import pandas as pd
 
 log2 = logging.getLogger('log2')
+FAIL_LOG_STATEMENT = "%s got failed engine"
 
 def write_to_txt1(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
@@ -18,8 +19,10 @@ def write_to_txt1(task_id,status,file_path):
             data_fram =  pd.read_csv(file_path, sep='\t')
             data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
             data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
+            return None
         else:
             log2.error("pipeline txt file does not exist")
+            return None
     except Exception as error:
         log2.exception("write_to_txt: %s.", str(error))
         raise error
@@ -68,7 +71,7 @@ def audit(json_file_path,json_data, task_name,run_id,status,value):
         raise error
 
 
-def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
+def engine_main(prj_nm,task_id,paths_data,run_id,file_path):
     """function consists of pre_checks,conversion,ingestion,post_checks, qc report"""
     log2.info("entered into engine_main")
     config_file_path = paths_data["folder_path"]+paths_data["config_path"]
@@ -108,29 +111,29 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
         json_data["task"]["source"]["source_type"] == 'mssql_read'):
             pre_check = dq.qc_pre_check(prj_nm,json_data,json_checks,paths_data,config_file_path,
             task_id,run_id,file_path,audit_json_path)
-        elif json_data["task"]["source"]["source_type"] == "csv_read" and \
-        (json_data['task']['data_quality_execution']['pre_check_enable'] == 'N' and \
-        json_data['task']['data_quality_execution']['post_check_enable'] == 'N'):
-            if json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
-            and json_data['task']['data_quality_features']['data_masking_required'] == 'Y':
-                auto_correction(json_data)
-                data_masking(json_data)
-            elif json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
-            and json_data['task']['data_quality_features']['data_encryption_required'] == 'Y':
-                auto_correction(json_data)
-                data_encryption(json_data)
-            elif json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
-            and json_data['task']['data_quality_features']['data_masking_required'] == 'Y' \
-            and json_data['task']['data_quality_features']['data_encryption_required'] == 'Y':
-                auto_correction(json_data)
-                data_masking(json_data)
-                data_encryption(json_data)
-            elif json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y':
-                auto_correction(json_data)
-            elif json_data['task']['data_quality_features']['data_masking_required'] == 'Y':
-                data_masking(json_data)
-            elif json_data['task']['data_quality_features']['data_encryption_required'] == 'Y':
-                data_encryption(json_data)
+        # elif json_data["task"]["source"]["source_type"] == "csv_read" and \
+        # (json_data['task']['data_quality_execution']['pre_check_enable'] == 'N' and \
+        # json_data['task']['data_quality_execution']['post_check_enable'] == 'N'):
+        #     if json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
+        #     and json_data['task']['data_quality_features']['data_masking_required'] == 'Y':
+        #         auto_correction(json_data)
+        #         data_masking(json_data)
+        #     elif json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
+        #     and json_data['task']['data_quality_features']['data_encryption_required'] == 'Y':
+        #         auto_correction(json_data)
+        #         data_encryption(json_data)
+        #     elif json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y' \
+        #     and json_data['task']['data_quality_features']['data_masking_required'] == 'Y' \
+        #     and json_data['task']['data_quality_features']['data_encryption_required'] == 'Y':
+        #         auto_correction(json_data)
+        #         data_masking(json_data)
+        #         data_encryption(json_data)
+        #     elif json_data['task']['data_quality_features']['dq_auto_correction_required'] == 'Y':
+        #         auto_correction(json_data)
+        #     elif json_data['task']['data_quality_features']['data_masking_required'] == 'Y':
+        #         data_masking(json_data)
+        #     elif json_data['task']['data_quality_features']['data_encryption_required'] == 'Y':
+        #         data_encryption(json_data)
 
         py_scripts_path=paths_data["folder_path"]+paths_data["ingestion_path"]
         #log2.info(py_scripts_path)
@@ -184,6 +187,8 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
             from text_write import write
         elif json_data["task"]["target"]["target_type"] == "sqlserver_write":
             from sqlserver_write import write
+        elif json_data["task"]["target"]["target_type"] == "s3_write":
+            from s3_write import write
 
 
         # main script execution starts here
@@ -200,22 +205,22 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
                 if json_data["task"]["target"]["target_type"] != "csv_write":
                     value=write(prj_nm,json_data, i,counter,config_file_path,task_id,run_id,
                     paths_data,file_path)
-                    if value=='Fail':
+                    if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
-                        log2.warning("%s  got failed engine", task_id)
+                        log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
-                    if value=='drop_Pass':
+                    if value is True:
                         write_to_txt1(task_id,'SUCCESS',file_path)
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','COMPLETED')
                         log2.info('Task %s Execution Completed',task_id)
                         return False
                 else:
                     value=write(json_data, i,counter)
-                    if value=='Fail':
+                    if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
-                        log2.warning("%s  got failed engine", task_id)
+                        log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
         elif json_data["task"]["source"]["source_type"] == "csv_read":
             data_fram=read(prj_nm,json_data,task_id,run_id,paths_data,file_path)
@@ -227,17 +232,23 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
                 if json_data["task"]["target"]["target_type"] != "csv_write":
                     value=write(prj_nm,json_data, i,counter,config_file_path,task_id,run_id,
                     paths_data,file_path)
-                    if value=='Fail':
+                    if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
-                        log2.warning("%s  got failed engine", task_id)
+                        log2.warning(FAIL_LOG_STATEMENT, task_id)
+                        return False
+                    if value is True:
+                        write_to_txt1(task_id,'SUCCESS',file_path)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','COMPLETED')
+                        log2.info('Task %s Execution Completed',task_id)
                         return False
                 else:
+                    log2.info("enter ...")
                     value=write(json_data, i,counter)
-                    if value=='Fail':
+                    if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
-                        log2.warning("%s  got failed engine", task_id)
+                        log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
             #log2.info(data_fram.__next__())
         elif json_data["task"]["source"]["source_type"] == "csvfile_read" or \
@@ -251,13 +262,20 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
             for i in data_fram :
                 # log2.info(i)
                 counter+=1
-                # value=write(json_data, i)
                 if json_data["task"]["target"]["target_type"] == "csvfile_write":
                     value=write(json_data, i,counter)
                     if value=='Fail':
                         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         write_to_txt1(task_id,'FAILED',file_path)
-                        log2.warning("%s  got failed engine", task_id)
+                        log2.warning(FAIL_LOG_STATEMENT, task_id)
+                        return False
+                elif json_data["task"]["target"]["target_type"] == "s3_write":
+                    value=write(prj_nm,json_data, i,config_file_path,task_id,run_id,
+                    paths_data,file_path)
+                    if value=='Fail':
+                        write_to_txt1(task_id,'FAILED',file_path)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+                        log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
                 else:
                     # log2.info("entered")
@@ -278,10 +296,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
             #qc report generation
         new_path=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
         paths_data["qc_reports_path"]
-        if json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'N' and \
-            json_data["task"]["data_quality_execution"]["post_check_enable"] == 'N':
-            pass
-        elif json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'Y' and \
+        if json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'Y' and \
             json_data["task"]["data_quality_execution"]["post_check_enable"] == 'N':
             post_check = pd.DataFrame()
             dq.qc_report(pre_check,post_check,new_path,file_path,audit_json_path,
@@ -304,6 +319,6 @@ def engine_main(prj_nm,task_id,paths_data,run_id,pip_nm,file_path):
         audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         write_to_txt1(task_id,'FAILED',file_path)
         # write_to_txt(Task_id,Status1)
-        log2.warning("%s got failed engine", task_id)
+        log2.warning(FAIL_LOG_STATEMENT, task_id)
         log2.exception("error in  %s.", str(error))
         raise error

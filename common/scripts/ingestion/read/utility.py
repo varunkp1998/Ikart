@@ -1,5 +1,4 @@
 """script for general purpose methods like log, audit, connections etc..."""
-# import configparser
 import logging
 import json
 import base64
@@ -28,7 +27,7 @@ def initiate_logging(project: str, log_loc: str) -> bool:
         raise ex
 
 # reading the connection.json file and passing the connection details as dictionary
-def get_config_section(config_path:str, conn_nm: str) -> dict:
+def get_config_section(config_path:str) -> dict:
     """reads the connection file and returns connection details as dict for
        connection name you pass it through the json
     """
@@ -38,10 +37,26 @@ def get_config_section(config_path:str, conn_nm: str) -> dict:
             json_data = json.load(jsonfile)
             logging.info("reading connection details completed")
             # print("connection established")
-            return dict(json_data[conn_nm].items())
+            return dict(json_data["connection_details"].items())
     except Exception as error:
         logging.exception("get_config_section() is %s.", str(error))
         raise error
+
+# # reading the connection.json file and passing the connection details as dictionary
+# def get_config_section(config_path:str, conn_nm: str) -> dict:
+#     """reads the connection file and returns connection details as dict for
+#        connection name you pass it through the json
+#     """
+#     try:
+#         with open(config_path,'r', encoding='utf-8') as jsonfile:
+#             logging.info("fetching connection details")
+#             json_data = json.load(jsonfile)
+#             logging.info("reading connection details completed")
+#             # print("connection established")
+#             return dict(json_data[conn_nm].items())
+#     except Exception as error:
+#         logging.exception("get_config_section() is %s.", str(error))
+#         raise error
 
 def decrypt(edata):
     """password decryption function"""

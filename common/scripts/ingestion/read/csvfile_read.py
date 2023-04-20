@@ -24,12 +24,12 @@ def write_to_txt(task_id,status,file_path):
 
 
 def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,
-        delimiter = ",",skip_header = 0,skip_footer= 0, quotechar = '"', escapechar = None) -> bool:
+        delimiter = ",",skip_header = 0,skip_footer= 0, quotechar = '"', escapechar = None):
     """ function for reading data from csv"""
     try:
         log2.info("reading csv initiated...")
-        path = json_data["task"]["source"]["source_file_path"]+\
-        json_data["task"]["source"]["source_file_name"]
+        path = json_data["task"]["source"]["file_path"]+\
+        json_data["task"]["source"]["file_name"]
         # function for reading files present in a folder with different csv formats
         all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}*.csv',
         f'{path}*.csv.zip', f'{path}*.gz', f'{path}*.bz2',f'{path}*.txt') ] for f in f_]
@@ -40,15 +40,9 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,
         from engine_code import audit
         audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
         paths_data["audit_path"]+task_id+'_audit_'+run_id+'.json'
-        # if pip_nm == "-9999":
-        #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+task_id+\
-        #         '_audit_'+run_id+'.json'
-        # else:
-        #     audit_json_path = paths_data["folder_path"] +paths_data["audit_path"]+pip_nm+\
-        #         '_audit_'+run_id+'.json'
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
-            json_data["task"]["source"]["source_file_name"])
+            json_data["task"]["source"]["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
             audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
             sys.exit()
@@ -61,8 +55,8 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,
             json_data["task"]["source"]["skip_footer"]
             default_quotechar = quotechar if json_data["task"]["source"]["quote_char"]==" " else\
             json_data["task"]["source"]["quote_char"]
-            default_escapechar = escapechar if json_data["task"]["source"]["escape_char"]==" " else\
-            json_data["task"]["source"]["escape_char"]
+            default_escapechar=escapechar if json_data["task"]["source"]["escape_char"]=="none" \
+            else json_data["task"]["source"]["escape_char"]
             default_select_cols = None if json_data["task"]["source"]["select_columns"]==" " else\
             list(json_data["task"]["source"]["select_columns"].split(","))
             default_alias_cols = None if json_data["task"]["source"]["alias_columns"]==" " else\
@@ -71,10 +65,7 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,
             json_data["task"]["source"]["encoding"]
             # print(default_alias_cols)
             default_header ='infer' if json_data["task"]["source"]["alias_columns"] == " " else None
-            count = 0
-            # df = pd.DataFrame()
             for file in all_files:
-                count +=1
                 data = pd.read_csv(filepath_or_buffer = file,encoding=default_encoding,
                 low_memory=False)
                 # print(type(data))

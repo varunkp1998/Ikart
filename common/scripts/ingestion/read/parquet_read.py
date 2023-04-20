@@ -27,8 +27,8 @@ def read(prj_nm,json_data : dict,task_id,run_id,paths_data,file_path) -> bool:
     try:
         log2.info("parquet reading started")
         # Reading the data from Parquet File
-        file_path1 = json_data["task"]["source"]["source_file_path"]+\
-            json_data["task"]["source"]["source_file_name"]
+        file_path1 = json_data["task"]["source"]["file_path"]+\
+            json_data["task"]["source"]["file_name"]
         log2.info("list of files which were read")
         log2.info(file_path1)
         is_exists = os.path.exists(file_path1)
@@ -40,13 +40,13 @@ def read(prj_nm,json_data : dict,task_id,run_id,paths_data,file_path) -> bool:
         paths_data["audit_path"]+task_id+'_audit_'+run_id+'.json'
         if is_exists is False:
             log2.error("'%s' SOURCE FILE not found in the location",
-            json_data["task"]["source"]["source_file_name"])
+            json_data["task"]["source"]["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
             audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
             sys.exit()
         else:
-            datafram = pd.read_parquet(json_data["task"]["source"]["source_file_path"]+\
-            json_data["task"]["source"]["source_file_name"],
+            datafram = pd.read_parquet(json_data["task"]["source"]["file_path"]+\
+            json_data["task"]["source"]["file_name"],
               engine='auto')
         yield datafram
         return True

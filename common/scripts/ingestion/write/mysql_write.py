@@ -10,16 +10,20 @@ import pymysql
 from utility import get_config_section,decrypt
 
 log2 = logging.getLogger('log2')
+CURRENT_TIMESTAMP = "%Y-%m-%d %H:%M:%S"
+MYSQL_LOG_STATEMENT = "mysql ingestion completed"
+WITH_AUDIT_COLUMNS = "data ingesting with audit columns"
+WITH_OUT_AUDIT_COLUMNS = "data ingesting with out audit columns"
 
-def establish_conn(json_data: dict, json_section: str,config_file_path:str) -> bool:
+def establish_conn(json_data: dict, json_section: str,config_file_path:str):
     """establishes connection for the mysql database
        you pass it through the json"""
     try:
         connection_details = get_config_section(config_file_path+json_data["task"][json_section]\
-        ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
+        ["connection_name"]+'.json')
         password = decrypt(connection_details["password"])
-        conn = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["user"]}'
-        f':{password.replace("@", "%40")}@{connection_details["host"]}'
+        conn = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["username"]}'
+        f':{password.replace("@", "%40")}@{connection_details["hostname"]}'
         f':{int(connection_details["port"])}/{connection_details["database"]}', encoding='utf-8')
         # logging.info("connection established")
         return conn,connection_details
@@ -52,32 +56,28 @@ def create(json_data: dict, conn, datafram,conn_details:str)-> bool:
             log2.info('%s does not exists so creating a new table',
             json_data["task"]["target"]["table_name"])
             if json_data["task"]["target"]["audit_columns"] == "active":
-                datafram['CRTD_BY']=conn_details["user"]
-                datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                datafram['CRTD_BY']=conn_details["username"]
+                datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                 datafram['UPDT_BY']= " "
                 datafram['UPDT_DTTM']= " "
-                # dataframe = dataframe.fillna("etl_user")
+                log2.info(WITH_AUDIT_COLUMNS)
                 datafram.to_sql(json_data["task"]["target"]["table_name"], conn,
                 index = False, if_exists = "append")
-                log2.info("mysql ingestion completed")
+                log2.info(MYSQL_LOG_STATEMENT)
             else:
-                log2.info("data ingesting without audit columns")
+                log2.info(WITH_OUT_AUDIT_COLUMNS)
                 datafram.to_sql(json_data["task"]["target"]["table_name"], conn,
                 index = False, if_exists = "append")
-                log2.info("mysql ingestion completed")
+                log2.info(MYSQL_LOG_STATEMENT)
         else:
             # if table exists, it will say table is already present, give new name to create
             log2.error('%s already exists, so give a new table name to create',
             json_data["task"]["target"]["table_name"])
             # sys.exit()
-            return "Fail"
+            return False
     except OperationalError as error:
         if 'Duplicate column name' in str(error):
             log2.error("there are duplicate column names in the target table")
-            # status = 'FAILED'
-            # write_to_txt(prj_nm,task_id,'FAILED',run_id,paths_data)
-            # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
-            # # return "Fail"
             sys.exit()
         else:
             log2.info("else")
@@ -93,31 +93,29 @@ def append(json_data: dict, conn: dict, dataframe, conn_details) -> bool:
             log2.info("%s table exists, started appending the data to table",
             json_data["task"]["target"]["table_name"])
             if json_data["task"]["target"]["audit_columns"] == "active":
-                dataframe['CRTD_BY']=conn_details["user"]
-                dataframe['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                dataframe['CRTD_BY']=conn_details["username"]
+                dataframe['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                 dataframe['UPDT_BY']= " "
                 dataframe['UPDT_DTTM']= " "
+                log2.info(WITH_AUDIT_COLUMNS)
                 dataframe.to_sql(json_data["task"]["target"]["table_name"], conn, index = False,
                 if_exists = "append")
-                log2.info("mysql ingestion completed")
+                log2.info(MYSQL_LOG_STATEMENT)
             else:
+                log2.info(WITH_OUT_AUDIT_COLUMNS)
                 dataframe.to_sql(json_data["task"]["target"]["table_name"], conn, index = False,
                 if_exists = "append")
-                log2.info("mysql ingestion completed")
+                log2.info(MYSQL_LOG_STATEMENT)
         else:
             # if table is not there, then it will say table does not exist
             # create table first or give table name that exists to append data
             log2.error('%s does not exists, so create table first',
             json_data["task"]["target"]["table_name"])
-            # audit(audit_json_path,json_data, task_id,'STATUS','COMPLETED')
-            # sys.exit()
-            return "Fail"
+            return False
     except OperationalError as error:
         if "Unknown column 'CRTD_BY' in 'field list'" in str(error):
             log2.error("audit columns not found in the table previously to append")
-            # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
-            # sys.exit()
-            return "Fail"
+            return False
         else:
             # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.exception("append() is %s", str(error))
@@ -136,38 +134,39 @@ def replace(json_data: dict, conn: dict, dataframe,counter: int, conn_details) -
                 log2.info(" table replace finished, started inserting data into "
                  "%s table", json_data["task"]["target"]["table_name"])
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    dataframe['CRTD_BY']=conn_details["user"]
-                    dataframe['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    dataframe['CRTD_BY']=conn_details["username"]
+                    dataframe['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     dataframe['UPDT_BY']= " "
                     dataframe['UPDT_DTTM']= " "
+                    log2.info(WITH_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
                 else:
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
             else:
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    dataframe['CRTD_BY']=conn_details["user"]
-                    dataframe['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    dataframe['CRTD_BY']=conn_details["username"]
+                    dataframe['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     dataframe['UPDT_BY']= " "
                     dataframe['UPDT_DTTM']= " "
-                    # dataframe = dataframe.fillna("etl_user")
+                    log2.info(WITH_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
                 else:
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
         else:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name',
             json_data["task"]["target"]["table_name"])
-            # audit(audit_json_path,json_data, task_id,'STATUS','COMPLETED')
-            # sys.exit()
-            return "Fail"
+            return False
     except Exception as error:
         # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
         log2.exception("replace() is %s", str(error))
@@ -186,44 +185,46 @@ def truncate(json_data: dict, conn: dict,dataframe,counter: int, conn_details) -
                 log2.info("mysql truncating table finished, started inserting data into "
                 "%s table", json_data["task"]["target"]["table_name"])
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    dataframe['CRTD_BY']=conn_details["user"]
-                    dataframe['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    dataframe['CRTD_BY']=conn_details["username"]
+                    dataframe['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     dataframe['UPDT_BY']= " "
                     dataframe['UPDT_DTTM']= " "
+                    log2.info(WITH_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
                 else:
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
             else:
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    dataframe['CRTD_BY']=conn_details["user"]
-                    dataframe['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    dataframe['CRTD_BY']=conn_details["username"]
+                    dataframe['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     dataframe['UPDT_BY']= " "
                     dataframe['UPDT_DTTM']= " "
+                    log2.info(WITH_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
                 else:
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     dataframe.to_sql(json_data["task"]["target"]["table_name"], conn,
                     index = False, if_exists = "append")
-                    log2.info("mysql ingestion completed")
+                    log2.info(MYSQL_LOG_STATEMENT)
         else:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name to truncate',
             json_data["task"]["target"]["table_name"])
-            # audit(audit_json_path,json_data, task_id,'STATUS','COMPLETED')
-            # sys.exit()
-            return "Fail"
+            return False
     except OperationalError as error:
         if "Unknown column 'CRTD_BY' in 'field list'" in str(error):
             # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.error("audit columns not found in the table previously"
             "to insert data after truncate")
             # sys.exit()
-            return "Fail"
+            return False
         else:
             # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.exception("append() is %s", str(error))
@@ -239,21 +240,12 @@ def drop(json_data: dict, conn: dict) -> bool:
             f'{json_data["task"]["target"]["table_name"]}')
             conn.execution_options(autocommit=True).execute(drop_query)
             log2.info("mysql dropping table completed")
-            # sys.exit()
-            return "drop_Pass"
-            # log2.info(" table drop finished, started inserting data into
-            #  %s table", json_data["table"])
-            # for chunk in dataframe:
-            #     chunk.to_sql(json_data["table"], conn, schema = json_data["schema"],
-            #     index = False, if_exists = "append"
-            # )
+            return True
         else:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name to drop',
             json_data["task"]["target"]["table_name"])
-            # audit(audit_json_path,json_data, task_id,'STATUS','COMPLETED')
-            # sys.exit()
-            return "Fail"
+            return False
     except Exception as error:
         # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
         log2.exception("drop() is %s", str(error))
@@ -306,9 +298,9 @@ def write(prj_nm,json_data,datafram,counter,config_file_path,task_id,run_id,path
         elif json_data["task"]["target"]["operation"] not in ("create", "append",
             "truncate", "drop","replace"):
             log2.error("give propper input for operation condition")
-            status = "Fail"
+            status = False
             # sys.exit()
-        if json_data["task"]["target"]["operation"] != "drop":
+        if json_data["task"]["target"]["operation"] != "drop" and status is not False:
             connection = conn.raw_connection()
             cursor = connection.cursor()
             sql = f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};'
@@ -318,7 +310,6 @@ def write(prj_nm,json_data,datafram,counter,config_file_path,task_id,run_id,path
             log2.info('the number of records present in target table after ingestion:%s',
             myresult[-1][-1])
         conn.dispose()
-        # return myresult[-1][-1]
         return status
     # except OperationalError:
     #     # log2.error("there are duplicate column names in the target table")

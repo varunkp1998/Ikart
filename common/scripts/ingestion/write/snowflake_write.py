@@ -10,6 +10,10 @@ from snowflake.connector.errors import ProgrammingError
 from utility import get_config_section,decrypt
 
 log2 = logging.getLogger('log2')
+CURRENT_TIMESTAMP = "%Y-%m-%d %H:%M:%S"
+SNOWFLAKE_LOG_STATEMENT = "snowflake ingestion completed"
+WITH_AUDIT_COLUMNS = "data ingesting with audit columns"
+WITH_OUT_AUDIT_COLUMNS = "data ingesting with out audit columns"
 
 def db_table_exists(conn: dict,database: str,schema: str, table_name: str)-> bool:
     """ function for checking whether a table exists or not in snowflake """
@@ -23,10 +27,6 @@ def db_table_exists(conn: dict,database: str,schema: str, table_name: str)-> boo
         cursor.execute(sql)
         # print(bool(cursor.rowcount))
         return bool(cursor.rowcount)
-        # results_df = pd.read_sql_query(sql, conn)
-        # print(results_df)
-        # print(bool(len(results_df)))
-        # return bool(len(results_df))
     except Exception as error:
         log2.exception("db_table_exists() is %s", str(error))
         raise error
@@ -34,16 +34,16 @@ def db_table_exists(conn: dict,database: str,schema: str, table_name: str)-> boo
     # print(bool(len(results_df)))
     # return bool(len(results_df))
 
-def establish_conn(json_data: dict, json_section: str,config_file_path:str) -> bool:
+def establish_conn(json_data: dict, json_section: str,config_file_path:str):
     """establishes connection for the snowflake database
        you pass it through the json"""
     try:
         connection_details =  get_config_section(config_file_path+json_data["task"][json_section]\
-        ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
+        ["connection_name"]+'.json')
         password = decrypt(connection_details["password"])
-        conn = sqlalchemy.create_engine(f'snowflake://{connection_details["user"]}'
+        conn = sqlalchemy.create_engine(f'snowflake://{connection_details["username"]}'
         f':{password.replace("@", "%40")}@{connection_details["account"]}/'
-        f':{connection_details["database"]}/{connection_details["schema"]}'
+        f':{connection_details["database"]}/{json_data["task"]["target"]["schema"]}'
         f'?warehouse={connection_details["warehouse"]}&role={connection_details["role"]}')
         # log2.info("connection established")
         return conn,connection_details
@@ -60,27 +60,25 @@ def create(json_data: dict, conn, datafram, conn_details) -> bool:
             json_data["task"]["target"]["table_name"])
             schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
             if json_data["task"]["target"]["audit_columns"] == "active":
-                datafram['CRTD_BY']=conn_details["user"]
-                datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                datafram['CRTD_BY']=conn_details["username"]
+                datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                 datafram['UPDT_BY']= " "
                 datafram['UPDT_DTTM']= " "
-                log2.info("data ingesting with audit columns")
-                # log2.info(datafram['ORDERDATE'])
-                # schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
+                log2.info(WITH_AUDIT_COLUMNS)
                 datafram.to_sql(json_data["task"]["target"]["table_name"], conn,\
                 schema = schema_name,index = False, if_exists = "append")
-                log2.info("snowflake ingestion completed")
+                log2.info(SNOWFLAKE_LOG_STATEMENT)
             else:
-                log2.info("data ingesting without audit columns")
+                log2.info(WITH_OUT_AUDIT_COLUMNS)
                 datafram.to_sql(json_data["task"]["target"]["table_name"], conn,\
                 schema = schema_name,index = False, if_exists = "append")
-                log2.info("snowflake ingestion completed")
+                log2.info(SNOWFLAKE_LOG_STATEMENT)
         else:
             # if table exists, it will say table is already present, give new name to create
             log2.error('%s already exists, so give a new table name to create',
             json_data["task"]["target"]["table_name"])
             # sys.exit()
-            return "Fail"
+            return False
     except Exception as error:
         log2.exception("create() is %s", str(error))
         raise error
@@ -94,33 +92,32 @@ def append(json_data: dict, conn: dict, datafram,conn_details) -> bool:
             json_data["task"]["target"]["table_name"])
             schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
             if json_data["task"]["target"]["audit_columns"] == "active":
-                datafram['CRTD_BY']=conn_details["user"]
-                datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                datafram['CRTD_BY']=conn_details["username"]
+                datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                 datafram['UPDT_BY']= " "
                 datafram['UPDT_DTTM']= " "
-                log2.info("data ingesting with audit columns")
-                # schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
+                log2.info(WITH_AUDIT_COLUMNS)
                 datafram.to_sql(json_data["task"]["target"]["table_name"], conn,
                 schema = schema_name ,index = False, if_exists = "append")
-                log2.info("snowflake ingestion completed")
+                log2.info(SNOWFLAKE_LOG_STATEMENT)
             else:
-                log2.info("data ingesting without audit columns")
+                log2.info(WITH_OUT_AUDIT_COLUMNS)
                 datafram.to_sql(json_data["task"]["target"]["table_name"], conn,
                 schema = schema_name ,index = False, if_exists = "append")
-                log2.info("snowflake ingestion completed")
+                log2.info(SNOWFLAKE_LOG_STATEMENT)
         else:
             # if table is not there, then it will say table does not exist
             # create table first or give table name that exists to append data
             log2.error('%s does not exists, so create table first',\
             json_data["task"]["target"]["table_name"])
             # sys.exit()
-            return "Fail"
+            return False
     except ProgrammingError:
         # if 'column "CRTD_BY" of relation' in str(error):
         # if "invalid identifier 'CRTD_BY'" in str(error):
         log2.error("audit columns not found in the table previously to append")
             # sys.exit()
-        return "Fail"
+        return False
             # raise Exception("audit columns not found in the table previously") from error
         # else:
         #     log2.exception("append() is %s", str(error))
@@ -142,46 +139,45 @@ def truncate(json_data: dict, conn: dict,datafram,counter: int, conn_details) ->
                 log2.info("snowflake truncating table finished, started inserting data into "
                 "%s table", json_data["task"]["target"]["table_name"])
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    datafram['CRTD_BY']=conn_details["user"]
-                    datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    datafram['CRTD_BY']=conn_details["username"]
+                    datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     datafram['UPDT_BY']= " "
                     datafram['UPDT_DTTM']= " "
-                    log2.info("data ingesting with audit columns")
+                    log2.info(WITH_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"],conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
                 else:
-                    log2.info("data ingesting without audit columns")
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"],conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
             else:
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    datafram['CRTD_BY']=conn_details["user"]
-                    datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    datafram['CRTD_BY']=conn_details["username"]
+                    datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     datafram['UPDT_BY']= " "
                     datafram['UPDT_DTTM']= " "
-                    log2.info("data ingesting with audit columns")
+                    log2.info(WITH_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"],conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
                 else:
-                    log2.info("data ingesting without audit columns")
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"], conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
         else:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name to truncate',
             json_data["task"]["target"]["table_name"])
             # sys.exit()
-            return "Fail"
+            return False
     except ProgrammingError as error:
         if 'column "inserted_by" of relation' in str(error):
             log2.error("audit columns not found in the table previously to insert data")
             # sys.exit()
-            return "Fail"
-            # raise Exception("audit columns not found in the table previously") from error
+            return False
         else:
             log2.exception("append() is %s", str(error))
             raise error
@@ -198,20 +194,13 @@ def drop(json_data: dict, conn: dict,conn_details) -> bool:
             f'{json_data["task"]["target"]["table_name"]}')
             conn.execution_options(autocommit=True).execute(drop_query)
             log2.info("snowflake dropping table completed")
-            # sys.exit()
-            return "drop_Pass"
-            # log2.info(" table drop finished, started inserting data into
-            #  %s table", json_data["table"])
-            # for chunk in dataframe:
-            #     chunk.to_sql(json_data["table"], conn, schema = json_data["schema"],
-            #     index = False, if_exists = "append"
-            # )
+            return True
         else:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name to drop',
             json_data["task"]["target"]["table_name"])
             # sys.exit()
-            return "Fail"
+            return False
     except Exception as error:
         log2.exception("drop() is %s", str(error))
         raise error
@@ -231,43 +220,41 @@ def replace(json_data: dict, conn: dict, datafram,counter: int, conn_details: li
                 f'{json_data["task"]["target"]["table_name"]}')
                 conn.execution_options(autocommit=True).execute(replace_query)
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    datafram['CRTD_BY']=conn_details["user"]
-                    datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    datafram['CRTD_BY']=conn_details["username"]
+                    datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     datafram['UPDT_BY']= " "
                     datafram['UPDT_DTTM']= " "
-                    log2.info("data ingesting with audit columns")
-                    # dataframe = dataframe.fillna("etl_user")
+                    log2.info(WITH_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"],conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
                 else:
-                    log2.info("data ingesting without audit columns")
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"], conn, schema =
                     schema_name,
                     index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
             else:
                 if json_data["task"]["target"]["audit_columns"] == "active":
-                    datafram['CRTD_BY']=conn_details["user"]
-                    datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    datafram['CRTD_BY']=conn_details["username"]
+                    datafram['CRTD_DTTM']= datetime.now().strftime(CURRENT_TIMESTAMP)
                     datafram['UPDT_BY']= " "
                     datafram['UPDT_DTTM']= " "
-                    log2.info("data ingesting with audit columns")
-                    # dataframe = dataframe.fillna("etl_user")
+                    log2.info(WITH_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"],conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
                 else:
-                    log2.info("data ingesting without audit columns")
+                    log2.info(WITH_OUT_AUDIT_COLUMNS)
                     datafram.to_sql(json_data["task"]["target"]["table_name"], conn, schema =
                     schema_name,index = False, if_exists = "append")
-                    log2.info("snowflake ingestion completed")
+                    log2.info(SNOWFLAKE_LOG_STATEMENT)
         else:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name',\
             json_data["task"]["target"]["table_name"])
             # sys.exit()
-            return "Fail"
+            return False
     except Exception as error:
         log2.exception("replace() is %s", str(error))
         raise error
@@ -319,9 +306,9 @@ def write(prj_nm,json_data, datafram,counter,config_file_path,task_id,run_id,pat
             "drop","replace"):
             log2.error("give proper input for operation to be performed on table")
             # sys.exit()
-            status = "Fail"
+            status = False
         if json_data["task"]["target"]["operation"] in ("create", "append","truncate",
-            "replace"):
+            "replace") and status is not False:
             connection = conn2.raw_connection()
             cursor = connection.cursor()
             schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
@@ -335,11 +322,11 @@ def write(prj_nm,json_data, datafram,counter,config_file_path,task_id,run_id,pat
         return status
     except ProgrammingError : #to handle table not found issue
         log2.error("the table or connection specified in the command is incorrect")
-        # write_to_txt(task_id,'FAILED',file_path)
+        write_to_txt(task_id,'FAILED',file_path)
         # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         sys.exit()
     except Exception as error:
-        # write_to_txt(task_id,'FAILED',file_path)
+        write_to_txt(task_id,'FAILED',file_path)
         # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         log2.exception("ingest_data_to_snowflake() is %s", str(error))
         raise error

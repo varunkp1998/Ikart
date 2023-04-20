@@ -23,12 +23,12 @@ def write_to_txt(task_id,status,file_path):
         raise error
 
 def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,skip_header = 0,
-skip_footer= 0, sheet_name= 0)-> bool:
+skip_footer= 0, sheet_name= 0):
     """ function for reading data from excel"""
     try:
         log2.info("reading excel initiated...")
-        path1 = json_data["task"]["source"]["source_file_path"]+\
-        json_data["task"]["source"]["source_file_name"]
+        path1 = json_data["task"]["source"]["file_path"]+\
+        json_data["task"]["source"]["file_name"]
         # function for reading files present in a folder with different csv formats
         all_files = [f for f_ in [glob.glob(e) for e in (f'{path1}*.xls',
         f'{path1}*.xlsx', f'{path1}*.xlsm', f'{path1}*.xlsb') ] for f in f_]
@@ -42,28 +42,18 @@ skip_footer= 0, sheet_name= 0)-> bool:
                 '_audit_'+run_id+'.json'
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
-            json_data["task"]["source"]["source_file_name"])
+            json_data["task"]["source"]["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
             audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
             sys.exit()
-            #return False
         else:
             default_skip_header = skip_header if json_data["task"]["source"]["skip_header"]==" "\
             else json_data["task"]["source"]["skip_header"]
             default_skip_footer = skip_footer if json_data["task"]["source"]["skip_footer"]==" "\
             else json_data["task"]["source"]["skip_footer"]
-            # default_usecols = usecols  if json_data["task"]["source"]["select_columns"]==" "\
-            # else list(json_data["task"]["source"]["select_columns"].split(","))
             default_sheet_name = sheet_name if json_data["task"]["source"]["sheet_name"]==" "\
              else json_data["task"]["source"]["sheet_name"]
             for file in all_files:
-            # print(default_alias_cols)
-            # default_header ='infer' if json_data["task"]["source"]["alias_columns"] == " "\
-            #else None
-                count = 0
-            # df = pd.DataFrame()
-            for file in all_files:
-                count +=1
                 data = pd.read_excel(io = file)
                 # print(type(data))
                 row_count = data.shape[0]-default_skip_header-default_skip_footer

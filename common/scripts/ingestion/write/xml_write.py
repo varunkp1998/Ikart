@@ -7,8 +7,8 @@ def write(json_data: dict, chunk) -> bool:
     """ function for converting csv  to xml"""
     try:
         log2.info("converting data to xml initiated")
-        chunk.to_xml(json_data["task"]["target"]["target_file_path"] + \
-        json_data["task"]["target"]["target_file_name"],
+        chunk.to_xml(json_data["task"]["target"]["file_path"] + \
+        json_data["task"]["target"]["file_name"],
                 index=True)
         log2.info("csv to xml conversion completed")
         return True

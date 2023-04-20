@@ -6,6 +6,7 @@ import os
 import pandas as pd
 
 log2 = logging.getLogger('log2')
+ITERATION='%s iteration'
 
 def write_to_txt(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
@@ -22,13 +23,13 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = ",", skip_header = 0,
-        skip_footer= 0, quotechar = '"', escapechar = None) -> bool:
+def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = ",", skip_header= 0,
+        skip_footer= 0, quotechar = '"', escapechar = None):
     """ function for reading data from csv"""
     try:
         log2.info("reading csv initiated...")
-        path = json_data["task"]["source"]["source_file_path"]+\
-        json_data["task"]["source"]["source_file_name"]
+        path = json_data["task"]["source"]["file_path"]+\
+        json_data["task"]["source"]["file_name"]
         # function for reading files present in a folder with different csv formats
         all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}*.csv',
         f'{path}*.csv.zip', f'{path}*.gz', f'{path}*.bz2') ] for f in f_]
@@ -42,7 +43,7 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = 
                 '_audit_'+run_id+'.json'
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
-            json_data["task"]["source"]["source_file_name"])
+            json_data["task"]["source"]["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
             audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
             sys.exit()
@@ -55,19 +56,15 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = 
             ==" " else json_data["task"]["source"]["skip_footer"]
             default_quotechar = quotechar if json_data["task"]["source"]["quote_char"]==" " else\
             json_data["task"]["source"]["quote_char"]
-            default_escapechar = escapechar if json_data["task"]["source"]["escape_char"]==" " else\
-            json_data["task"]["source"]["escape_char"]
+            default_escapechar=escapechar if json_data["task"]["source"]["escape_char"]=="none" \
+            else json_data["task"]["source"]["escape_char"]
             default_select_cols = None if json_data["task"]["source"]["select_columns"]==" " else\
             list(json_data["task"]["source"]["select_columns"].split(","))
             default_alias_cols = None if json_data["task"]["source"]["alias_columns"]==" " else\
             list(json_data["task"]["source"]["alias_columns"].split(","))
             default_encoding = "utf-8" if json_data["task"]["source"]["encoding"]==" " else\
             json_data["task"]["source"]["encoding"]
-            # print(default_alias_cols)
-            count = 0
-            # df = pd.DataFrame()
             for file in all_files:
-                count +=1
                 data = pd.read_csv(filepath_or_buffer = file,encoding=default_encoding,
                 low_memory=False)
                 audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',data.shape[0])
@@ -84,7 +81,7 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = 
                     quotechar = default_quotechar, escapechar = default_escapechar,
                     encoding = default_encoding):
                         count1 = 1 + count1
-                        log2.info('%s iteration' , str(count1))
+                        log2.info(ITERATION , str(count1))
                         # print(list(chunk.columns))
                         yield chunk
                 elif json_data["task"]["source"]["select_columns"] != " " and \
@@ -99,7 +96,7 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = 
                     quotechar = default_quotechar, escapechar = default_escapechar,
                     encoding = default_encoding):
                         count1 = 1 + count1
-                        log2.info('%s iteration' , str(count1))
+                        log2.info(ITERATION , str(count1))
                         # print(list(chunk.columns))
                         yield chunk
                 elif json_data["task"]["source"]["select_columns"] == " " and \
@@ -114,7 +111,7 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = 
                     quotechar = default_quotechar, escapechar = default_escapechar,
                     encoding = default_encoding):
                         count1 = 1 + count1
-                        log2.info('%s iteration' , str(count1))
+                        log2.info(ITERATION , str(count1))
                         # print(list(chunk.columns))
                         yield chunk
                 elif json_data["task"]["source"]["select_columns"] == " " and \
@@ -129,7 +126,7 @@ def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,delimiter = 
                     quotechar = default_quotechar, escapechar = default_escapechar,
                     encoding = default_encoding):
                         count1 = 1 + count1
-                        log2.info('%s iteration' , str(count1))
+                        log2.info(ITERATION , str(count1))
                         # print(list(chunk.columns))
                         yield chunk
     except Exception as error:

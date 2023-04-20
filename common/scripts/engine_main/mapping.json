@@ -19,9 +19,9 @@
    "textfile_read":"text_read.py",
    "textfile_write":"text_write.py",
    "snowflake_read": "snowflake_read.py",
-   "snowflake_write": "snowflake_write.py",
-   "s3_read": "s3_read.py",
-   "s3_write": "s3_write.py"
+   "snowflake_write": "snowflake_write.py" ,
+   "s3_read":"s3_read.py",
+   "s3_write":"s3_write.py" 
 }
 }
 

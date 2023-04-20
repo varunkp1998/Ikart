@@ -9,17 +9,17 @@ from snowflake.connector.errors import ProgrammingError
 
 log2 = logging.getLogger('log2')
 
-def establish_conn(json_data: dict, json_section: str,connection_file_path:str) -> bool:
+def establish_conn(json_data: dict, json_section: str,connection_file_path:str):
     """establishes connection for the snowflake database
        you pass it through the json"""
     try:
         connection_details =get_config_section(connection_file_path+json_data["task"][json_section]\
-        ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
-        # print(connection_details["user"])
+        ["connection_name"]+'.json')
+        # print(connection_details["username"])
         password = decrypt(connection_details["password"])
-        conn1= sqlalchemy.create_engine(f'snowflake://{connection_details["user"]}'
+        conn1= sqlalchemy.create_engine(f'snowflake://{connection_details["username"]}'
         f':{password.replace("@", "%40")}@{connection_details["account"]}/'
-        f':{connection_details["database"]}/{connection_details["schema"]}'
+        f':{connection_details["database"]}/{json_data["task"]["source"]["schema"]}'
         f'?warehouse={connection_details["warehouse"]}&role={connection_details["role"]}')
         log2.info("connection established")
         # log2.info("connection established")
@@ -43,7 +43,7 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,file_path) -> bool:
+def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,file_path):
     """ function for reading data from snowflake table"""
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+\
@@ -64,7 +64,6 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,f
             json_data["task"]["source"]["table_name"])
             schema_name =conn_details["database"]+'.'+ json_data["task"]["source"]["schema"]
             sql = f'SELECT count(0) from {schema_name}.{json_data["task"]["source"]["table_name"]};'
-            # sql = f'SELECT count(0) from  {json_data["task"]["source"]["table_name"]};'
             cursor.execute(sql)
             myresult = cursor.fetchall()
             audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])

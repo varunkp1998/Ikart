@@ -9,15 +9,15 @@ from utility import get_config_section,decrypt
 
 log2 = logging.getLogger('log2')
 
-def establish_conn(json_data: dict, json_section: str,config_file_path:str) -> bool:
+def establish_conn(json_data: dict, json_section: str,config_file_path:str):
     """establishes connection for the mysql database
        you pass it through the json"""
     try:
         connection_details = get_config_section(config_file_path+json_data["task"][json_section]
-        ["connection_name"]+'.json', json_data["task"][json_section]["connection_name"])
+        ["connection_name"]+'.json')
         password = decrypt(connection_details["password"])
-        conn1 = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["user"]}'
-        f':{password.replace("@", "%40")}@{connection_details["host"]}'
+        conn1 = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["username"]}'
+        f':{password.replace("@", "%40")}@{connection_details["hostname"]}'
         f':{int(connection_details["port"])}/{connection_details["database"]}', encoding='utf-8')
         # logging.info("connection established")
         return conn1
@@ -40,7 +40,7 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,file_path) -> bool:
+def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,file_path):
     """ function for reading data from mysql table"""
     audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
     paths_data["audit_path"]+task_id+\

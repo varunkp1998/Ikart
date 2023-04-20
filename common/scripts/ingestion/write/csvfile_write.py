@@ -9,36 +9,44 @@ def write(json_data: dict,datafram, counter) -> bool:
     """ function for writing data to csv file"""
     try:
         log2.info("writing data to csv file")
-        if counter ==1:
+        if counter ==1: # if it is first iteration
+            # if audit_columns are active
             if json_data["task"]["target"]["audit_columns"] == "active":
                 datafram['CRTD_BY']="etl_user"
                 datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 datafram['UPDT_BY']= " "
                 datafram['UPDT_DTTM']= " "
-                datafram.to_csv(json_data["task"]["target"]["target_file_path"],
-                sep=json_data["task"]["target"]["file_delimiter"], header=literal_eval(
+                datafram.to_csv(json_data["task"]["target"]["file_path"]+
+                json_data["task"]["target"]["file_name"],
+                sep=json_data["task"]["target"]["delimiter"], header=literal_eval(
                 json_data["task"]["target"]["header"]),
                 index=literal_eval(json_data["task"]["target"]["index"]), mode='w',\
                 encoding=json_data["task"]["target"]["encoding"])
             else:
-                datafram.to_csv(json_data["task"]["target"]["target_file_path"],
-                sep=json_data["task"]["target"]["file_delimiter"], header=literal_eval(
+                # if audit_columns are not active
+                datafram.to_csv(json_data["task"]["target"]["file_path"]+
+                json_data["task"]["target"]["file_name"],
+                sep=json_data["task"]["target"]["delimiter"], header=literal_eval(
                 json_data["task"]["target"]["header"]),
                 index=literal_eval(json_data["task"]["target"]["index"]), mode='w',\
                 encoding=json_data["task"]["target"]["encoding"])
-        else:
+        else: # if it is iteration other than first
             if json_data["task"]["target"]["audit_columns"] == "active":
+                # if audit_columns are active
                 datafram['CRTD_BY']="etl_user"
                 datafram['CRTD_DTTM']= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 datafram['UPDT_BY']= " "
                 datafram['UPDT_DTTM']= " "
-                datafram.to_csv(json_data["task"]["target"]["target_file_path"],
-                sep=json_data["task"]["target"]["file_delimiter"], header=False,\
+                datafram.to_csv(json_data["task"]["target"]["file_path"]+
+                json_data["task"]["target"]["file_name"],
+                sep=json_data["task"]["target"]["delimiter"], header=False,\
                 index=literal_eval(json_data["task"]["target"]["index"]),
                 mode='w', encoding=json_data["task"]["target"]["encoding"])
             else:
-                datafram.to_csv(json_data["task"]["target"]["target_file_path"],
-                sep=json_data["task"]["target"]["file_delimiter"], header=False,\
+                # if audit_columns are not active
+                datafram.to_csv(json_data["task"]["target"]["file_path"]+
+                json_data["task"]["target"]["file_name"],
+                sep=json_data["task"]["target"]["delimiter"], header=False,\
                 index=literal_eval(json_data["task"]["target"]["index"]),
                 mode='w', encoding=json_data["task"]["target"]["encoding"])
         return True
