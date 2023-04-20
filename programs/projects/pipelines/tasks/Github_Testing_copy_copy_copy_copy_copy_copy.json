@@ -1,0 +1,49 @@
+{
+  "project_name": "Order Tracking",
+  "pipeline_id": 58,
+  "pipeline_name": "pipeline to test",
+  "task_description": "testing",
+  "task_type": "Ingestion",
+  "task_name": "Github_Testing_copy_copy_copy_copy_copy_copy",
+  "task_sequence": "30",
+  "source": "Local Server",
+  "target": "AWS S3",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "csv_read",
+      "file_type": "csv",
+      "encoding": "utf-16",
+      "alias_columns": " ",
+      "connection_name": "ORDMSDB37",
+      "select_columns": " ",
+      "escape_char": "none",
+      "quote_char": "none",
+      "skip_footer": "  ",
+      "skip_header": "  ",
+      "file_name": "test1.csv",
+      "file_path": "/uploads/",
+      "delimiter": ","
+    },
+    "target": {
+      "table_name": "",
+      "target_type": "aws s3_write",
+      "file_type": "xml",
+      "encoding": "ascii",
+      "connection_name": "personal_s3accountUpdate",
+      "escape_char": "custom",
+      "quote_char": "\\\"",
+      "skip_footer": "  ",
+      "skip_header": " ",
+      "file_name": "csv",
+      "file_path": "  csvf",
+      "delimiter": "|",
+      "operation": "append"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
