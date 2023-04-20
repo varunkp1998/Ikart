@@ -1,0 +1,37 @@
+{
+  "id": null,
+  "project_name": "Sales",
+  "pipeline_id": 10,
+  "pipeline_name": "pipeline1",
+  "task_description": "Preview",
+  "task_type": "Ingestion",
+  "task_name": "MSsQL_copy",
+  "task_sequence": "1",
+  "source": "MSSQL",
+  "target": "MSSQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "schema_name": "information_schema",
+      "source_type": "mysql_read",
+      "table_name": "tbl_pgm",
+      "query": "select * from tbl_pgm;",
+      "chunk_size": 1000,
+      "alias_columns": "no",
+      "connection_name": "ORDMSDB3",
+      "select_columns": "10"
+    },
+    "target": {
+      "schema_name": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "tbl_pgm",
+      "connection_name": "ORDMSDB3",
+      "operation": "replace",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
