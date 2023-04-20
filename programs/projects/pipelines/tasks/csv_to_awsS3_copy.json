@@ -1,0 +1,49 @@
+{
+  "id": null,
+  "project_name": "Order Tracking",
+  "pipeline_id": 1,
+  "pipeline_name": "Open_Orders_Ingestion",
+  "task_description": "csv_to_awsS3 desc",
+  "task_type": "injestion",
+  "task_name": "csv_to_awsS3_copy",
+  "task_sequence": "44",
+  "source": "Local Server",
+  "target": "AWS S3",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "csv_read",
+      "file_type": "csv",
+      "encoding": "utf-8",
+      "alias_columns": " ",
+      "connection_name": "Local server",
+      "select_columns": " ",
+      "escape_char": "none",
+      "quote_char": "none",
+      "skip_footer": " ",
+      "skip_header": " ",
+      "file_name": "sales_data",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+      "delimiter": ","
+    },
+    "target": {
+      "file_type": "csv",
+      "target_type": "aws s3_write",
+      "encoding": "utf-8",
+      "connection_name": "aws_connection_test",
+      "escape_char": "none",
+      "quote_char": "none",
+      "skip_footer": " ",
+      "skip_header": " ",
+      "file_path": "test/",
+      "file_name": "test2.csv",
+      "delimiter": ",",
+      "operation": "append"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
