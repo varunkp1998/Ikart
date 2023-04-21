@@ -1,0 +1,36 @@
+{
+  "project_name": "Order Tracking",
+  "pipeline_id": 14,
+  "pipeline_name": "pipeline to extract ",
+  "task_description": "preview_postgressql",
+  "task_type": "Ingestion",
+  "task_name": "Tetst2_copy_copy",
+  "task_sequence": "2",
+  "source": "PostgreSQL",
+  "target": "PostgreSQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "postgresql_read",
+      "alias_columns": "yes",
+      "connection_name": "ORDMSDB",
+      "select_columns": "10",
+      "schema_name": "public",
+      "table_name": "tbl_task",
+      "query": "select * from tbl_task;"
+    },
+    "target": {
+      "connection_name": "ORDMSDB",
+      "target_type": "postgresql_write",
+      "operation": "replace",
+      "audit_columns": "inactive",
+      "schema_name": "public",
+      "table_name": "tbl_task"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
