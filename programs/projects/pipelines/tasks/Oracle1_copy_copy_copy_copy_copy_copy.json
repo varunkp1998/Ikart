@@ -1,0 +1,42 @@
+{
+  "project_name": "Order Tracking",
+  "pipeline_id": 1,
+  "pipeline_name": "Open_Orders_Ingestion",
+  "task_description": "preview_tables",
+  "task_type": "Ingestion",
+  "task_name": "Oracle1_copy_copy_copy_copy_copy_copy",
+  "task_sequence": "3",
+  "source": "Oracle",
+  "target": "Oracle",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "oracle_read",
+      "table_name": "TASK_TBL",
+      "query": "select * from TASK_TBL;",
+      "chunk_size": 1000,
+      "alias_columns": "no",
+      "connection_name": "ORDMSDB15",
+      "select_columns": "10"
+    },
+    "target": {
+      "id": "281",
+      "target_type": "oracle_write",
+      "project_name": "Order Tracking",
+      "pipeline_name": "Open_Orders_Ingestion",
+      "source": "Oracle",
+      "target": "Oracle",
+      "is_active": "Y",
+      "schema": "public",
+      "table_name": "TASK_TBL",
+      "connection_name": "ORDMSDB15",
+      "operation": "drop",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
