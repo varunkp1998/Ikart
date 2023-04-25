@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "dq_check_01",
+  "task_description": "checking",
+  "task_type": "Ingestiondwqqwdd",
+  "task_sequence": "1",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "TASK_TBL",
+      "query": "etet",
+      "chunk_size": 1000,
+      "connection_name": "Mysql_Local_Connection_01",
+      "select_columns": "3"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mssql_write",
+      "table_name": "fgh",
+      "connection_name": "ORDMSDB3",
+      "operation": "replace",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
