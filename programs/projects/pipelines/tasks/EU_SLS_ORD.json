@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 10,
+  "task_name": "EU_SLS_ORD",
+  "task_description": "dq_check",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "select * from tbl_user;",
+      "chunk_size": 1000,
+      "connection_name": "Mysql_Local_Connection_01",
+      "select_columns": "3"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "sales_data1",
+      "connection_name": "Mysql_Local_Connection_02",
+      "operation": "replace",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
