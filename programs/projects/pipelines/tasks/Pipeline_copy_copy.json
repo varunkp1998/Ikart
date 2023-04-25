@@ -1,0 +1,38 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 10,
+  "task_name": "Pipeline_copy_copy",
+  "task_description": "Pipeline_copy",
+  "task_type": "Ingestion",
+  "task_sequence": 1,
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "Ing",
+      "query": "select * from Ing",
+      "chunk_size": 0,
+      "connection_name": "ORDMSDB12",
+      "select_columns": "0"
+    },
+    "target": {
+      "id": null,
+      "target_type": "mysql_write",
+      "project_name": "Sales",
+      "pipeline_name": "pipeline1",
+      "source": "MySQL",
+      "target": "MySQL",
+      "is_active": "Y",
+      "schema": "public",
+      "table_name": "Ing",
+      "connection_name": "ORDMSDB12",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
