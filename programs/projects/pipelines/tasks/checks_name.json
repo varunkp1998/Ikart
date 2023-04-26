@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "checks_name",
+  "task_description": "dq",
+  "task_type": "Ingestion",
+  "task_sequence": "5",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "select * from tbl_user;",
+      "chunk_size": 1000,
+      "connection_name": "Mysql_Local_Connection_02",
+      "select_columns": "1"
+    },
+    "target": {
+      "schema": "1000",
+      "target_type": "mysql_write",
+      "table_name": "public",
+      "connection_name": "RDS_MYSQL_ingest",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
