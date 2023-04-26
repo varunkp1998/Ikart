@@ -1,0 +1,15 @@
+{
+  "created_dttm": {
+    "val": "CURRENT_TIMESTAMP"
+  },
+  "updated_dttm": {
+    "val": "CURRENT_TIMESTAMP"
+  },
+  "id": 228,
+  "program_name": "Endura_Cor",
+  "program_description": "Endura handles Import & Export of Generic drugs to be supplied to few Pharma Corporations",
+  "primary_stakeholder": "Jane McCullum",
+  "secondary_stakeholder": null,
+  "is_active": "Y",
+  "created_by": "admin"
+}
