@@ -1,0 +1,10 @@
+{
+  "id": 47,
+  "pipeline_id": "555",
+  "task/pipeline_name": "P_222",
+  "run_id": "20230421115014_55",
+  "iteration": "1",
+  "audit_type": "STATUS",
+  "audit_value": "STARTED",
+  "process_dttm": "2023-04-21T06:20:14.630Z"
+}
