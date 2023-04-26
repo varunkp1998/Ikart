@@ -1,0 +1,10 @@
+{
+  "id": 48,
+  "pipeline_id": "1",
+  "task/pipeline_name": "Task 1",
+  "run_id": "1",
+  "iteration": 1,
+  "audit_type": "STATUS",
+  "audit_value": "STARTED",
+  "process_dttm": "2023-04-21T11:50:14.000Z"
+}
