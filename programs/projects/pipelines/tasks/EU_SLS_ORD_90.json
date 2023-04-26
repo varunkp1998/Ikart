@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "EU_SLS_ORD_90",
+  "task_description": "hht",
+  "task_type": "Ingestion",
+  "task_sequence": "30",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "PUBLIC",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "grtgrgrtgtr",
+      "chunk_size": null,
+      "connection_name": "mysql_docker_connection",
+      "select_columns": "1"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "public",
+      "connection_name": "Mysql_Local_Connection_02",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
