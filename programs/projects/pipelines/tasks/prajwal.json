@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "prajwal",
+  "task_description": "nandish",
+  "task_type": "Ingestion",
+  "task_sequence": "5",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mssql_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "select * from tbl_user;",
+      "chunk_size": 1000,
+      "connection_name": "Mssql_Local_Connection_01",
+      "select_columns": "1"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "oracle_write",
+      "table_name": "public",
+      "connection_name": "Oracle_Connection_01",
+      "operation": "truncate",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
