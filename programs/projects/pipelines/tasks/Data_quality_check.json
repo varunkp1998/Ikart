@@ -1,0 +1,32 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "Data_quality_check",
+  "task_description": "Data_quality_check_01",
+  "task_type": "Ingestion",
+  "task_sequence": "5",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "PUBLIC",
+      "source_type": "snowflake_read",
+      "table_name": "TBL_PGM",
+      "query": "select * from tbl_user;",
+      "chunk_size": 1000,
+      "connection_name": "SnowFlake_Connection_01"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "tbl_configuration_option",
+      "connection_name": "Mysql_Local_Connection_02",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
