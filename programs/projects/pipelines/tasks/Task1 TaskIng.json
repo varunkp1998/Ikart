@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "Task1 TaskIng",
+  "task_description": "TaskIng",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "Ing",
+      "query": "select * from Ing",
+      "chunk_size": 0,
+      "connection_name": "MySQLforcopy",
+      "select_columns": "100000"
+    },
+    "target": {
+      "schema": "public",
+      "target_type": "mysql_write",
+      "table_name": "Ing",
+      "connection_name": "MySQLforcopy",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
