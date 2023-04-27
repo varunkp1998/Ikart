@@ -1,0 +1,38 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "taskfortesting_copy_copy",
+  "task_description": "taskfortesting",
+  "task_type": "Ingestion",
+  "task_sequence": 1,
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_option",
+      "query": "select * from tbl_configuration_option",
+      "chunk_size": 0,
+      "connection_name": "MySQLforcopy",
+      "select_columns": "0"
+    },
+    "target": {
+      "id": null,
+      "target_type": "mysql_write",
+      "project_name": "HRMS",
+      "pipeline_name": "pipeline8",
+      "source": "MySQL",
+      "target": "MySQL",
+      "is_active": "Y",
+      "schema": "public",
+      "table_name": "tbl_configuration_option",
+      "connection_name": "MySQLforcopy",
+      "operation": "replace",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
