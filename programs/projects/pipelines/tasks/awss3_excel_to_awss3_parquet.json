@@ -1,0 +1,32 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "awss3_excel_to_awss3_parquet",
+  "task_description": "",
+  "task_type": "Ingestion",
+  "task_sequence": "30",
+  "Details": "",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "aws s3_read",
+      "file_type": "xlsx",
+      "file_name": "test2.xlsx",
+      "file_path": "test/",
+      "connection_name": "personal_s3account"
+    },
+    "target": {
+      "file_type": "parquet",
+      "target_type": "aws s3_write",
+      "connection_name": "personal_s3account",
+      "file_path": "test2.parquet",
+      "file_name": "test/",
+      "operation": "replace"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
