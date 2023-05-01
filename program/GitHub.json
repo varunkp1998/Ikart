@@ -1,15 +1,12 @@
 {
-  "created_dttm": {
-    "val": "CURRENT_TIMESTAMP"
-  },
-  "updated_dttm": {
-    "val": "CURRENT_TIMESTAMP"
-  },
   "id": 212,
   "program_name": "GitHub",
-  "program_description": "testing",
-  "primary_stakeholder": "nms",
+  "program_description": "testing 12",
+  "primary_stakeholder": "nm",
   "secondary_stakeholder": "lkp",
   "is_active": "Y",
-  "created_by": "system"
+  "created_by": "system",
+  "created_dttm": "2023-04-17T09:08:40.000Z",
+  "updated_by": "system",
+  "updated_dttm": "2023-05-01T06:59:37.000Z"
 }
