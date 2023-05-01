@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "Task1rae",
+  "task_description": "egarwg",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "rtgt",
+      "source_type": "mysql_read",
+      "table_name": "aergdg",
+      "query": "rzgc",
+      "chunk_size": null,
+      "connection_name": "MySQLforcopy",
+      "select_columns": "100000"
+    },
+    "target": {
+      "schema": "aetgc",
+      "target_type": "mysql_write",
+      "table_name": "e5ardgv",
+      "connection_name": "ORDMSDB",
+      "operation": "append",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
