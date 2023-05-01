@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 14,
+  "task_name": "EU_SLS_ORD_task_name",
+  "task_description": "EU_SLS_ORD_task_name",
+  "task_type": "Ingestion",
+  "task_sequence": "2",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "grtgrgrtgtr",
+      "chunk_size": null,
+      "connection_name": "ORDMSDB12",
+      "select_columns": "1"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "oracle_write",
+      "table_name": "sales_data1",
+      "connection_name": "Oracle",
+      "operation": "replace",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
