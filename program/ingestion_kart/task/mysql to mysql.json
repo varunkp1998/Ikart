@@ -1,0 +1,29 @@
+{
+  "is_active": "Y",
+  "id": 194,
+  "pipeline_id": 9,
+  "task_name": "mysql to mysql",
+  "task_description": "mysql to mysql",
+  "task_type": "mysql to mysql create",
+  "task_sequence": "31",
+  "task": {
+    "source": {
+      "query": "select * from tbl_user",
+      "source_type": "mysql_read",
+      "connection_name": "mysql connection",
+      "chunk_size": 1000,
+      "table_name": "tbl_user",
+      "schema": "information_schema"
+    },
+    "target": {
+      "target_type": "mysql_write",
+      "audit_columns": "active",
+      "operation": "create",
+      "connection_name": "mysql connection"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
