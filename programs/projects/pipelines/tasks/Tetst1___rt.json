@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "Tetst1___rt",
+  "task_description": "dq_checking",
+  "task_type": "Ingestion",
+  "task_sequence": "2",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "PUBLIC",
+      "source_type": "mysql_read",
+      "table_name": "TASK_TBL",
+      "query": "select * from tbl_user;",
+      "chunk_size": null,
+      "connection_name": "Mysql_Local_Connection_01",
+      "select_columns": "1"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mssql_write",
+      "table_name": "public",
+      "connection_name": "ORDMSDB3",
+      "operation": "append",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
