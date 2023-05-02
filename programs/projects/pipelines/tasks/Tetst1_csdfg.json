@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "Tetst1_csdfg",
+  "task_description": "eeww",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "mysql_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "select * from tbl_user;",
+      "chunk_size": 1000,
+      "connection_name": "mysql_rds",
+      "select_columns": "acac"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "oracle_write",
+      "table_name": "public",
+      "connection_name": "Oracle_Connection_01",
+      "operation": "drop",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
