@@ -1,0 +1,33 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "Tetst1_nakul_checking",
+  "task_description": "testing",
+  "task_type": "Ingestion",
+  "task_sequence": "2",
+  "Details": "",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "oracle_read",
+      "table_name": "tbl_configuration_detail",
+      "query": "select * from tbl_user;",
+      "chunk_size": 1000,
+      "connection_name": "ORDMSDB15",
+      "select_columns": "10"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "public",
+      "connection_name": "MySQL",
+      "operation": "replace",
+      "audit_columns": "inactive"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
