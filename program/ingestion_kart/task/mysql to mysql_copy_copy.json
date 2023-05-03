@@ -1,0 +1,67 @@
+{
+  "is_active": "Y",
+  "id": "194",
+  "pipeline_id": 9,
+  "task_name": "mysql to mysql_copy_copy",
+  "task_description": "mysql to mysql",
+  "task_type": "mysql to mysql create",
+  "task_sequence": "31",
+  "task": {
+    "source": {
+      "chunk_size": 1000,
+      "source_type": "mysql_read",
+      "connection_name": "mysql_1",
+      "schema": "information_schema",
+      "table_name": " ",
+      "query": "select * from sales_18",
+      "select_columns": " "
+    },
+    "target": {
+      "operation": "append",
+      "target_type": "mysql_write",
+      "connection_name": "mysql_1",
+      "audit_columns": "inactive",
+      "schema": "information_schema",
+      "table_name": " sales_32"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    },
+    "data_quality_features": {
+      "dq_auto_correction_required": "N",
+      "dq_auto_correct_columns": {
+        "county": "county_nm",
+        "state": "stt"
+      },
+      "dq_lkup_key_column": {
+        "zip": "zip_code"
+      },
+      "dq_lookup_file_path": "C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
+      "data_masking_required": "N",
+      "data_masking_columns": {
+        "msk_date": "0,DateOfBirth",
+        "msk_alpha": "x,PersonalEmail,IBAN",
+        "msk_numeric": "*,BSNNumber,account_no"
+      },
+      "data_encryption_required": "N",
+      "data_decryption_required": "N",
+      "data_encryption_columns": "LastName, IBAN, PersonalEmail",
+      "data_decryption_columns": "LastName, PersonalEmail"
+    },
+    "data_quality": [
+      {
+        "check": "column_max_to_be_between",
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": "20",
+        "type": "pre_check",
+        "parameters": {
+          "column": "SALES",
+          "max": "100",
+          "min": "0"
+        }
+      }
+    ]
+  }
+}
