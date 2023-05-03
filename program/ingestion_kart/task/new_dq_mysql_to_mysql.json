@@ -25,7 +25,7 @@
       "table_name": " sales_32"
     },
     "data_quality_execution": {
-      "pre_check_enable": "N",
+      "pre_check_enable": "Y",
       "post_check_enable": "N"
     },
     "data_quality": [
