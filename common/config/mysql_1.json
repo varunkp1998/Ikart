@@ -1,9 +1,0 @@
-{
-    "mysql_1": {
-      "host": "ikart-dev.cpe2skhikiyu.us-east-1.rds.amazonaws.com",
-      "user": "config",
-      "password": "zfcu33xXwboQup6U7HyTFQ",
-      "database": "ingestion",
-      "port": "3306"
-    }
-  }
