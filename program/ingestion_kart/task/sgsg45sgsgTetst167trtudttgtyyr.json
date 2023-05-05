@@ -1,0 +1,69 @@
+{
+  "is_active": "Y",
+  "id": "232",
+  "pipeline_id": 1,
+  "task_name": "sgsg45sgsgTetst167trtudttgtyyr",
+  "task_description": "dgsg",
+  "task_type": "Ingestion",
+  "task_sequence": "30",
+  "task": {
+    "source": {
+      "schema": "public",
+      "source_type": "oracle_read",
+      "table_name": "TASK_TBL",
+      "query": "etet",
+      "chunk_size": 1000,
+      "connection_name": "Oracle_Connection_01",
+      "select_columns": "10yy90"
+    },
+    "target": {
+      "schema": "information_schema",
+      "target_type": "mysql_write",
+      "table_name": "fgh",
+      "connection_name": "Mysql_Local_Connection_01",
+      "operation": "replace",
+      "audit_columns": "active"
+    },
+    "data_quality_execution": {
+      "post_check_Execution": "Y",
+      "pre_check_Execution": "N"
+    },
+    "data_quality_features": {
+      "dq_auto_correction_required": "N",
+      "dq_auto_correct_columns": {
+        "county": "county_nm",
+        "state": "stt"
+      },
+      "dq_lkup_key_column": {
+        "zip": "zip_code"
+      },
+      "dq_lookup_file_path": "C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
+      "data_masking_required": "N",
+      "data_masking_columns": {
+        "msk_date": "0,DateOfBirth",
+        "msk_alpha": "x,PersonalEmail,IBAN",
+        "msk_numeric": "*,BSNNumber,account_no"
+      },
+      "data_encryption_required": "N",
+      "data_decryption_required": "N",
+      "data_encryption_columns": "LastName, IBAN, PersonalEmail",
+      "data_decryption_columns": "LastName, PersonalEmail"
+    },
+    "data_quality": [
+      {
+        "check": "table_columns_to_match_set",
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": "890",
+        "type": "pre_check",
+        "parameters": {
+          "column": "DFGD",
+          "format": "dd:mm:yytrttrttr",
+          "min": "1000",
+          "max": "20000",
+          "set": ""
+        }
+      }
+    ]
+  }
+}
