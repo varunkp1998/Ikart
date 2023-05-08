@@ -4,8 +4,8 @@
     "task": {
         "source": {	
             "source_type": "csvfile_read",
-            "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
-            "source_file_name": "sales_data",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+            "file_name": "sales_data",
             "delimiter":",",
             "skip_header":" ",
             "skip_footer":" ",
@@ -18,8 +18,8 @@
         },
         "target": {	
             "target_type": "jsonfile_write",
-            "target_file_path": "/app/intel_new/Program/Project/Pipeline/Task/target_files/",
-            "target_file_name": "sales.json",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
+            "file_name": "sales.json",
             "encoding": " "
         },
 		"data_quality_execution":{

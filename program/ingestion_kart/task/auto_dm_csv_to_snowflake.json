@@ -4,8 +4,8 @@
     "task": {
         "source": {	
             "source_type": "csv_read",
-            "source_file_path": "/app/intel_new/Program/Project/Pipeline/Task/source_files/",
-            "source_file_name": "test_Customer_Data",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+            "file_name": "test_Customer_Data",
             "delimiter":",",
             "skip_header":" ",
             "skip_footer":" ",
@@ -34,7 +34,7 @@
             "dq_auto_correction_required":"Y",
             "dq_auto_correct_columns": {"county":"county_nm", "state":"stt"},
             "dq_lkup_key_column": {"zip":"zip_code"},
-            "dq_lookup_file_path":"/app/intel_new/Program/Project/Pipeline/Task/source_files/county_city_zip_lookup.csv",
+            "dq_lookup_file_path":"/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/county_city_zip_lookup.csv",
             "data_masking_required": "Y",
             "data_masking_columns":{"msk_date":"*,date", 
                                     "msk_alpha":"", 

@@ -14,8 +14,8 @@
       "encoding": "utf-8",
       "alias_columns": " ",
       "select_columns": " ",
-      "escape_char": "none",
-      "quote_char": "none",
+      "escape_char": " ",
+      "quote_char": " ",
       "skip_footer": " ",
       "skip_header": " ",
       "file_name": "sales_data",
@@ -25,7 +25,7 @@
     "target": {
       "schema_name": "INFORMATION_SCHEMA1",
       "target_type": "mysql_write",
-      "table_name": " sales_32",
+      "table_name": "sales_001",
       "connection_name": "RDS_MYSQL_ingest",
       "operation": "create",
       "audit_columns": "active"

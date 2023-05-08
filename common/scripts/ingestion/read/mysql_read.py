@@ -40,11 +40,8 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,file_path):
+def read(json_data,config_file_path,task_id,run_id,paths_data,file_path,iter_value):
     """ function for reading data from mysql table"""
-    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-    paths_data["audit_path"]+task_id+\
-                '_audit_'+run_id+'.json'
     try:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
@@ -61,7 +58,8 @@ def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,
             sql = f'SELECT count(0) from {json_data["task"]["source"]["table_name"]};'
             cursor.execute(sql)
             myresult = cursor.fetchall()
-            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            audit(json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1],
+            iter_value)
             log2.info('the number of records present in source table before ingestion:%s',
             myresult[-1][-1])
             default_columns = None if json_data["task"]["source"]["select_columns"]==" "\
@@ -78,7 +76,8 @@ def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,
             log2.info(sql)
             cursor.execute(sql)
             myresult = cursor.fetchall()
-            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            audit(json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1],
+            iter_value)
             log2.info('the number of records present in source table before ingestion:%s',
             myresult[-1][-1])
             log2.info('sql_query: %s',json_data["task"]["source"]["query"])
@@ -92,10 +91,11 @@ def read(prj_nm,json_data: dict,config_file_path: str,task_id,run_id,paths_data,
     except pymysql.err.ProgrammingError: #to handle table not found issue
         log2.error("the table name or connection specified in the task is incorrect/doesnot exists")
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',
+        iter_value)
         sys.exit()
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
         log2.exception("read_data_from_mysql() is %s", str(error))
         raise error

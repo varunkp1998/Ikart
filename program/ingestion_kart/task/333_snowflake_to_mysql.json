@@ -7,7 +7,7 @@
             "table_name": "sales",
             "connection_name":"snowflake_1",
             "schema": "public",
-            "query": "select * from TEST.PUBLIC.TWEET_B",
+            "query": "select * from TEST.PUBLIC.TWEET",
             "chunk_size":1000,					
             "encoding": "utf-8"
         },

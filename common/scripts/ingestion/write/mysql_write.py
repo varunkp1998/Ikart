@@ -39,12 +39,7 @@ def db_table_exists(conn: dict, tablename: str)-> bool:
         connection = conn.raw_connection()
         cursor = connection.cursor()
         cursor.execute(sql)
-        # print(bool(cursor.rowcount))
         return bool(cursor.rowcount)
-        # return results of sql query from conn as a pandas dataframe
-        # results_df = pd.read_sql_query(sql, conn)
-        # returns True if table exists else False
-        # return bool(len(results_df))
     except Exception as error:
         log2.exception("db_table_exists() is %s", str(error))
         raise error
@@ -70,10 +65,8 @@ def create(json_data: dict, conn, datafram,conn_details:str)-> bool:
                 index = False, if_exists = "append")
                 log2.info(MYSQL_LOG_STATEMENT)
         else:
-            # if table exists, it will say table is already present, give new name to create
             log2.error('%s already exists, so give a new table name to create',
             json_data["task"]["target"]["table_name"])
-            # sys.exit()
             return False
     except OperationalError as error:
         if 'Duplicate column name' in str(error):
@@ -81,14 +74,12 @@ def create(json_data: dict, conn, datafram,conn_details:str)-> bool:
             sys.exit()
         else:
             log2.info("else")
-            # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.exception("create() is %s", str(error))
             raise error
 
 def append(json_data: dict, conn: dict, dataframe, conn_details) -> bool:
     """if table exists, it will append"""
     try:
-        # print(json_data["task"]["target"]["table_name"])
         if db_table_exists(conn, json_data["task"]["target"]["table_name"]) is True:
             log2.info("%s table exists, started appending the data to table",
             json_data["task"]["target"]["table_name"])
@@ -107,8 +98,6 @@ def append(json_data: dict, conn: dict, dataframe, conn_details) -> bool:
                 if_exists = "append")
                 log2.info(MYSQL_LOG_STATEMENT)
         else:
-            # if table is not there, then it will say table does not exist
-            # create table first or give table name that exists to append data
             log2.error('%s does not exists, so create table first',
             json_data["task"]["target"]["table_name"])
             return False
@@ -117,7 +106,6 @@ def append(json_data: dict, conn: dict, dataframe, conn_details) -> bool:
             log2.error("audit columns not found in the table previously to append")
             return False
         else:
-            # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.exception("append() is %s", str(error))
             raise error
 
@@ -168,7 +156,6 @@ def replace(json_data: dict, conn: dict, dataframe,counter: int, conn_details) -
             json_data["task"]["target"]["table_name"])
             return False
     except Exception as error:
-        # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
         log2.exception("replace() is %s", str(error))
         raise error
 
@@ -220,13 +207,10 @@ def truncate(json_data: dict, conn: dict,dataframe,counter: int, conn_details) -
             return False
     except OperationalError as error:
         if "Unknown column 'CRTD_BY' in 'field list'" in str(error):
-            # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.error("audit columns not found in the table previously"
             "to insert data after truncate")
-            # sys.exit()
             return False
         else:
-            # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
             log2.exception("append() is %s", str(error))
             raise error
 
@@ -247,7 +231,6 @@ def drop(json_data: dict, conn: dict) -> bool:
             json_data["task"]["target"]["table_name"])
             return False
     except Exception as error:
-        # audit(audit_json_path,json_data, task_id,'STATUS','FAILED')
         log2.exception("drop() is %s", str(error))
         raise error
 
@@ -256,7 +239,6 @@ def write_to_txt(task_id,status,file_path):
     try:
         is_exist = os.path.exists(file_path)
         if is_exist is True:
-            # log2.info("txt getting called")
             data_fram =  pd.read_csv(file_path, sep='\t')
             data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
             data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
@@ -267,12 +249,9 @@ def write_to_txt(task_id,status,file_path):
         raise error
 
 
-def write(prj_nm,json_data,datafram,counter,config_file_path,task_id,run_id,paths_data,
-          file_path) -> bool:
+def write(json_data,datafram,counter,config_file_path,task_id,run_id,paths_data,
+          file_path,iter_value) -> bool:
     """ function for ingesting data to mysql based on the operation in json"""
-    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-    paths_data["audit_path"]+task_id+\
-                '_audit_'+run_id+'.json'
     try:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
@@ -292,21 +271,20 @@ def write(prj_nm,json_data,datafram,counter,config_file_path,task_id,run_id,path
             status=truncate(json_data, conn, datafram, counter,conn_details)
         elif json_data["task"]["target"]["operation"] == "drop":
             status=drop(json_data, conn)
-            # log2.info(status)
         elif json_data["task"]["target"]["operation"] == "replace":
             status=replace(json_data, conn, datafram, counter,conn_details)
         elif json_data["task"]["target"]["operation"] not in ("create", "append",
             "truncate", "drop","replace"):
             log2.error("give propper input for operation condition")
             status = False
-            # sys.exit()
         if json_data["task"]["target"]["operation"] != "drop" and status is not False:
             connection = conn.raw_connection()
             cursor = connection.cursor()
             sql = f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};'
             cursor.execute(sql)
             myresult = cursor.fetchall()
-            audit(audit_json_path,json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1])
+            audit(json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1],
+            iter_value)
             log2.info('the number of records present in target table after ingestion:%s',
             myresult[-1][-1])
         conn.dispose()
@@ -314,15 +292,15 @@ def write(prj_nm,json_data,datafram,counter,config_file_path,task_id,run_id,path
     # except OperationalError:
     #     # log2.error("there are duplicate column names in the target table")
     #     write_to_txt(task_id,'FAILED',file_path)
-    #     audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+    #     audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED',iter_value)
     #     sys.exit()
     # except pymysql.err.ProgrammingError: #to handle table not found issue
     #     log2.error("the table name or connection specified in the task is incorrect")
     #     write_to_txt(task_id,'FAILED',file_path)
-    #     audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+    #     audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED',iter_value)
     #     sys.exit()
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
         log2.exception("write() is %s", str(error))
         raise error

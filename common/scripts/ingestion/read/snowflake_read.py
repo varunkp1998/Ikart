@@ -43,11 +43,8 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,file_path):
+def read(json_data,connection_file_path,task_id,run_id,paths_data,file_path,iter_value):
     """ function for reading data from snowflake table"""
-    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-    paths_data["audit_path"]+task_id+\
-                '_audit_'+run_id+'.json'
     try:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
@@ -66,7 +63,8 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,f
             sql = f'SELECT count(0) from {schema_name}.{json_data["task"]["source"]["table_name"]};'
             cursor.execute(sql)
             myresult = cursor.fetchall()
-            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            audit(json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1],
+            iter_value)
             log2.info('the number of records present in source table before ingestion:%s',
             myresult[-1][-1])
             query = (f'select * from {conn_details["database"]}.'
@@ -87,7 +85,8 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,f
             # log2.info(sql)
             cursor.execute(sql)
             myresult = cursor.fetchall()
-            audit(audit_json_path,json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1])
+            audit(json_data, task_id,run_id,'SRC_RECORD_COUNT',myresult[-1][-1],
+            iter_value)
             log2.info('sql_query: %s',json_data["task"]["source"]["query"])
             for query in pd.read_sql(json_data["task"]["source"]["query"],
             conn3, chunksize = json_data["task"]["source"]["chunk_size"]):
@@ -99,7 +98,7 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,f
     except ProgrammingError : #to handle table not found issue
         log2.error("the table name or connection specified in the command is incorrect")
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
         sys.exit()
     # except sqlalchemy.exc.OperationalError:
     #     log2.error("The details provided inside the connection file path is incorrect")
@@ -108,6 +107,6 @@ def read(prj_nm,json_data: dict,connection_file_path,task_id,run_id,paths_data,f
     #     sys.exit()
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
         log2.exception("read_data_from_snowflake() is %s", str(error))
         raise error

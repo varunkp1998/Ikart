@@ -8,8 +8,8 @@
   "task_sequence": "17",
   "task": {
     "source": {
-      "chunk_size": 1000,
-      "source_type": "csv_read",
+      "chunk_size": " ",
+      "source_type": "csvfile_read",
       "file_type": "csv",
       "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
       "file_name": "sales_data",
@@ -23,12 +23,13 @@
       "select_columns": " "
     },
         "target": {
-            "file_name": "sales_1.csv",
-            "target_type": "s3",
-            "file_path": "'test1/sales1/'",
+            "file_name": "sales",
+            "file_type": "parquet",
+            "target_type": "s3_write",
+            "file_path": "ingest/sales/",
             "audit_columns": "inactive",
-            "bucket_name" : "pg-mystoreinventory-6135",
-            "connection_name" : "s3"
+            "connection_name": "s3",
+            "operation": "replace"
           },
           "data_quality_execution": {
             "pre_check_enable": "N",

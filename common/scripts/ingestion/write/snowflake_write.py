@@ -171,12 +171,10 @@ def truncate(json_data: dict, conn: dict,datafram,counter: int, conn_details) ->
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name to truncate',
             json_data["task"]["target"]["table_name"])
-            # sys.exit()
             return False
     except ProgrammingError as error:
         if 'column "inserted_by" of relation' in str(error):
             log2.error("audit columns not found in the table previously to insert data")
-            # sys.exit()
             return False
         else:
             log2.exception("append() is %s", str(error))
@@ -186,7 +184,7 @@ def drop(json_data: dict, conn: dict,conn_details) -> bool:
     """if table exists, it will drop"""
     try:
         if db_table_exists(conn,conn_details["database"], json_data["task"]["target"]["schema"],
-        json_data["task"]["target"]["table_name"]) is True:
+            json_data["task"]["target"]["table_name"]) is True:
             log2.info("%s table exists, started dropping the table",
             json_data["task"]["target"]["table_name"])
             schema_name =conn_details["database"]+'.'+ json_data["task"]["target"]["schema"]
@@ -199,7 +197,6 @@ def drop(json_data: dict, conn: dict,conn_details) -> bool:
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name to drop',
             json_data["task"]["target"]["table_name"])
-            # sys.exit()
             return False
     except Exception as error:
         log2.exception("drop() is %s", str(error))
@@ -253,7 +250,6 @@ def replace(json_data: dict, conn: dict, datafram,counter: int, conn_details: li
             # if table is not there, then it will say table does not exist
             log2.error('%s does not exists, give correct table name',\
             json_data["task"]["target"]["table_name"])
-            # sys.exit()
             return False
     except Exception as error:
         log2.exception("replace() is %s", str(error))
@@ -264,7 +260,6 @@ def write_to_txt(task_id,status,file_path):
     try:
         is_exist = os.path.exists(file_path)
         if is_exist is True:
-            # log2.info("txt getting called")
             data_fram =  pd.read_csv(file_path, sep='\t')
             data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
             data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
@@ -274,12 +269,9 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def write(prj_nm,json_data, datafram,counter,config_file_path,task_id,run_id,paths_data,
-          file_path) -> bool:
+def write(json_data, datafram,counter,config_file_path,task_id,run_id,paths_data,
+          file_path,iter_value) -> bool:
     """ function for ingesting data to snowflake based on the operation in json"""
-    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-    paths_data["audit_path"]+task_id+\
-                '_audit_'+run_id+'.json'
     try:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
@@ -315,7 +307,8 @@ def write(prj_nm,json_data, datafram,counter,config_file_path,task_id,run_id,pat
             sql = f'SELECT count(0) from {schema_name}.{json_data["task"]["target"]["table_name"]};'
             cursor.execute(sql)
             myresult = cursor.fetchall()
-            audit(audit_json_path,json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1])
+            audit(json_data, task_id,run_id,'TRGT_RECORD_COUNT',myresult[-1][-1],
+            iter_value)
             log2.info('the number of records present in target table after ingestion:%s',
             myresult[-1][-1])
         conn2.dispose()
@@ -323,10 +316,8 @@ def write(prj_nm,json_data, datafram,counter,config_file_path,task_id,run_id,pat
     except ProgrammingError : #to handle table not found issue
         log2.error("the table or connection specified in the command is incorrect")
         write_to_txt(task_id,'FAILED',file_path)
-        # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         sys.exit()
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
-        # audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         log2.exception("ingest_data_to_snowflake() is %s", str(error))
         raise error

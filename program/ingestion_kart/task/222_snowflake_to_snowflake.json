@@ -4,11 +4,11 @@
     "task": {
         "source": {	
             "source_type": "snowflake_read",
-            "table_name": "sales",
+            "table_name": "sales_data",
             "connection_name":"snowflake_1",
             "schema": "public",
             "query": " ",
-            "chunk_size":1000,					
+            "chunk_size":10000,					
             "encoding": "utf-8"
         },
         "target": {	
@@ -20,8 +20,8 @@
             "audit_columns":  "inactive"
         },
 		"data_quality_execution":{
-            "pre_check_enable":"Y",
-            "post_check_enable":"Y"
+            "pre_check_enable":"N",
+            "post_check_enable":"N"
         },
         "data_quality_features":{
             "dq_process_rejected_records": "N",

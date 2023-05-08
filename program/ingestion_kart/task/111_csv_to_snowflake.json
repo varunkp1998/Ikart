@@ -4,8 +4,8 @@
     "task": {
         "source": {	
             "source_type": "csv_read",
-            "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
-            "source_file_name": "sales_data",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+            "file_name": "sales_data",
             "delimiter":",",
             "skip_header":" ",
             "skip_footer":" ",
@@ -19,10 +19,10 @@
          "target": {	
             "target_type": "snowflake_write",
             "connection_name": "snowflake_1",
-            "table_name": "sales_data1",
+            "table_name": "sales_data",
             "schema": "public",
             "operation":"append",
-            "audit_columns":  "active"
+            "audit_columns":  "inactive"
         },
 		"data_quality_execution":{
             "pre_check_enable":"Y",

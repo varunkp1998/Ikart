@@ -4,10 +4,7 @@
     "pipeline_id":"555",
     "pipeline_name":"P_222",
     "tasks_details":{
-		"128_csv_to_xml":0,
-		"1235_csv_to_parquet":0,
-        "166_parquet_to_csv":0,
-        "1999_json_to_parquet":0
+        "321_excel_to_csv":0
     }
      
 }

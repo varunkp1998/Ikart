@@ -19,14 +19,16 @@
       "skip_header": " ",
       "file_name": "sales_data",
       "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
-      "delimiter": ","
+      "delimiter": ",",
+      "quote_char": " ",
+      "escape_char":" "
     },
     "target": {
       "schema": "information_schema",
       "target_type": "mysql_write",
-      "table_name": "my_sales",
+      "table_name": "my_sales_09",
       "connection_name": "mysql_1",
-      "operation": "append",
+      "operation": "replace",
       "audit_columns": "active"
     },
     "data_quality_execution": {

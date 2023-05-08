@@ -22,7 +22,7 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt1: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data: dict,task_id,run_id,paths_data,file_path,skip_header = 0,
+def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,skip_header = 0,
 skip_footer= 0, sheet_name= 0):
     """ function for reading data from excel"""
     try:
@@ -37,14 +37,11 @@ skip_footer= 0, sheet_name= 0):
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
         from engine_code import audit
-        audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-        paths_data["audit_path"]+task_id+\
-                '_audit_'+run_id+'.json'
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
             json_data["task"]["source"]["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
-            audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+            audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
             sys.exit()
         else:
             default_skip_header = skip_header if json_data["task"]["source"]["skip_header"]==" "\

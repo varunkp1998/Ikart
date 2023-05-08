@@ -22,7 +22,7 @@ def write_to_txt(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(prj_nm,json_data : dict,task_id,run_id,paths_data,file_path) -> bool:
+def read(json_data : dict,task_id,run_id,paths_data,file_path,iter_value) -> bool:
     """ function for readinging data from parquet  """
     try:
         log2.info("parquet reading started")
@@ -36,13 +36,11 @@ def read(prj_nm,json_data : dict,task_id,run_id,paths_data,file_path) -> bool:
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
         from engine_code import audit
-        audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-        paths_data["audit_path"]+task_id+'_audit_'+run_id+'.json'
         if is_exists is False:
             log2.error("'%s' SOURCE FILE not found in the location",
             json_data["task"]["source"]["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
-            audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+            audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
             sys.exit()
         else:
             datafram = pd.read_parquet(json_data["task"]["source"]["file_path"]+\
@@ -52,6 +50,6 @@ def read(prj_nm,json_data : dict,task_id,run_id,paths_data,file_path) -> bool:
         return True
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
         log2.exception("reading_parquet_() is %s", str(error))
         raise error

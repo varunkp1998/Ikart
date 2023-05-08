@@ -4,18 +4,18 @@ import logging
 import sys
 import os
 from datetime import datetime
-import requests
+from os import path
 import pandas as pd
 
 log2 = logging.getLogger('log2')
 FAIL_LOG_STATEMENT = "%s got failed engine"
-TASK_LOG = 'Task %s Execution Completed'
 
 def write_to_txt1(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
     try:
         is_exist = os.path.exists(file_path)
         if is_exist is True:
+            # log2.info("txt getting called")
             data_fram =  pd.read_csv(file_path, sep='\t')
             data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
             data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
@@ -27,32 +27,59 @@ def write_to_txt1(task_id,status,file_path):
         log2.exception("write_to_txt: %s.", str(error))
         raise error
 
-def audit(json_data, task_name,run_id,status,value,itervalue):
-    """ create audit json file and audits event records into it"""    
+def audit(json_file_path,json_data, task_name,run_id,status,value):
+    """ create audit json"""
     try:
-        url = "http://localhost:8080/api/audit"
-        audit_data = [{
+        if path.isfile(json_file_path) is False:
+            log2.info('audit started')
+            # Data to be written
+            audit_data = [{
+                "pipeline_id": json_data["pipeline_id"],
+                "task/pipeline_name": task_name,
+                "run_id": run_id,
+                "iteration": "1",
+                "audit_type": status,
+                "audit_value": value,
+                "process_dttm" : datetime.now()
+            }]
+            # Serializing json
+            json_object = json.dumps(audit_data, indent=4, default=str)
+            # Writing to sample.json
+            with open(json_file_path, "w", encoding='utf-8') as outfile:
+                outfile.write(json_object)
+            # outfile.close()
+            log2.info("audit json file created and audit done")
+        else:
+            with open(json_file_path, "r+", encoding='utf-8') as audit1:
+                audit_data = json.load(audit1)
+                audit_data.append(
+                    {
                     "pipeline_id": json_data["pipeline_id"],
                     "task/pipeline_name": task_name,
                     "run_id": run_id,
-                    "iteration": itervalue,
+                    "iteration": "1",
                     "audit_type": status,
                     "audit_value": value,
-                    "process_dttm" : datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-                }]
-        response = requests.post(url, json=audit_data, timeout=60)
-        log2.info("audit status code:%s",response.status_code)
+                    "process_dttm" : datetime.now()
+                    })
+                audit1.seek(0)
+                json.dump(audit_data, audit1, indent=4, default=str)
+                # audit1.close()
+                log2.info('Audit of an event has been made')
     except Exception as error:
-        log2.exception("error in audit %s.", str(error))
+        log2.exception("error in auditing json %s.", str(error))
         raise error
 
-def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
+
+def engine_main(prj_nm,task_id,paths_data,run_id,file_path):
     """function consists of pre_checks,conversion,ingestion,post_checks, qc report"""
     log2.info("entered into engine_main")
     config_file_path = paths_data["folder_path"]+paths_data["config_path"]
     dq_scripts_path=paths_data["folder_path"]+paths_data["dq_scripts_path"]
     sys.path.insert(0, dq_scripts_path)
     import definitions_qc as dq
+    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
+    paths_data["audit_path"]+task_id+'_audit_'+run_id+'.json'
     try:
         with open(r""+paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
         paths_data["task_json_path"]+task_id+".json","r",encoding='utf-8') as jsonfile:
@@ -60,7 +87,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
             json_data = json.load(jsonfile)
             log2.info("reading TASK JSON data completed")
             write_to_txt1(task_id,'STARTED',file_path)
-            audit(json_data, task_id,run_id,'STATUS','STARTED',iter_value)
+            audit(audit_json_path,json_data, task_id,run_id,'STATUS','STARTED')
     except Exception as error:
         log2.exception("error in reading json %s.", str(error))
         raise error
@@ -73,7 +100,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
 
         dq_scripts_path=paths_data["folder_path"]+paths_data["dq_scripts_path"]
         sys.path.insert(0, dq_scripts_path)
-        # from definitions_qc import auto_correction,data_masking,data_encryption
+        from definitions_qc import auto_correction,data_masking,data_encryption
 
         # Precheck script execution starts here
         if json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'Y' and\
@@ -83,7 +110,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
 	    json_data["task"]["source"]["source_type"] == 'snowflake_read'or\
         json_data["task"]["source"]["source_type"] == 'mssql_read'):
             pre_check = dq.qc_pre_check(prj_nm,json_data,json_checks,paths_data,config_file_path,
-            task_id,run_id,file_path,iter_value)
+            task_id,run_id,file_path,audit_json_path)
         # elif json_data["task"]["source"]["source_type"] == "csv_read" and \
         # (json_data['task']['data_quality_execution']['pre_check_enable'] == 'N' and \
         # json_data['task']['data_quality_execution']['post_check_enable'] == 'N'):
@@ -169,65 +196,68 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
             json_data["task"]["source"]["source_type"] == "mysql_read" or\
 	        json_data["task"]["source"]["source_type"] == "snowflake_read" or\
             json_data["task"]["source"]["source_type"] == "sqlserver_read":
-            data_fram = read(json_data,config_file_path,task_id,run_id,paths_data,
-            file_path,iter_value)
+            data_fram = read(prj_nm,json_data,config_file_path,task_id,run_id,paths_data,file_path)
+            # log2.info(data_fram.__next__())
             counter=0
             for i in data_fram :
+                # log2.info(i)
                 counter+=1
                 if json_data["task"]["target"]["target_type"] != "csv_write":
-                    value=write(json_data, i,counter,config_file_path,task_id,run_id,
-                    paths_data,file_path,iter_value)
+                    value=write(prj_nm,json_data, i,counter,config_file_path,task_id,run_id,
+                    paths_data,file_path)
                     if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','FAILED',iter_value)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
                     if value is True:
                         write_to_txt1(task_id,'SUCCESS',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','COMPLETED',
-                              iter_value)
-                        log2.info(TASK_LOG,task_id)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','COMPLETED')
+                        log2.info('Task %s Execution Completed',task_id)
                         return False
                 else:
                     value=write(json_data, i,counter)
                     if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','FAILED',iter_value)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
         elif json_data["task"]["source"]["source_type"] == "csv_read":
-            data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
+            data_fram=read(prj_nm,json_data,task_id,run_id,paths_data,file_path)
+                         # log2.info(data_fram.__next__())
             counter=0
             for i in data_fram :
+                # log2.info(i)
                 counter+=1
                 if json_data["task"]["target"]["target_type"] != "csv_write":
-                    value=write(json_data, i,counter,config_file_path,task_id,run_id,
-                    paths_data,file_path,iter_value)
+                    value=write(prj_nm,json_data, i,counter,config_file_path,task_id,run_id,
+                    paths_data,file_path)
                     if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','FAILED',iter_value)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
                     if value is True:
                         write_to_txt1(task_id,'SUCCESS',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','COMPLETED',
-                              iter_value)
-                        log2.info(TASK_LOG,task_id)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','COMPLETED')
+                        log2.info('Task %s Execution Completed',task_id)
                         return False
                 else:
                     log2.info("enter ...")
                     value=write(json_data, i,counter)
                     if value is False:
                         write_to_txt1(task_id,'FAILED',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','FAILED',iter_value)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
+            #log2.info(data_fram.__next__())
         elif json_data["task"]["source"]["source_type"] == "csvfile_read" or \
             json_data["task"]["source"]["source_type"] == "jsonfile_read" or \
             json_data["task"]["source"]["source_type"] == "xmlfile_read" or \
             json_data["task"]["source"]["source_type"] == "parquetfile_read" or \
             json_data["task"]["source"]["source_type"] == "excelfile_read":
-            data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
+            data_fram=read(prj_nm,json_data,task_id,run_id,paths_data,file_path)
+            # log2.info(data_fram.__next__())
             counter=0
             for i in data_fram :
                 # log2.info(i)
@@ -235,19 +265,20 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                 if json_data["task"]["target"]["target_type"] == "csvfile_write":
                     value=write(json_data, i,counter)
                     if value=='Fail':
-                        audit(json_data,task_id,run_id,'STATUS','FAILED',iter_value)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         write_to_txt1(task_id,'FAILED',file_path)
                         log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
                 elif json_data["task"]["target"]["target_type"] == "s3_write":
-                    value=write(json_data, i,config_file_path,task_id,run_id,
-                    paths_data,file_path,iter_value)
+                    value=write(prj_nm,json_data, i,config_file_path,task_id,run_id,
+                    paths_data,file_path)
                     if value=='Fail':
                         write_to_txt1(task_id,'FAILED',file_path)
-                        audit(json_data,task_id,run_id,'STATUS','FAILED',iter_value)
+                        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
                         log2.warning(FAIL_LOG_STATEMENT, task_id)
                         return False
                 else:
+                    # log2.info("entered")
                     value=write(json_data, i)
         else:
             log2.info("only ingestion available currently")
@@ -261,30 +292,33 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
         json_data["task"]["data_quality_execution"]["post_check_enable"] == 'Y':
             # post check code
             post_check=dq.qc_post_check(prj_nm,json_data, json_checks,paths_data,
-            config_file_path,task_id,run_id,file_path,iter_value)
+            config_file_path,task_id,run_id,file_path,audit_json_path)
             #qc report generation
         new_path=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
         paths_data["qc_reports_path"]
         if json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'Y' and \
             json_data["task"]["data_quality_execution"]["post_check_enable"] == 'N':
             post_check = pd.DataFrame()
-            dq.qc_report(pre_check,post_check,new_path,file_path,
-                         json_data,task_id,run_id,iter_value)
+            dq.qc_report(pre_check,post_check,new_path,file_path,audit_json_path,
+                         json_data,task_id,run_id)
         elif json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'N' and \
             json_data["task"]["data_quality_execution"]["post_check_enable"] == 'Y':
             pre_check = pd.DataFrame()
-            dq.qc_report(pre_check,post_check,new_path,file_path,
-                         json_data,task_id,run_id,iter_value)
+            dq.qc_report(pre_check,post_check,new_path,file_path,audit_json_path,
+                         json_data,task_id,run_id)
         elif json_data["task"]["data_quality_execution"]["pre_check_enable"] == 'Y' and \
             json_data["task"]["data_quality_execution"]["post_check_enable"] == 'Y':
-            dq.qc_report(pre_check,post_check,new_path,file_path,
-                         json_data,task_id,run_id,iter_value)
-        log2.info(TASK_LOG,task_id)
+            dq.qc_report(pre_check,post_check,new_path,file_path,audit_json_path,
+                         json_data,task_id,run_id)
+        # log2.info(qc_report)
+        log2.info('Task %s Execution Completed',task_id)
+        # write_to_txt(Task_id,Status1)
         write_to_txt1(task_id,'SUCCESS',file_path)
-        audit(json_data, task_id,run_id,'STATUS','COMPLETED',iter_value)
+        audit(audit_json_path,json_data, task_id,run_id,'STATUS','COMPLETED')
     except Exception as error:
-        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
+        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
         write_to_txt1(task_id,'FAILED',file_path)
+        # write_to_txt(Task_id,Status1)
         log2.warning(FAIL_LOG_STATEMENT, task_id)
         log2.exception("error in  %s.", str(error))
         raise error

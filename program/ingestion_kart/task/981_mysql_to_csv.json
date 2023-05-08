@@ -4,17 +4,17 @@
     "task": {
         "source": {	
             "source_type": "mysql_read",
-            "table_name": " ",
+            "table_name": "sales_18",
             "connection_name":"mysql_1",
-            "query": "select * from sales_18",
+            "query": " ",
             "chunk_size":1000,	
-            "select_columns": " "
+            "select_columns": "ORDERNUMBER,SHIPDATE,STATUS,QTR_ID,MONTH_ID,YEAR_ID,PRODUCTLINE,MSRP,PRODUCTCODE,CUSTOMERNAME,PHONE,ADDRESSLINE1,ADDRESSLINE2,CITY,STATE,POSTALCODE,COUNTRY"
         },
         "target": {	
             "target_type": "csv_write",
-            "file_delimiter": ",",
-            "target_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
-			"target_file_name": "mysql_to_csv.csv",
+            "delimiter": ",",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
+			"file_name": "mysql_to_csv.csv",
             "encoding": "utf-8",
             "header": "True",
             "index":"False",

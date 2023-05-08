@@ -4,7 +4,6 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-import pandas as pd
 
 EMAIL_SMTP = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -15,6 +14,7 @@ to_addr = "ingestionkart@gmail.com,pp552081@gmail.com"
 cc_addr = " "
 team_nm = "Ingestion Team"
 
+import pandas as pd
 
 def table(start_time, end_time):
     """table structure"""
@@ -63,7 +63,6 @@ def send_start_mail(message, arg_prj_nm):
             body = f"""<p>Hi Team,</p>
                         <p>The task/pipeline Execution Failed.</p>
                         <p>Thanks and Regards,</p><p>{team_nm}</p>"""
-            
         elif message == "started":
             msg['Subject'] = f"Task/pipeline execution Started on {str(datetime.now())}"
             # body = f"""<p>Hi Team,</p>

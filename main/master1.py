@@ -1,4 +1,4 @@
-""" importing modules, script with logging for json not exists in github"""
+""" importing modules """
 import logging
 import argparse
 import sys

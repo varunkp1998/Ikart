@@ -1,7 +1,6 @@
 """ script for writing data to S3"""
 import logging
 from datetime import datetime
-from io import StringIO
 import os
 import sys
 import io
@@ -17,7 +16,11 @@ XLSX = '.xlsx'
 JSON = '.json'
 PARQUET ='.parquet'
 XML = '.xml'
-
+REPLACE_OPERATION= "S3 target operation is REPLACE \n target path: %s"
+APPEND_OPERATION="S3 target operation is APPEND"
+OBJECT_EXISTS ="%s object already exists in the target location"
+OBJECT_NOT_EXISTS = "%s object does not exists in the target location"
+CREATE_OBJECT = "creating new object %s"
 
 def establish_conn(json_data: dict, json_section: str,config_file_path:str):
     """establishes connection for the mysql database
@@ -62,32 +65,32 @@ def check_path(con,file_path,connection_details):
 def write_csv(json_data,datafram,conn,target_path,connection_details):
     """function for s3 write for csv filetype"""
     log2.info("s3 write operation for CSV filetype started")
-    csv_buf = StringIO()
+    csv_buf = io.StringIO()
     datafram.to_csv(csv_buf, header=True, index=False)
     csv_buf.seek(0)
     if json_data["task"]["target"]["operation"] == "replace":
         #if operation is replace
-        log2.info("S3 target operation is REPLACE \n target path: %s",target_path+CSV)
+        log2.info(REPLACE_OPERATION,target_path+CSV)
         conn.put_object(Bucket=connection_details["bucket_name"],Body=
         csv_buf.getvalue(), Key=target_path+CSV,ServerSideEncryption='AES256')
     elif json_data["task"]["target"]["operation"] == "append":
         # if operation is append
-        log2.info("S3 target operation is APPEND")
+        log2.info(APPEND_OPERATION)
         object_exists = check_path(conn,target_path+CSV,connection_details)
         # checking whether object exists or not
         if object_exists is True:
             #if object in s3 already exists
-            log2.info("%s object already exists in the target location",\
+            log2.info(OBJECT_EXISTS,\
             json_data["task"]["target"]["file_name"]+CSV)
-            log2.info("creating new object %s",target_path+'_'+file_timestamp+CSV)
+            log2.info(CREATE_OBJECT,target_path+'_'+file_timestamp+CSV)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             csv_buf.getvalue(), Key=target_path+'_'+file_timestamp+CSV,
             ServerSideEncryption='AES256')
         else:
             #if object in s3 does not exists
-            log2.info("%s object does not exists in the target location",\
+            log2.info(OBJECT_NOT_EXISTS,\
             json_data["task"]["target"]["file_name"]+CSV)
-            log2.info("creating new object %s",target_path+CSV)
+            log2.info(CREATE_OBJECT,target_path+CSV)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             csv_buf.getvalue(), Key=target_path+CSV,ServerSideEncryption='AES256')
 
@@ -99,27 +102,27 @@ def write_excel(json_data,datafram,conn,target_path,connection_details):
             datafram.to_excel(writer,header=True, index=False)
         data = output.getvalue()
     if json_data["task"]["target"]["operation"] == "replace":
-        log2.info("S3 target operation is REPLACE \n target path: %s",target_path+XLSX)
+        log2.info(REPLACE_OPERATION,target_path+XLSX)
         conn.put_object(Bucket=connection_details["bucket_name"],Body=
         data, Key=target_path+XLSX,ServerSideEncryption='AES256')
     elif json_data["task"]["target"]["operation"] == "append":
         # if operation is append
-        log2.info("S3 target operation is APPEND")
+        log2.info(APPEND_OPERATION)
         object_exists = check_path(conn,target_path+XLSX,connection_details)
         # checking whether object exists or not
         if object_exists is True:
             #if object in s3 already exists
-            log2.info("%s object already exists in the target location",\
+            log2.info(OBJECT_EXISTS,\
             json_data["task"]["target"]["file_name"]+XLSX)
-            log2.info("creating new object %s",target_path+'_'+file_timestamp+XLSX)
+            log2.info(CREATE_OBJECT,target_path+'_'+file_timestamp+XLSX)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             data, Key=target_path+'_'+file_timestamp+XLSX,
             ServerSideEncryption='AES256')
         else:
             #if object in s3 does not exists
-            log2.info("%s object does not exists in the target location",\
+            log2.info(OBJECT_NOT_EXISTS,\
             json_data["task"]["target"]["file_name"]+XLSX)
-            log2.info("creating new object %s",target_path+XLSX)
+            log2.info(CREATE_OBJECT,target_path+XLSX)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             data, Key=target_path+XLSX,ServerSideEncryption='AES256')
 
@@ -130,27 +133,27 @@ def write_json(json_data,datafram,conn,target_path,connection_details):
     datafram.to_json(json_buffer,orient='records', index=True)
     if json_data["task"]["target"]["operation"] == "replace":
         #if operation is replace
-        log2.info("S3 target operation is REPLACE \n target path: %s",target_path+JSON)
+        log2.info(REPLACE_OPERATION,target_path+JSON)
         conn.put_object(Bucket=connection_details["bucket_name"],Body=
         json_buffer.getvalue(), Key=target_path+JSON,ServerSideEncryption='AES256')
     elif json_data["task"]["target"]["operation"] == "append":
         # if operation is append
-        log2.info("S3 target operation is APPEND")
+        log2.info(APPEND_OPERATION)
         object_exists = check_path(conn,target_path+JSON,connection_details)
         # checking whether object exists or not
         if object_exists is True:
             #if object in s3 already exists
-            log2.info("%s object already exists in the target location",\
+            log2.info(OBJECT_EXISTS,\
             json_data["task"]["target"]["file_name"]+JSON)
-            log2.info("creating new object %s",target_path+'_'+file_timestamp+JSON)
+            log2.info(CREATE_OBJECT,target_path+'_'+file_timestamp+JSON)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             json_buffer.getvalue(), Key=target_path+'_'+file_timestamp+JSON,
             ServerSideEncryption='AES256')
         else:
             #if object in s3 does not exists
-            log2.info("%s object does not exists in the target location",\
+            log2.info(OBJECT_NOT_EXISTS,\
             json_data["task"]["target"]["file_name"]+JSON)
-            log2.info("creating new object %s",target_path+JSON)
+            log2.info(CREATE_OBJECT,target_path+JSON)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             json_buffer.getvalue(), Key=target_path+JSON,ServerSideEncryption='AES256')
 
@@ -161,27 +164,27 @@ def write_parquet(json_data,datafram,conn,target_path,connection_details):
     datafram.astype(str).to_parquet(parquet_buffer,engine='auto', index=False)
     if json_data["task"]["target"]["operation"] == "replace":
         #if operation is replace
-        log2.info("S3 target operation is REPLACE \n target path: %s",target_path+PARQUET)
+        log2.info(REPLACE_OPERATION,target_path+PARQUET)
         conn.put_object(Bucket=connection_details["bucket_name"],Body=
         parquet_buffer.getvalue(), Key=target_path+PARQUET,ServerSideEncryption='AES256')
     elif json_data["task"]["target"]["operation"] == "append":
         # if operation is append
-        log2.info("S3 target operation is APPEND")
+        log2.info(APPEND_OPERATION)
         object_exists = check_path(conn,target_path+PARQUET,connection_details)
         # checking whether object exists or not
         if object_exists is True:
             #if object in s3 already exists
-            log2.info("%s object already exists in the target location",\
+            log2.info(OBJECT_EXISTS,\
             json_data["task"]["target"]["file_name"]+PARQUET)
-            log2.info("creating new object %s",target_path+'_'+file_timestamp+PARQUET)
+            log2.info(CREATE_OBJECT,target_path+'_'+file_timestamp+PARQUET)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             parquet_buffer.getvalue(), Key=target_path+'_'+file_timestamp+PARQUET,
             ServerSideEncryption='AES256')
         else:
             #if object in s3 does not exists
-            log2.info("%s object does not exists in the target location",\
+            log2.info(OBJECT_NOT_EXISTS,\
             json_data["task"]["target"]["file_name"]+PARQUET)
-            log2.info("creating new object %s",target_path+PARQUET)
+            log2.info(CREATE_OBJECT,target_path+PARQUET)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             parquet_buffer.getvalue(), Key=target_path+PARQUET,ServerSideEncryption='AES256')
 
@@ -192,41 +195,38 @@ def write_xml(json_data,datafram,conn,target_path,connection_details):
     datafram.to_xml(xml_buffer,index=True)
     if json_data["task"]["target"]["operation"] == "replace":
         #if operation is replace
-        log2.info("S3 target operation is REPLACE \n target path: %s",target_path+XML)
+        log2.info(REPLACE_OPERATION,target_path+XML)
         conn.put_object(Bucket=connection_details["bucket_name"],Body=
         xml_buffer.getvalue(), Key=target_path+XML,ServerSideEncryption='AES256')
     elif json_data["task"]["target"]["operation"] == "append":
         # if operation is append
-        log2.info("S3 target operation is APPEND")
+        log2.info(APPEND_OPERATION)
         object_exists = check_path(conn,target_path+XML,connection_details)
         # checking whether object exists or not
         if object_exists is True:
             #if object in s3 already exists
-            log2.info("%s object already exists in the target location",\
+            log2.info(OBJECT_EXISTS,\
             json_data["task"]["target"]["file_name"]+XML)
-            log2.info("creating new object %s",target_path+'_'+file_timestamp+XML)
+            log2.info(CREATE_OBJECT,target_path+'_'+file_timestamp+XML)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             xml_buffer.getvalue(), Key=target_path+'_'+file_timestamp+XML,
             ServerSideEncryption='AES256')
         else:
             #if object in s3 does not exists
-            log2.info("%s object does not exists in the target location",\
+            log2.info(OBJECT_NOT_EXISTS,\
             json_data["task"]["target"]["file_name"]+XML)
-            log2.info("creating new object %s",target_path+XML)
+            log2.info(CREATE_OBJECT,target_path+XML)
             conn.put_object(Bucket=connection_details["bucket_name"],Body=
             xml_buffer.getvalue(), Key=target_path+XML,ServerSideEncryption='AES256')
 
-def write(prj_nm,json_data,datafram,config_file_path,task_id,run_id,paths_data,
-          file_path):
+def write(json_data,datafram,config_file_path,task_id,run_id,paths_data,
+          file_path,iter_value):
     """ function for ingesting data to S3 bucket based on the inputs in task json"""
-    audit_json_path = paths_data["folder_path"] +paths_data["Program"]+prj_nm+\
-    paths_data["audit_path"]+task_id+\
-                '_audit_'+run_id+JSON
+    engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
+    sys.path.insert(0, engine_code_path)
+    #importing audit function from orchestrate script
+    from engine_code import audit
     try:
-        engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
-        sys.path.insert(0, engine_code_path)
-        #importing audit function from orchestrate script
-        from engine_code import audit
         log2.info("ingest data to S3 initiated")
         conn,connection_details = establish_conn(json_data,'target',config_file_path)
         status="Pass"
@@ -245,6 +245,6 @@ def write(prj_nm,json_data,datafram,config_file_path,task_id,run_id,paths_data,
         return status
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
-        audit(audit_json_path,json_data, task_id,run_id,'STATUS','FAILED')
+        audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
         log2.exception("write() is %s", str(error))
         raise error

@@ -4,8 +4,8 @@
     "task": {
         "source": {	
             "source_type": "csv_read",
-            "source_file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
-            "source_file_name": "fake_customer_data",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/source_files/",
+            "file_name": "fake_customer_data",
             "delimiter":",",
             "skip_header":" ",
             "skip_footer":" ",

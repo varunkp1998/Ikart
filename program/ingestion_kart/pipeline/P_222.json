@@ -5,8 +5,8 @@
     "tasks_details":{
 		"128_csv_to_xml":0,
 		"1235_csv_to_parquet":0,
-        "166_parquet_to_csv":0,
-        "1999_json_to_parquet":0
+        "166_parquet_to_csv":["1235_csv_to_parquet"],
+        "1999_json_to_parquet":["1235_csv_to_parquet"]
     }
      
 }

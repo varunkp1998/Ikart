@@ -14,4 +14,4 @@ def write(json_data: dict, datafram) -> bool:
         return True
     except Exception as error:
         log2.exception("convert_csv_to_json() is %s", str(error))
-        raise error        
+        raise error
