@@ -2,10 +2,15 @@
 import logging
 import os
 import sys
+import importlib
 import sqlalchemy
 import pymysql
 import pandas as pd
-from utility import get_config_section,decrypt
+
+module = importlib.import_module("utility")
+get_config_section = getattr(module, "get_config_section")
+decrypt = getattr(module, "decrypt")
+
 
 log2 = logging.getLogger('log2')
 
@@ -46,7 +51,8 @@ def read(json_data,config_file_path,task_id,run_id,paths_data,file_path,iter_val
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
         #importing audit function from orchestrate script
-        from engine_code import audit
+        module1 = importlib.import_module("engine_code")
+        audit = getattr(module1, "audit")
         conn3 = establish_conn(json_data, 'source',config_file_path)
         log2.info('reading data from mysql started')
         connection = conn3.raw_connection()

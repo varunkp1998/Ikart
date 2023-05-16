@@ -2,11 +2,15 @@
 import logging
 from datetime import datetime
 import os
+import importlib
 import sys
 import io
 import pandas as pd
 import boto3
-from utility import get_config_section,decrypt
+
+module = importlib.import_module("utility")
+get_config_section = getattr(module, "get_config_section")
+decrypt = getattr(module, "decrypt")
 
 log2 = logging.getLogger('log2')
 folder_timestamp = datetime.now().strftime("%Y%m%d")
@@ -225,7 +229,8 @@ def write(json_data,datafram,config_file_path,task_id,run_id,paths_data,
     engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
     sys.path.insert(0, engine_code_path)
     #importing audit function from orchestrate script
-    from engine_code import audit
+    module1 = importlib.import_module("engine_code")
+    audit = getattr(module1, "audit")
     try:
         log2.info("ingest data to S3 initiated")
         conn,connection_details = establish_conn(json_data,'target',config_file_path)

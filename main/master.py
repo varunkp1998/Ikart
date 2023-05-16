@@ -6,6 +6,7 @@ import json
 import os
 import uuid
 import subprocess
+import importlib
 import base64
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
@@ -211,7 +212,7 @@ if __name__ == "__main__":
                             paths_data["GH_download_file_path"]]
                             subprocess.call(DOWNLOAD_FILE)
                             log1.info(DOWNLOAD_LOG_STATEMENT)
-                        import download
+                        download = importlib.import_module("download")
                         log1.info(MASTER_LOG_STATEMENT)
                         download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                         arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
@@ -240,7 +241,7 @@ if __name__ == "__main__":
                             paths_data["GH_download_file_path"]]
                             subprocess.call(DOWNLOAD_FILE)
                             log1.info(DOWNLOAD_LOG_STATEMENT)
-                        import download
+                        download = importlib.import_module("download")
                         log1.info(MASTER_LOG_STATEMENT)
                         download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                         arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
@@ -281,7 +282,7 @@ if __name__ == "__main__":
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
                                 log1.info(DOWNLOAD_LOG_STATEMENT)
-                            import download
+                            download = importlib.import_module("download")
                             log1.info(MASTER_LOG_STATEMENT)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
@@ -335,7 +336,7 @@ if __name__ == "__main__":
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
                                 log1.info(DOWNLOAD_LOG_STATEMENT)
-                            import download
+                            download = importlib.import_module("download")
                             log1.info(MASTER_LOG_STATEMENT)
                             # log1.info("MODE:%s", MODE)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
@@ -369,7 +370,7 @@ if __name__ == "__main__":
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
                                 log1.info(DOWNLOAD_LOG_STATEMENT)
-                            import download
+                            download = importlib.import_module("download")
                             log1.info(MASTER_LOG_STATEMENT)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm, RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
@@ -401,7 +402,7 @@ if __name__ == "__main__":
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
                                 log1.info(DOWNLOAD_LOG_STATEMENT)
-                            import download
+                            download = importlib.import_module("download")
                             log1.info(MASTER_LOG_STATEMENT)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,restart)

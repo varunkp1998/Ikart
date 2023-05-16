@@ -16,6 +16,9 @@ import pandas as pd
 import requests
 import download
 
+
+STATUS_LIST=[]
+
 log1 = logging.getLogger('log1')
 JSON = ".json"
 TASK_TRIGGER='triggering the task run %s'
@@ -34,19 +37,113 @@ def execute_job(prj_nm,paths_data,task_id,run_id,file_path,iter_value):
         logging.exception("error in master_executor file %s.", str(error))
         raise error
 
+def pipeline_json_read(path_data,proj_nm,pip_nm):
+    """function to load pipeline json data to a variable"""
+    try:
+        new_path= path_data["folder_path"]+path_data["Program"]+proj_nm+\
+        path_data["pipeline_json_path"]+ pip_nm+ JSON
+        with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+            json_data1 = json.load(jsonfile)
+        return json_data1
+    except Exception as error:
+        log1.exception("error in pipeline_json_read %s.", str(error))
+        raise error
+
+def orc_get_log_status(file_path,new_dep_task_list):
+    """reading the orchestration text file for getting the statuses"""
+    try:
+        df_2 =pd.read_csv(file_path, sep='\t')
+        # loop for independent tasks
+        for i, row in df_2.iterrows():
+            if str(row['task_depended_on'])=='0':
+                log1.info(str(row['task_name']+" task is "+row['Job_Status']))
+
+        pipeline_status_list = df_2['Job_Status'].to_list()
+        #loop for dependent tasks
+        # dependent_task =set(df_2[df_2['task_depended_on'] != 0]['task_name'].to_list())
+        for i in new_dep_task_list:
+            status = df_2[df_2['task_name'] == i]['Job_Status'].to_list()
+            if 'FAILED' in status:
+                log1.info("%s task is FAILED", i)
+            elif 'STARTED' in status:
+                log1.info("%s task is STARTED", i)
+            elif 'Start' in status:
+                log1.info("%s task is NOT STARTED", i)
+            else :
+                log1.info("%s task is SUCCESS", i)
+        return pipeline_status_list
+    except Exception as error:
+        log1.exception("error in orc_get_log_status %s.", str(error))
+        raise error
+
+def dependent_task_loop(dependent_task,file_path,prj_nm,paths_data,run_id,iter_value):
+    """function for executing dependent tasks"""
+    try:
+        #Running the dependent jobs in a loop
+        length = int(len(dependent_task))
+        is_break='N'
+        dep_processes = []
+        while length>0:
+            dependent_task1 =  dependent_task
+            for row in dependent_task1:
+                df_2 =pd.read_csv(file_path, sep='\t')
+                success_ls=df_2[df_2['Job_Status'] == 'SUCCESS']['task_name'].to_list()
+                failed_ls=df_2[df_2['Job_Status'] == 'FAILED']['task_name'].to_list()
+                task_depend=df_2[df_2['task_name'] == row]['task_depended_on'].to_list()
+                # if there are failed tasks in failed_ls and
+                # if failed tasks is subset of tasks depended on
+                # if tasks depended on are subset of failed  list
+                if (len(failed_ls) != 0) & (set(failed_ls).issubset(set(task_depend)) |\
+                set(task_depend).issubset(set(failed_ls)) is True ):
+                    log1.warning("Task failed so stopping execution of %s", row )
+                    is_break='Y'
+                    break
+                # if tasks depended on are subset of success list
+                if set(task_depend).issubset(set(success_ls)) is False:
+                    time.sleep(3)
+                else:
+                    log1.info(TASK_TRIGGER, row)
+                    dep_task = mp.Process(target = execute_job, args = [prj_nm,paths_data,row,
+                    run_id,file_path,iter_value], name = 'Process_' + str(row))
+                    dep_processes.append(dep_task)
+                    log1.info(START_PROCESS ,str(dep_task.name))
+                    dep_task.start()
+                    dependent_task.remove(row)
+                    length=length-1
+                    for process in dep_processes:
+                        process.join()
+            if is_break=='Y':
+                break
+    except Exception as error:
+        log1.exception("error in dependent_loop %s.", str(error))
+        raise error
+
+def independent_task_loop(independent_task,prj_nm,paths_data,run_id,
+            file_path,iter_value):
+    """unction for independent task execution"""
+    try:
+        #Running the independent jobs in a loop###
+        ind_processes = []
+        for i in independent_task:
+            log1.info(TASK_TRIGGER, i)
+            ind_task = mp.Process(target = execute_job, args = [prj_nm,paths_data,i,run_id,
+            file_path,iter_value],name = 'Process_' + str(i))
+            ind_processes.append(ind_task)
+            log1.info(START_PROCESS ,str(ind_task.name))
+            ind_task.start()
+            # time.sleep(3)
+        for process in ind_processes:
+            process.join()
+    except Exception as error:
+        log1.exception("error in independent_loop %s.", str(error))
+        raise error
+
+
 def orchestration_execution(prj_nm,paths_data,pip_nm,run_id,iter_value):
     """function for executing orchestration process"""
     # Readding Pipeline json file
-    try:
-        new_path= paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-        paths_data["pipeline_json_path"]+ pip_nm+ JSON
-        with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
-            json_data = json.load(jsonfile)
-            task_details=json_data['tasks_details'].items()
-            pd.DataFrame(json_data['tasks_details'].items())
-    except Exception as error:
-        log1.exception("error in reading pipeline json %s.", str(error))
-        raise error
+    json_data = pipeline_json_read(paths_data,prj_nm,pip_nm)
+    task_details=json_data['tasks_details'].items()
 
     log1.info('Pipeline execution initiated')
     #Script starts here
@@ -64,88 +161,20 @@ def orchestration_execution(prj_nm,paths_data,pip_nm,run_id,iter_value):
     paths_data["status_txt_file_path"]+pip_nm+'_Pipeline_'+run_id+".txt"
 
     #Running the independent jobs in a loop###
-    ind_processes = []
-    is_break='N'
-    for i in independent_task:
-        log1.info(TASK_TRIGGER, i)
-        ind_task = mp.Process(target = execute_job, args = [prj_nm,paths_data,i,run_id,
-        file_path,iter_value],name = 'Process_' + str(i))
-        ind_processes.append(ind_task)
-        log1.info(START_PROCESS ,str(ind_task.name))
-        ind_task.start()
-    for process in ind_processes:
-        process.join()
+    independent_task_loop(independent_task,prj_nm,paths_data,run_id,
+            file_path,iter_value)
 
     #Running the dependent jobs in a loop
-    length = int(len(dependent_task))
-    dep_processes = []
-    while length>0:
-        for row in dependent_task:
-            df_2 =pd.read_csv(file_path, sep='\t')
-            success_ls=df_2[df_2['Job_Status'] == 'SUCCESS']['task_name'].to_list()
-            failed_ls=df_2[df_2['Job_Status'] == 'FAILED']['task_name'].to_list()
-            task_depend=df_2[df_2['task_name'] == row]['task_depended_on'].to_list()
-            # if there are failed tasks in failed_ls and
-            # if failed tasks is subset of tasks depended on
-            # if tasks depended on are subset of failed  list
-            if (len(failed_ls) != 0) & (set(failed_ls).issubset(set(task_depend)) |\
-            set(task_depend).issubset(set(failed_ls)) is True ):
-                log1.warning("Task failed so stopping execution of %s", row )
-                is_break='Y'
-                break
-            # if tasks depended on are subset of success list
-            if set(task_depend).issubset(set(success_ls)) is False:
-                time.sleep(3)
-                # continue
-            else:
-                log1.info(TASK_TRIGGER, row)
-                dep_task = mp.Process(target = execute_job, args = [prj_nm,paths_data,row,
-                run_id,file_path,iter_value], name = 'Process_' + str(row))
-                dep_processes.append(dep_task)
-                log1.info(START_PROCESS ,str(dep_task.name))
-                dep_task.start()
-                dependent_task.remove(row)
-                length=length-1
-                for process in dep_processes:
-                    process.join()
-        if is_break=='Y':
-            break
-
-    #reading the orchestration text file for getting the statuses
-    df_2 =pd.read_csv(file_path, sep='\t')
-    # loop for independent tasks
-    for i, row in df_2.iterrows():
-        if str(row['task_depended_on'])=='0':
-            log1.info(str(row['task_name']+"task is "+row['Job_Status']))
-
-    pipeline_status_list = df_2['Job_Status'].to_list()
-    #loop for dependent tasks
-    # dependent_task =set(df_2[df_2['task_depended_on'] != 0]['task_name'].to_list())
-    for i in new_dep_task_list:
-        status = df_2[df_2['task_name'] == i]['Job_Status'].to_list()
-        if 'FAILED' in status:
-            log1.info("%s task is FAILED", i)
-        elif 'STARTED' in status:
-            log1.info("%s task is STARTED", i)
-        elif 'Start' in status:
-            log1.info("%s task is NOT STARTED", i)
-        else :
-            log1.info("%s task is SUCCESS", i)
+    dependent_task_loop(dependent_task,file_path,prj_nm,paths_data,run_id,iter_value)
+    #for logging all statuses in pipeline log
+    pipeline_status_list= orc_get_log_status(file_path,new_dep_task_list)
     return pipeline_status_list
 
 def restart_orchestration_execution(prj_nm,paths_data,pip_nm,run_id,iter_value):
     """function for executing orchestration process"""
     # Readding Pipeline json file
-    try:
-        new_path= paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-        paths_data["pipeline_json_path"]+ pip_nm+JSON
-        with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
-            json_data = json.load(jsonfile)
-            task_details=json_data['tasks_details'].items()
-            pd.DataFrame(json_data['tasks_details'].items())
-    except Exception as error:
-        log1.exception("error in reading pipeline json %s.", str(error))
-        raise error
+    json_data = pipeline_json_read(paths_data,prj_nm,pip_nm)
+    task_details=json_data['tasks_details'].items()
 
     log1.info('Pipeline execution initiated')
     #Script starts here
@@ -172,78 +201,18 @@ def restart_orchestration_execution(prj_nm,paths_data,pip_nm,run_id,iter_value):
     file_path=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
     paths_data["status_txt_file_path"]+pip_nm+'_Pipeline_'+run_id+".txt"
 
-    independent_task1=list(set(independent_task) - set(success_lss))
-    log1.info("independent_tasks running:%s",independent_task1)
+    independent_task=list(set(independent_task) - set(success_lss))
+    log1.info("independent_tasks running:%s",independent_task)
 
-    dependent_task1=list(set(dependent_task) - set(success_lss))
-    log1.info("dependent_tasks running:%s",dependent_task1)
+    dependent_task=list(set(dependent_task) - set(success_lss))
+    log1.info("dependent_tasks running:%s",dependent_task)
     #Running the independent jobs in a loop###
-    ind_processes = []
-    is_break='N'
-    for i in independent_task1:
-        log1.info(TASK_TRIGGER, i)
-        ind_task = mp.Process(target = execute_job, args = [prj_nm,paths_data,i,run_id,
-        file_path,iter_value], name = 'Process_' + str(i))
-        ind_processes.append(ind_task)
-        log1.info(START_PROCESS ,str(ind_task.name))
-        ind_task.start()
-    for process in ind_processes:
-        process.join()
+    independent_task_loop(independent_task,prj_nm,paths_data,run_id,
+            file_path,iter_value)
 
     #Running the dependent jobs in a loop
-    length = int(len(dependent_task1))
-    dep_processes = []
-    while length>0:
-        for row in dependent_task1:
-            df_2 =pd.read_csv(file_path, sep='\t')
-            success_ls=df_2[df_2['Job_Status'] == 'SUCCESS']['task_name'].to_list()
-            failed_ls=df_2[df_2['Job_Status'] == 'FAILED']['task_name'].to_list()
-            task_depend=df_2[df_2['task_name'] == row]['task_depended_on'].to_list()
-            #if there are failed tasks in failed_ls and
-            # if failed tasks is subset of tasks depended on
-            # if tasks depended on are subset of failed  list
-            if (len(failed_ls) != 0) & (set(failed_ls).issubset(set(task_depend)) |\
-            set(task_depend).issubset(set(failed_ls)) is True ):
-                log1.warning("Task failed so stopping execution of %s", row )
-                is_break='Y'
-                break
-            # if tasks depended on are subset of success list
-            if set(task_depend).issubset(set(success_ls)) is False:
-                time.sleep(3)
-            else:
-                log1.info(TASK_TRIGGER, row)
-                dep_task = mp.Process(target = execute_job, args = [prj_nm,paths_data,row
-                ,run_id,file_path,iter_value], name = 'Process_' + str(row))
-                dep_processes.append(dep_task)
-                log1.info(START_PROCESS ,str(dep_task.name))
-                dep_task.start()
-                dependent_task1.remove(row)
-                length=length-1
-                for process in dep_processes:
-                    process.join()
-        if is_break=='Y':
-            break
-
-    #reading the orchestration text file for getting the statuses
-    df_2 =pd.read_csv(file_path, sep='\t')
-    # loop for independent tasks
-    for i, row in df_2.iterrows():
-        if str(row['task_depended_on'])=='0':
-            log1.info(str(row['task_name']+" task is "+row['Job_Status']))
-
-    pipeline_status_list = df_2['Job_Status'].to_list()
-    #loop for dependent tasks
-    # dependent_task =set(df_2[df_2['task_depended_on'] != 0]['task_name'].to_list())
-    for i in new_dep_task_list:
-        status = df_2[df_2['task_name'] == i]['Job_Status'].to_list()
-        if 'FAILED' in status:
-            log1.info("%s task is FAILED", i)
-        elif 'STARTED' in status:
-            log1.info("%s task is STARTED", i)
-        elif 'Start' in status:
-            log1.info("%s task is NOT STARTED", i)
-        else :
-            log1.info("%s task is SUCCESS", i)
+    dependent_task_loop(dependent_task,file_path,prj_nm,paths_data,run_id,iter_value)
+    pipeline_status_list= orc_get_log_status(file_path,new_dep_task_list)
     return pipeline_status_list
 
 ###################################################################################################
@@ -356,7 +325,7 @@ def job_check(df_flat):
     v_error_status, v_err_msg = check_for_cyclic(df_flat)
     if v_error_status == 'error':
         v_err_status = 'failure'
-        v_err_msg = 'Error: Cyclic job dependent in dataframe.'
+        v_err_msg = 'Error: Cyclic dependendcy found in pipeline.'
         return v_err_status, v_err_msg
 
     return v_err_status, v_err_msg
@@ -365,10 +334,7 @@ def job_check(df_flat):
 def main_job(prj_nm,paths_data,pip_nm):
     """pipeline execution"""
     # Read the csv file
-    pip_path= paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-    paths_data["pipeline_json_path"]+ pip_nm+ JSON
-    with open(pip_path,"r", encoding='utf-8') as jsonfile:
-        json_data = json.load(jsonfile)
+    json_data = pipeline_json_read(paths_data,prj_nm,pip_nm)
     df_3=pd.DataFrame(json_data['tasks_details'].items())
     df_return = df_flatten(df_3)
     # set(df_return['task_name'])
@@ -400,48 +366,33 @@ def audit(json_data, task_name,run_id,status,value,itervalue):
         log1.exception("error in audit %s.", str(error))
         raise error
 
-def copy(src_path,target_path):
-    """ copies contents of one file to other file"""
-    try:
-        with open(src_path, "r", encoding='utf-8') as audit1:
-            audit_data1 = json.load(audit1)
-        with open(target_path, "r+", encoding='utf-8') as audit2:
-            audit_data2 = json.load(audit2)
-            audit_data2.extend(audit_data1)
-            audit2.seek(0)
-            json.dump(audit_data2, audit2, indent=4, default=str)
-    except Exception as error:
-        log1.exception("error in copying json %s.", str(error))
-        raise error
+def get_time(log_file_path1,log_file_name1):
+    """function to get start and end times from log files"""
+    # Open the log file
+    with open(log_file_path1+log_file_name1, 'r', encoding="utf-8") as file:
+        log_data = file.read()
+    # print(log_data)
+    # Define a regular expression pattern to match the date and time format in the log file
+    pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+    # Find all matches of the pattern in the log data
+    matches = re.findall(pattern, log_data)
+    # Check if the matches list is not empty
+    if matches:
+        # Convert the first and last match to datetime objects
+        starting_time = datetime.strptime(matches[0], '%Y-%m-%d %H:%M:%S')
+        ending_time = datetime.strptime(matches[-1], '%Y-%m-%d %H:%M:%S')
+    else:
+        log1.info("matches not found")
+    return starting_time,ending_time
 
-def send_mail(message, prj_nm,run_id,paths_data,name,log_file_path,log_file_name):
-    """Function to send emails for notyfying users on job status"""
+
+def html_email_code(msg,message,paths_data,prj_nm,log_file_path,log_file_name,name,run_id):
+    """html code for email in started, failed and completed cases"""
     try:
-        msg = MIMEMultipart()
         msg['From'] = paths_data["from_addr"]
         msg['To'] = paths_data["to_addr"]
         msg['Cc'] = paths_data["cc_addr"]
-
-        def get_time():
-            """function to get start and end times from log files"""
-            # Open the log file
-            with open(log_file_path+log_file_name, 'r', encoding="utf-8") as file:
-                log_data = file.read()
-            # print(log_data)
-            # Define a regular expression pattern to match the date and time format in the log file
-            pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
-            # Find all matches of the pattern in the log data
-            matches = re.findall(pattern, log_data)
-            # Check if the matches list is not empty
-            if matches:
-                # Convert the first and last match to datetime objects
-                starting_time = datetime.strptime(matches[0], '%Y-%m-%d %H:%M:%S')
-                ending_time = datetime.strptime(matches[-1], '%Y-%m-%d %H:%M:%S')
-            else:
-                log1.info("matches not found")
-            return starting_time,ending_time
-
-        i,j =get_time()
+        i,j =get_time(log_file_path,log_file_name)
         if message == "FAILED": # if job Failed
             msg['Subject'] = f"FAILURE: IKART: {name} Summary Report"
             body = f"""<p>Hi Team,</p>
@@ -480,11 +431,11 @@ def send_mail(message, prj_nm,run_id,paths_data,name,log_file_path,log_file_name
         elif message == "STARTED": # if job Started
             msg['Subject'] = f"STARTED: IKART: {name} Summary Report"
             body = f"""<p>Hi Team,</p>
-                       <p style="color:green;"> The Job(s) execution has Started.</p>
-                       <p style="color:black;"><b>Run ID</b> : {run_id}</p>
-                       <p style="color:black;"><b>Project</b> : {prj_nm}</p>
-                       <p>Thanks and Regards,</p>
-                       <p>{paths_data["team_nm"]}</p>"""
+                    <p style="color:green;"> The Job(s) execution has Started.</p>
+                    <p style="color:black;"><b>Run ID</b> : {run_id}</p>
+                    <p style="color:black;"><b>Project</b> : {prj_nm}</p>
+                    <p>Thanks and Regards,</p>
+                    <p>{paths_data["team_nm"]}</p>"""
         elif message == "COMPLETED": # if job completed
             msg['Subject'] = f"SUCCESS: IKART: {name} Summary Report"
             body = f"""<p>Hi Team,</p>
@@ -521,6 +472,15 @@ def send_mail(message, prj_nm,run_id,paths_data,name,log_file_path,log_file_name
                 <p>Thanks and Regards,</p>
                 <p>{paths_data["team_nm"]}</p>"""
         msg.attach(MIMEText(body, 'html'))
+    except Exception as error:
+        log1.exception("html_email_code %s", str(error))
+        raise error
+
+def send_mail(message, prj_nm,run_id,paths_data,name,log_file_path,log_file_name):
+    """Function to send emails for notyfying users on job status"""
+    try:
+        msg = MIMEMultipart()
+        html_email_code(msg,message,paths_data,prj_nm,log_file_path,log_file_name,name,run_id)
         if message != "STARTED":
             with open(log_file_path+log_file_name, "rb") as log_data:
                 attachment = MIMEApplication(log_data.read(), _subtype="txt")
@@ -539,133 +499,186 @@ def send_mail(message, prj_nm,run_id,paths_data,name,log_file_path,log_file_name
         log1.exception("Connection to mail server failed %s", str(error))
         raise error
 
-def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id,log_file_path,log_file_name,
-MODE,iter_value):
-    """executes the orchestration at task or
-    pipeline level based on the command given"""
-# if __name__ == "__main__":
-    global STATUS_LIST
-    STATUS_LIST=[]
+def create_status_txt_file(paths_data1,task_name,proj_nm,run_id1):
+    """creating status text file"""
     try:
-        if (str(pip_nm) == "-9999" ) or (task_nm != -9999 and pip_nm != -9999) or\
-            (str(task_nm) != "-9999"):
-            # log1.info("entered into task")
-            df_1 = pd.DataFrame(columns=["task_name","task_depended_on","Job_Status"],index = [1])
-            df_1['task_name']= task_nm
-            df_1['task_depended_on']= 0
-            df_1['Job_Status']= 'Start'
-            file_path=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-            paths_data["status_txt_file_path"]+task_nm+'_Task_'+run_id+".txt"
-            df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
-        else:
-            # log1.info("entered into pip")
-            new_path = paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-            paths_data["pipeline_json_path"]+pip_nm+JSON
-            # reading pipeline Json
-            with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
-                json_data = json.load(jsonfile)
-                #reading pipeline JSON completed
-                audit(json_data, pip_nm,run_id,'STATUS','STARTED',iter_value)
-            df_2=pd.DataFrame(json_data['tasks_details'].items())
-            df_1 = df_flatten(df_2)
-            df_1['Job_Status']= 'Start'
-            file_path=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-            paths_data["status_txt_file_path"]+pip_nm+'_Pipeline_'+run_id+".txt"
-        if (task_nm != -9999 and pip_nm != -9999) or (task_nm != -9999):
-            log1.info("execution at task level")
-            send_mail('STARTED', prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
-            execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
-        elif task_nm == -9999 and pip_nm != -9999:
-            log1.info("execution at pipeline level")
-            send_mail('STARTED', prj_nm,run_id,paths_data,pip_nm,log_file_path,log_file_name)
-            main_job(prj_nm,paths_data,pip_nm) #this checks for cyclic dependency
-            text_filepath=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
-            paths_data["status_txt_file_path"]
-            # * means all if need specific format then *.csv
-            list_of_prev_files = glob.glob(text_filepath+pip_nm+'*'+".txt")
-            if len(list_of_prev_files) != 0:
-                log1.info("entered inside existing previous files")
-                latest_file = max(list_of_prev_files, key=os.path.getctime)
-                log1.info("previous txt file path:%s", latest_file)
+        df_1 = pd.DataFrame(columns=["task_name","task_depended_on","Job_Status"],index = [1])
+        df_1['task_name']= task_name
+        df_1['task_depended_on']= 0
+        df_1['Job_Status']= 'Start'
+        file_path1=paths_data1["folder_path"]+paths_data1["Program"]+proj_nm+\
+        paths_data1["status_txt_file_path"]+task_name+'_Task_'+run_id1+".txt"
+        df_1.to_csv(file_path1,mode='w', sep='\t',index = False, header=True)
+        return file_path1
+    except Exception as error:
+        log1.exception("create_status_txt_file %s", str(error))
+        raise error
+
+def pipeline_execution(proj_nm,path_data,pipe_nm,run_id1,log_file_path1,log_file_name1,
+    mode,iter_val):
+    """pipeline execution"""
+    try:
+        json_data = pipeline_json_read(path_data,proj_nm,pipe_nm) #pipeline json read
+        audit(json_data, pipe_nm,run_id1,'STATUS','STARTED',iter_val)
+        df_2=pd.DataFrame(json_data['tasks_details'].items())
+        df_1 = df_flatten(df_2)
+        df_1['Job_Status']= 'Start'
+        file_path=path_data["folder_path"]+path_data["Program"]+proj_nm+\
+        path_data["status_txt_file_path"]+pipe_nm+'_Pipeline_'+run_id1+".txt"
+        log1.info("execution at pipeline level")
+        send_mail('STARTED', proj_nm,run_id1,path_data,pipe_nm,log_file_path1,log_file_name1)
+        main_job(proj_nm,path_data,pipe_nm) #this checks for cyclic dependency
+        text_filepath=path_data["folder_path"]+path_data["Program"]+proj_nm+\
+        path_data["status_txt_file_path"]
+        # * means all if need specific format then *.csv
+        list_of_prev_files = glob.glob(text_filepath+pipe_nm+'*'+".txt")
+        if len(list_of_prev_files) != 0:
+            log1.info("entered inside existing previous files")
+            latest_file = max(list_of_prev_files, key=os.path.getctime)
+            log1.info("previous txt file path:%s", latest_file)
+            if mode =='RESTART':
+                log1.info("execution of pipeline in RESTART mode")
                 # reading previous run text file
                 df_2 =pd.read_csv(latest_file, sep='\t')
-                if MODE =='RESTART':
-                    log1.info("execution of pipeline in RESTART mode")
-                    success_ls=df_2[df_2['Job_Status'] == 'SUCCESS']['task_name'].to_list()
-                    log1.info("list of tasks that are success in previous run:%s",success_ls)
-                    # creating new text file
-                    df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
-                    list_of_files = glob.glob(text_filepath+pip_nm+'*'+".txt")
-                    latest_file1 = max(list_of_files, key=os.path.getctime)
-                    log1.info("current txt file path:%s", latest_file1)
-                    df_3 =pd.read_csv(latest_file1, sep='\t')
-                    for i in success_ls:
-                        df_3.loc[df_3['task_name'] == i, 'Job_Status'] = 'SUCCESS'
-                        audit(json_data,i,run_id,'STATUS','SKIPPED',iter_value)
-                    log1.info(df_3)
-                    df_3.to_csv(latest_file1,mode='w', sep='\t',index = False, header=True)
-                    STATUS_LIST=restart_orchestration_execution(prj_nm,paths_data,pip_nm,
-                    run_id,iter_value)
-                else:
-                    log1.info("execution of pipeline in NORMAL mode")
-                    df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
-                    STATUS_LIST=orchestration_execution(prj_nm,paths_data,pip_nm,run_id,iter_value)
-            else:
-                log1.info("entered inside does not exist previous files block")
-                log1.info("execution of pipeline in Normal mode")
+                success_ls=df_2[df_2['Job_Status'] == 'SUCCESS']['task_name'].to_list()
+                log1.info("list of tasks that are success in previous run:%s",success_ls)
+                # creating new text file
                 df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
-                STATUS_LIST=orchestration_execution(prj_nm,paths_data,pip_nm,run_id,iter_value)
+                list_of_files = glob.glob(text_filepath+pipe_nm+'*'+".txt")
+                latest_file1 = max(list_of_files, key=os.path.getctime)
+                log1.info("current txt file path:%s", latest_file1)
+                df_3 =pd.read_csv(latest_file1, sep='\t')
+                for i in success_ls:
+                    df_3.loc[df_3['task_name'] == i, 'Job_Status'] = 'SUCCESS'
+                    audit(json_data,i,run_id1,'STATUS','SKIPPED',iter_val)
+                log1.info(df_3)
+                df_3.to_csv(latest_file1,mode='w', sep='\t',index = False, header=True)
+                status_list=restart_orchestration_execution(proj_nm,path_data,pipe_nm,
+                run_id1,iter_val)
+            else:
+                log1.info("execution of pipeline in NORMAL mode")
+                df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
+                status_list=orchestration_execution(proj_nm,path_data,pipe_nm,run_id1,iter_val)
+        else:
+            log1.info("entered inside does not exist previous files block")
+            log1.info("execution of pipeline in Normal mode")
+            df_1.to_csv(file_path,mode='w', sep='\t',index = False, header=True)
+            status_list=orchestration_execution(proj_nm,path_data,pipe_nm,run_id1,iter_val)
+        return status_list
+    except Exception as error:
+        log1.exception("pipeline_execution %s", str(error))
+        raise error
+
+def get_ind_task_status(file_path):
+    """function to get status from text"""
+    try:
+        task_status_list = []
+        df_2 =pd.read_csv(file_path, sep='\t')
+        for _,row in df_2.iterrows():
+            if row['task_depended_on']==0:
+                log1.info(row['task_name']+" task is "+row['Job_Status'])
+                task_status_list.append(row['Job_Status'])
+        return task_status_list
+    except Exception as error:
+        log1.exception("get_ind_task_status %s", str(error))
+        raise error
+
+def get_not_started_task_status(json_data,run_id,file_path,iter_value):
+    """function to get status from text"""
+    try:
+        df_2 =pd.read_csv(file_path, sep='\t')
+        for _,row in df_2.iterrows():
+            if row['Job_Status'] == 'Start':
+                #log and audit for tasks not started
+                # log1.info("not started task name:%s",row['task_name'])
+                audit(json_data,row['task_name'],run_id,
+                'STATUS','NOT STARTED',iter_value)
+    except Exception as error:
+        log1.exception("get_not_started_task_status %s", str(error))
+        raise error
+
+def task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
+iter_value):
+    """task_execution block"""
+    try:
+        file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+        # log1.info("entered into task")
+        log1.info("execution at task level")
+        send_mail('STARTED', prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
+        execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
+    except Exception as error:
+        log1.exception("error in orchestrate_task_calling %s.", str(error))
+        raise error
+    finally:
+        # entered into task
+        task_status_list = get_ind_task_status(file_path)
+        result = all(x == "SUCCESS" for x in task_status_list)
+        if result is False:
+            log1.info("Task %s Execution failed.",task_nm)
+            send_mail("FAILED",prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
+        else:
+            log1.info("Task %s Execution ended successfully.",task_nm)
+            send_mail("COMPLETED", prj_nm,run_id,paths_data,task_nm,log_file_path,
+            log_file_name)
+        log1.handlers.clear()
+
+def pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_file_name,
+mode,iter_value):
+    """pipeline execution block"""
+    global STATUS_LIST
+    # STATUS_LIST=[]
+    try:
+        # log1.info("entered into pip")
+        STATUS_LIST = pipeline_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,
+        log_file_name,mode,iter_value)
+    except Exception as error:
+        log1.exception("error in orchestrate_calling %s.", str(error))
+        raise error
+    finally:
+        file_path=paths_data["folder_path"]+paths_data["Program"]+prj_nm+\
+        paths_data["status_txt_file_path"]+pip_nm+'_Pipeline_'+run_id+".txt"
+        json_data = pipeline_json_read(paths_data,prj_nm,pip_nm)
+        if len(STATUS_LIST)==0:
+            audit(json_data, pip_nm,run_id,'STATUS',
+            'FAILED DUE TO CYCLIC DEPENDENCY',iter_value)
+            log1.info("pipeline %s Execution FAILED DUE TO CYCLIC DEPENDENCY", pip_nm)
+            send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,log_file_name)
+            log1.handlers.clear()
+        else:
+            result = all(x == "SUCCESS" for x in STATUS_LIST)
+            if result is False:
+                # log1.info("entered into false")
+                get_not_started_task_status(json_data,run_id,file_path,iter_value)
+                #calling audit or pipeline failure
+                audit(json_data, pip_nm,run_id,'STATUS','FAILED',iter_value)
+                log1.info("pipeline %s Execution failed.", pip_nm)
+                send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,
+                log_file_name)
+                sys.exit()
+            else:
+                #calling audit or pipeline success
+                audit(json_data, pip_nm,run_id,'STATUS','COMPLETED',iter_value)
+                log1.info("pipeline %s Execution ended successfully.", pip_nm)
+                send_mail("COMPLETED",prj_nm,run_id,paths_data,pip_nm,log_file_path,
+                log_file_name)
+            log1.handlers.clear()
+
+
+
+def orchestrate_calling(prj_nm,paths_data,task_nm,pip_nm,run_id,log_file_path,log_file_name,
+mode,iter_value):
+    """executes the orchestration at task or
+    pipeline level based on the command given"""
+    try:
+        if (task_nm != -9999 and pip_nm != -9999) or (str(task_nm) != "-9999") or\
+        str(pip_nm) == "-9999":
+            task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
+            iter_value)
+        elif task_nm == -9999 and pip_nm != -9999:
+            pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_file_name,
+            mode,iter_value)
         else:
             log1.info("Please enter the correct command")
     except Exception as error:
         log1.exception("error in orchestrate_calling %s.", str(error))
         raise error
-    finally:
-        if (str(pip_nm) == "-9999" ) or (task_nm != -9999 and pip_nm != -9999) or \
-        (str(task_nm) != "-9999"):
-            # entered into task
-            task_status_list = []
-            df_2 =pd.read_csv(file_path, sep='\t')
-            for i,row in df_2.iterrows():
-                if row['task_depended_on']==0:
-                    log1.info(row['task_name']+" task is "+row['Job_Status'])
-                    task_status_list.append(row['Job_Status'])
-            result = all(x == "SUCCESS" for x in task_status_list)
-            if result is False:
-                log1.info("Task %s Execution failed.",task_nm)
-                send_mail("FAILED", prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
-                log1.handlers.clear()
-            else:
-                log1.info("Task %s Execution ended successfully.",task_nm)
-                send_mail("COMPLETED", prj_nm,run_id,paths_data,task_nm,log_file_path,
-                log_file_name)
-                log1.handlers.clear()
-        else:
-            if len(STATUS_LIST)==0:
-                audit(json_data, pip_nm,run_id,'STATUS',
-                'FAILED DUE TO CYCLIC DEPENDENCY',iter_value)
-                log1.info("pipeline %s Execution FAILED DUE TO CYCLIC DEPENDENCY", pip_nm)
-                send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,log_file_name)
-                log1.handlers.clear()
-            else:
-                result = all(x == "SUCCESS" for x in STATUS_LIST)
-                if result is False:
-                    log1.info("entered into false")
-                    df_2 =pd.read_csv(file_path, sep='\t')
-                    for i,row in df_2.iterrows():
-                        if row['Job_Status'] == 'Start':
-                            log1.info("not started task name:%s",row['task_name'])
-                            audit(json_data,row['task_name'],run_id,
-                            'STATUS','NOT STARTED',iter_value)
-                    audit(json_data, pip_nm,run_id,'STATUS','FAILED',iter_value)
-                    log1.info("pipeline %s Execution failed.", pip_nm)
-                    send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,
-                    log_file_name)
-                else:
-                    audit(json_data, pip_nm,run_id,'STATUS','COMPLETED',iter_value)
-                    log1.info("pipeline %s Execution ended successfully.", pip_nm)
-                    send_mail("COMPLETED",prj_nm,run_id,paths_data,pip_nm,log_file_path,
-                    log_file_name)
-                log1.handlers.clear()
-                if result is False:
-                    sys.exit()

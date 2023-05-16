@@ -1,6 +1,7 @@
 """ script for reading data from excel"""
 import glob
 import logging
+import importlib
 import sys
 import os
 import pandas as pd
@@ -36,7 +37,8 @@ skip_footer= 0, sheet_name= 0):
         log2.info(all_files)
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
-        from engine_code import audit
+        module1 = importlib.import_module("engine_code")
+        audit = getattr(module1, "audit")
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
             json_data["task"]["source"]["file_name"])

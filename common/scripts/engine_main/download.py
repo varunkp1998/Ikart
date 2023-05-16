@@ -4,7 +4,9 @@ import subprocess
 import logging
 import os
 import json
+import importlib
 import requests
+
 
 log1 = logging.getLogger('log1')
 log2 = logging.getLogger('log2')
@@ -33,8 +35,8 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
         logging.error('UDF Failed: setup_logger failed')
         raise ex
 
-def create_folder_structure(prj_nm,path: str):
-    """Function to create folder stucture in server"""
+def create_common_folder_structure(path: str):
+    """Function to create common folder stucture in server"""
     log1.info("started creating the folder structure")
     try:
         os.chdir(path)
@@ -54,8 +56,38 @@ def create_folder_structure(prj_nm,path: str):
             os.makedirs('ingestion')
         if not os.path.exists('orchestration'):
             os.makedirs('orchestration')
-        os.chdir('..')
-        os.chdir('..')
+    except Exception as error:
+        log1.exception("error in create_common_folder_structure %s.", str(error))
+        raise error
+
+def create_task_folder_structure(prj_nm,path: str):
+    """Function to create task folder stucture in server"""
+    try:
+        os.chdir(path+PROGRAM+prj_nm+'/Pipeline/Task/')
+        if not os.path.exists('archive'):
+            os.makedirs('archive')
+        if not os.path.exists('json'):
+            os.makedirs('json')
+        if not os.path.exists('logs'):
+            os.makedirs('logs')
+        if not os.path.exists('rejected'):
+            os.makedirs('rejected')
+        if not os.path.exists('source_files'):
+            os.makedirs('source_files')
+        if not os.path.exists('target_files'):
+            os.makedirs('target_files')
+        if not os.path.exists('reports'):
+            os.makedirs('reports')
+        log1.info("completed creating the folder structure")
+    except Exception as error:
+        log1.exception("error in create_task_folder_structure %s.", str(error))
+        raise error
+
+def create_folder_structure(prj_nm,path: str):
+    """Function to create program folder stucture in server"""
+    try:
+        create_common_folder_structure(path)
+        os.chdir(path)
         if not os.path.exists('Program'):
             os.makedirs('Program')
         os.chdir(path+PROGRAM)
@@ -73,22 +105,7 @@ def create_folder_structure(prj_nm,path: str):
             os.makedirs('logs')
         if not os.path.exists('text'):
             os.makedirs('text')
-        os.chdir(path+PROGRAM+prj_nm+'/Pipeline/Task/')
-        if not os.path.exists('archive'):
-            os.makedirs('archive')
-        if not os.path.exists('json'):
-            os.makedirs('json')
-        if not os.path.exists('logs'):
-            os.makedirs('logs')
-        if not os.path.exists('rejected'):
-            os.makedirs('rejected')
-        if not os.path.exists('source_files'):
-            os.makedirs('source_files')
-        if not os.path.exists('target_files'):
-            os.makedirs('target_files')
-        if not os.path.exists('reports'):
-            os.makedirs('reports')
-        log1.info("completed creating the folder structure")
+        create_task_folder_structure(prj_nm,path)
     except Exception as error:
         log1.exception("error in create_folder_structure %s.", str(error))
         raise error
@@ -116,11 +133,9 @@ def download_pipeline_json(prj_nm,pipeline_name:str,paths_data:str):
         log1.exception("error in download_pipeline_json %s.", str(error))
         raise error
 
-def common_files_downloads(paths_data:str):
-    """Function to download engine_code.py,checks_mapping.json,mapping.json,
-    definitions_qc,utility from Github to server"""
+def download_engine_code(paths_data:str):
+    """Function to download engine_code.py from Github to server"""
     try:
-        #curl command for downloading the engine_code file
         log1.info("downloading engine_code.py from Github started..")
         engine_path= paths_data["folder_path"]+paths_data["engine_path"]
         log1.info("engine_code.py location: %s", engine_path)
@@ -133,7 +148,13 @@ def common_files_downloads(paths_data:str):
             subprocess.call(engine)
             log1.info("downloading engine_code.py from Github completed..")
             log1.info(DASH)
-        #curl command for downloading the checks mapping file
+    except Exception as error:
+        log1.exception("error in download_engine_code %s.", str(error))
+        raise error
+
+def download_checks_mapping(paths_data:str):
+    """Function to download checks_mapping.json from Github to server"""
+    try:
         log1.info("downloading checks_mapping.json from Github started..")
         checks_mapping_check = paths_data["folder_path"]+paths_data["dq_scripts_path"]+\
         'checks_mapping.json'
@@ -146,7 +167,13 @@ def common_files_downloads(paths_data:str):
             subprocess.call(checks_mapping)
             log1.info("downloading the checks_mapping.json from Github completed")
             log1.info(DASH)
-        #curl command for downloading the mapping file
+    except Exception as error:
+        log1.exception("error in download_checks_mapping %s.", str(error))
+        raise error
+
+def download_mapping(paths_data:str):
+    """Function to download mapping.json from Github to server"""
+    try:
         log1.info("downloading mapping.json from Github started..")
         mapping_path_check = paths_data["folder_path"]+paths_data["engine_path"]+'mapping.json'
         # Check whether the specified path exists or not
@@ -158,6 +185,13 @@ def common_files_downloads(paths_data:str):
             subprocess.call(mapping_file)
             log1.info("downloading the mapping.json completed")
             log1.info(DASH)
+    except Exception as error:
+        log1.exception("error in download_mapping %s.", str(error))
+        raise error
+
+def download_definitions_qc(paths_data:str):
+    """Function to download definitions_qc from Github to server"""
+    try:
         qc_py = ['curl', '-o', paths_data["folder_path"]+paths_data["dq_scripts_path"]+
         'definitions_qc.py', paths_data["GH_definitions_qc_path"]]
         qc_check_path_check = paths_data["folder_path"]+paths_data["dq_scripts_path"]+\
@@ -169,6 +203,13 @@ def common_files_downloads(paths_data:str):
             subprocess.call(qc_py)
             log1.info("downloading the definitions_qc.py from github completed")
             log1.info(DASH)
+    except Exception as error:
+        log1.exception("error in download_definitions_qc %s.", str(error))
+        raise error
+
+def download_utility(paths_data:str):
+    """Function to download utility from Github to server"""
+    try:
         utility_path_check = paths_data["folder_path"]+paths_data["ingestion_path"]+'utility.py'
         log1.info("downloading utility.py from Github started..")
         is_exist = os.path.exists(utility_path_check)
@@ -179,6 +220,13 @@ def common_files_downloads(paths_data:str):
             log1.info("downloading the utility.py file form gihub completed")
             subprocess.call(utility_py)
             log1.info(DASH)
+    except Exception as error:
+        log1.exception("error in download_utility %s.", str(error))
+        raise error
+
+def download_orchestrate(paths_data:str):
+    """Function to download orchestrate from Github to server"""
+    try:
         orchestrate_path_check = paths_data["folder_path"]+paths_data["orchestration_path"]+\
         'orchestrate.py'
         log1.info("downloading orchestrate.py from Github started..")
@@ -189,6 +237,20 @@ def common_files_downloads(paths_data:str):
             log1.info("downloading the orchestrate.py form Github completed")
             subprocess.call(orchestrate_py)
             log1.info(DASH)
+    except Exception as error:
+        log1.exception("error in download_orchestrate %s.", str(error))
+        raise error
+
+def common_files_downloads(paths_data:str):
+    """Function to download engine_code.py,checks_mapping.json,mapping.json,
+    definitions_qc,utility from Github to server"""
+    try:
+        download_engine_code(paths_data)
+        download_checks_mapping(paths_data)
+        download_mapping(paths_data)
+        download_definitions_qc(paths_data)
+        download_utility(paths_data)
+        download_orchestrate(paths_data)
     except Exception as error:
         log1.exception("error in common_downloads %s.", str(error))
         raise error
@@ -224,6 +286,114 @@ def task_json_download(prj_nm,task_name:str, paths_data:str):
         log2.exception("error in task_downloads %s.", str(error))
         raise error
 
+def download_task_source_conn_files(config_json1,paths_data1):
+    """function to download source_connection
+    file from github to server for execution"""
+    try:
+        if (config_json1['task']['source']['source_type'])  not in ("csv_read","csvfile_read",
+        "excel_read","parquet_read","json_read","xml_read","text_read"):
+            source_conn_file = config_json1['task']['source']['connection_name']
+            url=paths_data1["GH_config_file_path"]+source_conn_file+JSON
+            response = requests.get(url,timeout=60)
+            if response.status_code == 200:
+                url_exists = bool(response.status_code)
+                log1.info("The source connection json file exists in the  GITHUB repository.")
+            else:
+                url_exists = bool(not response.status_code)
+                log1.info("The source connection file DOES NOT exists in the GITHUB repository")
+            if url_exists is False  :
+                log1.info(PROCESS_ABORTED)
+                sys.exit()
+            source_path_check = paths_data1["folder_path"]+paths_data1["config_path"]+\
+            source_conn_file+JSON
+            is_exist = os.path.exists(source_path_check)
+            log2.info("downloading the source connection file: %s.json operation started",
+            source_conn_file)
+            log2.info('source_conn_file.json exists: %s', is_exist)
+            if is_exist is False:
+                src_json = ['curl', '-o',paths_data1["folder_path"]+paths_data1["config_path"]+\
+                source_conn_file+JSON,
+                paths_data1["GH_config_file_path"]+source_conn_file+JSON]
+                subprocess.call(src_json)
+                log2.info("downloading source connection file: %s.json from Github completed..",
+                source_conn_file)
+                log2.info(DASH)
+    except Exception as error:
+        log2.exception("error in download_task_source_conn_files %s.", str(error))
+        raise error
+
+def download_task_target_conn_files(config_json1,paths_data1):
+    """function to download source_connection
+    file from github to server for execution"""
+    try:
+        if (config_json1['task']['target']['target_type'])  not in ("csv_write","csvfile_write",
+        "parquet_write","excel_write","json_write","xml_write","text_write"):
+            #curl command for downloading the target connection JSON
+            target_conn_file = config_json1['task']['target']['connection_name']
+            url=paths_data1["GH_config_file_path"]+target_conn_file+JSON
+            response = requests.get(url,timeout=60)
+            if response.status_code == 200:
+                url_exists = bool(response.status_code)
+                log1.info("The target connection json file exists in the  GITHUB repository.")
+            else:
+                url_exists = bool(not response.status_code)
+                log1.info("The target connection file DOES NOT exists in the GITHUB repository")
+            if url_exists is False  :
+                log1.info(PROCESS_ABORTED)
+                sys.exit()
+            target_path_check = paths_data1["folder_path"]+paths_data1["config_path"]+\
+            target_conn_file+JSON
+            # Check whether the specified path exists or not
+            is_exist = os.path.exists(target_path_check)
+            log2.info("downloading the target connection file: %s.json "
+            "operation started", target_conn_file)
+            log2.info('target_conn_file.json file exists: %s', is_exist)
+            if is_exist is False:
+                trgt_json = ['curl', '-o', paths_data1["folder_path"]+paths_data1["config_path"]+
+                target_conn_file+JSON,paths_data1["GH_config_file_path"]+target_conn_file+JSON]
+                subprocess.call(trgt_json)
+                log2.info("downloading target connection %s.json from Github completed",
+                target_conn_file)
+                log2.info(DASH)
+    except Exception as error:
+        log2.exception("error in download_task_target_conn_files %s.", str(error))
+        raise error
+
+def download_task_source_target_files(config_json1,paths_data1):
+    """function to download source.py, target.py
+    files from github to server for execution"""
+    try:
+        source_type = config_json1['task']['source']['source_type']
+        target_type = config_json1['task']['target']['target_type']
+        with open(r""+paths_data1["folder_path"]+paths_data1["engine_path"]+'mapping.json',"r",
+        encoding='utf-8') as mapjson:
+            config_new_json = json.load(mapjson)
+        source_file_name=config_new_json["mapping"][source_type]
+        target_file_name= config_new_json["mapping"][target_type]
+        src_py = ['curl', '-o',paths_data1["folder_path"]+paths_data1["ingestion_path"]+
+        source_file_name, paths_data1["GH_source_ingestion_path"]+source_file_name]
+        trgt_py = ['curl', '-o', paths_data1["folder_path"]+paths_data1["ingestion_path"]+
+        target_file_name, paths_data1["GH_target_ingestion_path"]+target_file_name]
+        src_py_path_check = paths_data1["folder_path"]+paths_data1["ingestion_path"]+\
+        source_file_name
+        is_exist = os.path.exists(src_py_path_check)
+        log2.info('source read file exists: %s', is_exist)
+        if is_exist is False:
+            log2.info("downloading the  source read file: %s", source_file_name)
+            subprocess.call(src_py)
+            log2.info(DASH)
+        trg_py_path_check = paths_data1["folder_path"]+paths_data1["ingestion_path"]+\
+        target_file_name
+        is_exist = os.path.exists(trg_py_path_check)
+        log2.info('target write file exists: %s', is_exist)
+        if is_exist is False:
+            log2.info("downloading the  target write file: %s", target_file_name)
+            subprocess.call(trgt_py)
+            log2.info(DASH)
+    except Exception as error:
+        log2.exception("error in download_task_source_target_files %s.", str(error))
+        raise error
+
 def download_task_files(prj_nm,task_name:str, paths_data:str):
     """function to download source_connection, target_connection, source.py, target.py
     files from github to server for execution"""
@@ -238,88 +408,10 @@ def download_task_files(prj_nm,task_name:str, paths_data:str):
         except FileNotFoundError as exc:
             log2.warning("the %s.json path or folder specified does not exists",task_name)
             raise exc
-        if (config_json['task']['source']['source_type'])  not in ("csv_read","csvfile_read",
-        "excelfile_read","parquetfile_read","jsonfile_read","xmlfile_read","textfile_read"):
-            source_conn_file = config_json['task']['source']['connection_name']
-            url=paths_data["GH_config_file_path"]+source_conn_file+JSON
-            response = requests.get(url,timeout=60)
-            if response.status_code == 200:
-                url_exists = bool(response.status_code)
-                log1.info("The source connection json file exists in the  GITHUB repository.")
-            else:
-                url_exists = bool(not response.status_code)
-                log1.info("The source connection file DOES NOT exists in the GITHUB repository")
-            if url_exists is False  :
-                log1.info(PROCESS_ABORTED)
-                sys.exit()
-            source_path_check = paths_data["folder_path"]+paths_data["config_path"]+\
-            source_conn_file+JSON
-            is_exist = os.path.exists(source_path_check)
-            log2.info("downloading the source connection file: %s.json operation started",
-            source_conn_file)
-            log2.info('source_conn_file.json exists: %s', is_exist)
-            if is_exist is False:
-                src_json = ['curl', '-o',paths_data["folder_path"]+paths_data["config_path"]+\
-                source_conn_file+JSON,
-                paths_data["GH_config_file_path"]+source_conn_file+JSON]
-                subprocess.call(src_json)
-                log2.info("downloading source connection file: %s.json from Github completed..",
-                source_conn_file)
-                log2.info(DASH)
-        if (config_json['task']['target']['target_type'])  not in ("csv_write","csvfile_write",
-        "parquetfile_write","excelfile_write","jsonfile_write","xmlfile_write","textfile_write"):
-            #curl command for downloading the target connection JSON
-            target_conn_file = config_json['task']['target']['connection_name']
-            url=paths_data["GH_config_file_path"]+target_conn_file+JSON
-            response = requests.get(url,timeout=60)
-            if response.status_code == 200:
-                url_exists = bool(response.status_code)
-                log1.info("The target connection json file exists in the  GITHUB repository.")
-            else:
-                url_exists = bool(not response.status_code)
-                log1.info("The target connection file DOES NOT exists in the GITHUB repository")
-            if url_exists is False  :
-                log1.info(PROCESS_ABORTED)
-                sys.exit()
-            target_path_check = paths_data["folder_path"]+paths_data["config_path"]+\
-            target_conn_file+JSON
-            # Check whether the specified path exists or not
-            is_exist = os.path.exists(target_path_check)
-            log2.info("downloading the target connection file: %s.json "
-            "operation started", target_conn_file)
-            log2.info('target_conn_file.json file exists: %s', is_exist)
-            if is_exist is False:
-                trgt_json = ['curl', '-o', paths_data["folder_path"]+paths_data["config_path"]+
-                target_conn_file+JSON,paths_data["GH_config_file_path"]+target_conn_file+JSON]
-                subprocess.call(trgt_json)
-                log2.info("downloading target connection %s.json from Github completed",
-                target_conn_file)
-                log2.info(DASH)
-        source_type = config_json['task']['source']['source_type']
-        target_type = config_json['task']['target']['target_type']
-        with open(r""+paths_data["folder_path"]+paths_data["engine_path"]+'mapping.json',"r",
-        encoding='utf-8') as mapjson:
-            config_new_json = json.load(mapjson)
-        source_file_name=config_new_json["mapping"][source_type]
-        target_file_name= config_new_json["mapping"][target_type]
-        src_py = ['curl', '-o',paths_data["folder_path"]+paths_data["ingestion_path"]+
-        source_file_name, paths_data["GH_source_ingestion_path"]+source_file_name]
-        trgt_py = ['curl', '-o', paths_data["folder_path"]+paths_data["ingestion_path"]+
-        target_file_name, paths_data["GH_target_ingestion_path"]+target_file_name]
-        src_py_path_check = paths_data["folder_path"]+paths_data["ingestion_path"]+source_file_name
-        is_exist = os.path.exists(src_py_path_check)
-        log2.info('source read file exists: %s', is_exist)
-        if is_exist is False:
-            log2.info("downloading the  source read file: %s", source_file_name)
-            subprocess.call(src_py)
-            log2.info(DASH)
-        trg_py_path_check = paths_data["folder_path"]+paths_data["ingestion_path"]+target_file_name
-        is_exist = os.path.exists(trg_py_path_check)
-        log2.info('target write file exists: %s', is_exist)
-        if is_exist is False:
-            log2.info("downloading the  target write file: %s", target_file_name)
-            subprocess.call(trgt_py)
-            log2.info(DASH)
+        #function calls for downloads
+        download_task_source_conn_files(config_json,paths_data)
+        download_task_target_conn_files(config_json,paths_data)
+        download_task_source_target_files(config_json,paths_data)
     except Exception as error:
         log2.exception("error in download_task_files %s.", str(error))
         raise error
@@ -336,7 +428,7 @@ def execute_pipeline_download(prj_nm,paths_data:str,task_name:str,pipeline_name:
         common_files_downloads(paths_data)
         orchestration_script=paths_data["folder_path"]+paths_data["orchestration_path"]
         sys.path.insert(0, orchestration_script)
-        import orchestrate
+        orchestrate =  importlib.import_module("orchestrate")
         log1.info("calling the orchestrate_calling function")
         orchestrate.orchestrate_calling(prj_nm,paths_data,task_name,pipeline_name,run_id,
         log_file_path,log_file_name,mode,iter_value)
@@ -357,7 +449,7 @@ def execute_engine(prj_nm,task_name:str,paths_data:str,run_id:str,file_path,iter
         print("calling the download_task_files function")
         download_task_files(prj_nm,task_name,paths_data)
         sys.path.insert(0, new_path)
-        import engine_code
+        engine_code =  importlib.import_module("engine_code")
         log2.info(DASH)
         log2.info("calling the engine_main")
         engine_code.engine_main(prj_nm,task_name,paths_data,run_id,file_path,iter_value)

@@ -2,6 +2,7 @@
 import sys
 import glob
 import logging
+import importlib
 import os
 import pandas as pd
 
@@ -38,7 +39,8 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
         log2.info(all_files)
         engine_code_path = paths_data["folder_path"]+paths_data["ingestion_path"]
         sys.path.insert(0, engine_code_path)
-        from engine_code import audit
+        module = importlib.import_module("engine_code")
+        audit = getattr(module, "audit")
         if all_files == []:
             log2.error("'%s' SOURCE FILE not found in the location",
             json_data["task"]["source"]["file_name"])
