@@ -14,7 +14,7 @@ decrypt = getattr(module, "decrypt")
 
 log2 = logging.getLogger('log2')
 folder_timestamp = datetime.now().strftime("%Y%m%d")
-file_timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+file_timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
 CSV = '.csv'
 XLSX = '.xlsx'
 JSON = '.json'
@@ -32,8 +32,9 @@ def establish_conn(json_data: dict, json_section: str,config_file_path:str):
     try:
         connection_details = get_config_section(config_file_path+json_data["task"][json_section]\
         ["connection_name"]+JSON)
-        d_aws_access_key_id = decrypt(connection_details["aws_access_key_id"])
-        d_aws_secret_access_key = decrypt(connection_details["aws_secret_access_key"])
+        # log2.info("aws access key id %s", decrypt(connection_details["aws_access_key_id"]))
+        d_aws_access_key_id = decrypt(connection_details["access_key"])
+        d_aws_secret_access_key = decrypt(connection_details["secret_access_key"])
         conn = boto3.client( service_name= 's3',region_name=
         connection_details["region_name"],aws_access_key_id=d_aws_access_key_id,
         aws_secret_access_key=d_aws_secret_access_key)
