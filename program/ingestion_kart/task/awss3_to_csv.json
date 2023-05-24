@@ -7,32 +7,31 @@
   "task_type": "Ingestion",
   "task_sequence": "12",
   "task": {
-    "source": {
+"source": {
       "source_type": "aws s3_read",
-      "chunk_size": 1000,
-      "file_type": "csv",
-      "encoding": "utf-8",
-      "connection_name": "aws_connection",
       "select_columns": " ",
+      "encoding": "utf-8",
       "escape_char": "none",
-      "quote_char": "none",
+      "quote_char": " ",
       "skip_footer": " ",
       "skip_header": " ",
-      "file_name": "sales_data",
+      "file_name": "sales",
       "file_path": "test/",
-      "delimiter": ","
-    },
-    "target": {
-      "target_type": "csv_write",
+      "alias_columns": " ",
+      "connection_name": "aws_connection",
       "file_type": "csv",
-      "encoding": "utf-8",
-      "connection_name": "",
-      "quote_char": "none",
-      "index": "False",
-      "audit_columns": "active",
-      "header": "False",
-      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_file/",
-      "delimiter": ","
+      "chunk_size": 1000,
+      "delimiter": " "
+    },
+"target": {	
+            "target_type": "csv_write",
+            "delimiter": ",",
+            "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
+			      "file_name": "mysql_to_csv.csv",
+            "encoding": "utf-8",
+            "header": "True",
+            "index":"False",
+            "audit_columns": "inactive"
     },
     "data_quality_execution": {
       "pre_check_enable": "N",
