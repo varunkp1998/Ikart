@@ -5,7 +5,7 @@
         "source": {	
             "source_type": "snowflake_read",
             "table_name": "sales_data",
-            "connection_name":"snowflake_1",
+            "connection_name":"snowflake_connection",
             "schema": "public",
             "query": " ",
             "chunk_size":10000,					
@@ -13,7 +13,7 @@
         },
         "target": {	
             "target_type": "snowflake_write",
-            "connection_name": "snowflake_1",
+            "connection_name": "snowflake_connection",
             "table_name": "tweet",
             "schema": "public",
             "operation":"create",
