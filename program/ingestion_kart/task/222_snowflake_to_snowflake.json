@@ -14,7 +14,7 @@
         "target": {	
             "target_type": "snowflake_write",
             "connection_name": "snowflake_connection",
-            "table_name": "tweet",
+            "table_name": "tweet1",
             "schema": "public",
             "operation":"create",
             "audit_columns":  "inactive"
