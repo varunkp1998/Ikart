@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 190,
+  "pipeline_id": 52,
+  "task_name": "tastcheck",
+  "task_description": "tastcheck",
+  "task_type": "Ingestion",
+  "task_sequence": "88"
+}
