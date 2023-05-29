@@ -1,0 +1,42 @@
+[
+  {
+    "id": 164,
+    "project_name": "Order Tracking",
+    "pipeline_name": "Open_Orders_Ingestion",
+    "project_id": 1,
+    "pipeline_id": 1,
+    "task_name": "csv_to_mysql",
+    "task_description": "csv_to_mysql description",
+    "task_type": "mysql_writing",
+    "task_sequence": "0",
+    "source": "none",
+    "target": "none",
+    "is_active": "Y",
+    "details": {
+      "DataQuality": [
+        [
+          {
+            "dq_idx": "1",
+            "dq_type": "pre_check",
+            "dq_check": "column_values_to_be_in_type_list",
+            "dq_active": "1",
+            "dq_column": "hosa_column",
+            "dq_datatype": "integer",
+            "dq_ignore_bad_records": "1",
+            "dq_threshold_bad_records": "164"
+          },
+          {
+            "dq_idx": "2",
+            "dq_set": "00000",
+            "dq_type": "pre_check",
+            "dq_check": "column_values_to_be_in_set",
+            "dq_active": "1",
+            "dq_column": "hosa_column1",
+            "dq_ignore_bad_records": "1",
+            "dq_threshold_bad_records": "164_1"
+          }
+        ]
+      ]
+    }
+  }
+]
