@@ -1,0 +1,19 @@
+    
+{
+	"task_id":  1,
+	"task_name": "sql_src->tgt",
+	"sql_execution": {
+		"connection_name": "sql_conn",
+		"restart": "normal | start"
+    },
+		"sql_list":[
+			{
+				"seq_no": 2,
+				"sql_query": "select * from sales_00"
+			},
+            {
+				"seq_no": 1,
+				"sql_query": " truncate table sales_3;"
+			}
+        ]
+	}
