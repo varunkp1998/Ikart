@@ -1,0 +1,28 @@
+[
+  {
+    "id": 125,
+    "project_name": "Order Tracking",
+    "pipeline_name": "pipeline to extract ",
+    "project_id": 1,
+    "pipeline_id": 14,
+    "task_name": "Tetst_preview",
+    "task_description": "Mysql_preview",
+    "task_type": "SQL Execution",
+    "task_sequence": "2",
+    "source": "none",
+    "target": "none",
+    "is_active": "Y",
+    "details": {
+      "SqlExecution": [
+        [
+          {
+            "se_idx": "1",
+            "se_sql_query": "select * from tbl;",
+            "se_sql_seq_no": "1",
+            "se_table_used_desc": "extract the table records"
+          }
+        ]
+      ]
+    }
+  }
+]
