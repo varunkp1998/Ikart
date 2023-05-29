@@ -1,0 +1,46 @@
+[
+  {
+    "id": 190,
+    "project_name": "HRMS",
+    "pipeline_name": "pipeline8",
+    "project_id": 3,
+    "pipeline_id": 9,
+    "task_name": "Tetst1",
+    "task_description": "reet",
+    "task_type": "SQL Execution",
+    "task_sequence": "e",
+    "source": "none",
+    "target": "none",
+    "is_active": "Y",
+    "details": {
+      "SqlExecution": [
+        [
+          {
+            "se_idx": "1",
+            "se_sql_query": "`SELECT * FROM config.vw_tasks where  connection_subtype=\"${connection_subtype}\" and connection_name= \"${connection_name}\"`;",
+            "se_sql_seq_no": "1",
+            "se_table_used_desc": "extract the table records"
+          },
+          {
+            "se_idx": "2",
+            "se_sql_query": "select sec, connection_subtype, connection_name, field_id,display_name, field_type, JSON_ARRAYAGG(JSON_OBJECT('value_01', value_01)) as listvalue\n        from config.vw_task1",
+            "se_sql_seq_no": "2",
+            "se_table_used_desc": "append"
+          },
+          {
+            "se_idx": "3",
+            "se_sql_query": "`delete  FROM config.tbl_task_parameter WHERE task_id = ${task_id} and task_type=\"${task_type}\"`;",
+            "se_sql_seq_no": "3",
+            "se_table_used_desc": "delete"
+          },
+          {
+            "se_idx": "4",
+            "se_sql_query": "select * from core;",
+            "se_sql_seq_no": "4222",
+            "se_table_used_desc": "retrieve"
+          }
+        ]
+      ]
+    }
+  }
+]
