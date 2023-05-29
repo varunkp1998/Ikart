@@ -1,0 +1,31 @@
+[
+  {
+    "id": 161,
+    "project_name": "Order Tracking",
+    "pipeline_name": "Open_Orders_Ingestion",
+    "project_id": 1,
+    "pipeline_id": 1,
+    "task_name": "csv_to_mysql",
+    "task_description": "csv_to_mysql desc",
+    "task_type": "SQL Execution",
+    "task_sequence": "0",
+    "source": "none",
+    "target": "none",
+    "is_active": "Y",
+    "details": {
+      "SqlExecution": {
+        "parameters": {
+          "se_connection_name": "EU_SLS_DAILY_FEED"
+        },
+        "SqlExecution": [
+          {
+            "se_idx": "1",
+            "se_sql_query": "select * from tbl_user;",
+            "se_sql_seq_no": "1",
+            "se_table_used_desc": "extract the table records"
+          }
+        ]
+      }
+    }
+  }
+]
