@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 187,
-  "pipeline_id": 14,
-  "task_name": "mysql_to_mysql",
-  "task_description": "mysql_to_mysql",
-  "task_type": "Ingestion",
-  "task_sequence": "55"
-}
