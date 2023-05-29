@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 188,
+  "pipeline_id": 9,
+  "task_name": "mytomy",
+  "task_description": "mytomy",
+  "task_type": "Ingestion",
+  "task_sequence": "54"
+}
