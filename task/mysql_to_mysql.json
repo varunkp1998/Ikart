@@ -1,0 +1,89 @@
+{
+  "id": 157,
+  "project_name": "Sales",
+  "pipeline_name": "pipeline1",
+  "project_id": 4,
+  "pipeline_id": 10,
+  "task_name": "mysql_to_mysql",
+  "task_description": "mysql_to_mysql",
+  "task_type": "mysql_create",
+  "task_sequence": "10",
+  "source": "MySQL",
+  "target": "MySQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "mysql_read",
+      "query": "select * from sales_18",
+      "chunk_size": "1000",
+      "table_name": "  ",
+      "schema_name": "INFORMATION_SCHEMA1",
+      "parameter_type": "MySQL",
+      "select_columns": "  ",
+      "connection_name": "27"
+    },
+    "target": {
+      "target_type": "mysql_write",
+      "operation": "create",
+      "table_name": " sales_32",
+      "schema_name": "INFORMATION_SCHEMA1",
+      "audit_columns": "inactive",
+      "parameter_type": "MySQL",
+      "connection_name": "28"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "Y",
+      "post_check_enable": "N"
+    },
+    "data_quality_features": {
+      "dq_process_rejected_records": "N",
+      "dq_perform_qc_on_corrected_file": "N",
+      "dq_auto_correction_required": "N",
+      "dq_auto_correct_columns": {
+        "county": "county_nm",
+        "state": "stt"
+      },
+      "dq_lkup_key_column": {
+        "zip": "zip_code"
+      },
+      "dq_lookup_file_path": "C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
+      "data_masking_required": "N",
+      "data_masking_columns": {
+        "msk_date": "0,DateOfBirth",
+        "msk_alpha": "x,PersonalEmail,IBAN",
+        "msk_numeric": "*,BSNNumber,account_no"
+      },
+      "data_encryption_required": "N",
+      "data_decryption_required": "N",
+      "data_encryption_columns": "LastName, IBAN, PersonalEmail",
+      "data_decryption_columns": "LastName, PersonalEmail"
+    },
+    "data_quality": [
+      {
+        "seq_no": "1",
+        "check": "column_sum_to_be_between",
+        "parameters": {
+          "max": "200",
+          "min": "10",
+          "column": "tb_column"
+        },
+        "active": "N",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 10,
+        "type": "pre_check"
+      },
+      {
+        "seq_no": "2",
+        "check": "multicolumn_sum_to_equal",
+        "parameters": {
+          "list": "column",
+          "column": "column120"
+        },
+        "active": "Y",
+        "ignore_bad_records": "N",
+        "threshold_bad_records": 333,
+        "type": "pre_check"
+      }
+    ]
+  }
+}
