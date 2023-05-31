@@ -1,0 +1,16 @@
+{
+  "task_id": 206,
+  "task_name": "Tetst111",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "mysql_rds",
+    "restart": "normal | start"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "select",
+      "table_used_desc": "extract the table records"
+    }
+  ]
+}
