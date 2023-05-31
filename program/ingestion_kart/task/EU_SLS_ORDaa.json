@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 10,
+  "task_name": "EU_SLS_ORDaa",
+  "task_description": "aa",
+  "task_type": "SQL Execution",
+  "task_sequence": "e"
+}
