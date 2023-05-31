@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "snowflake_to_csv",
+  "task_description": "snowflake_to_csv desc",
+  "task_type": "Ingestion",
+  "task_sequence": "55"
+}
