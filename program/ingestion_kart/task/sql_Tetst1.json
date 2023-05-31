@@ -1,0 +1,36 @@
+{
+  "task_id": 207,
+  "task_name": "sql_Tetst1",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "snowflake_connection",
+    "restart": "normal | start"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "qwertyuio_8779_000000000000000000000000000000000666666666",
+      "table_used_desc": "extract the table recordsdwdqw788828882"
+    },
+    {
+      "seq_no": 2,
+      "sql_query": "select * se;lectdqdq777777777",
+      "table_used_desc": "fgdfddqdqd3333333333"
+    },
+    {
+      "seq_no": 3,
+      "sql_query": "qwdqdqdq8888888888888",
+      "table_used_desc": "gddqdqd2222222222"
+    },
+    {
+      "seq_no": 4,
+      "sql_query": "ewqqdqdq999999999999",
+      "table_used_desc": "wrwdqqd1111111"
+    },
+    {
+      "seq_no": 5,
+      "sql_query": "acaca00000000000",
+      "table_used_desc": "cadaa00000000"
+    }
+  ]
+}
