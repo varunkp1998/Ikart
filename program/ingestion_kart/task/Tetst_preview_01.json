@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "Tetst_preview_01",
+  "task_description": "Sql_Execution_json",
+  "task_type": "SQL Execution",
+  "task_sequence": "1"
+}
