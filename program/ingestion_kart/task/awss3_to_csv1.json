@@ -1,0 +1,46 @@
+{
+  "id": 197,
+  "project_name": "HRMS",
+  "pipeline_name": "pipeline8",
+  "project_id": 3,
+  "pipeline_id": 9,
+  "task_name": "awss3_to_csv1",
+  "task_description": "awss3_to_csv1 desc",
+  "task_type": "Ingestion",
+  "task_sequence": "66",
+  "source": "AWS S3",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "aws_s3_read",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "sales",
+      "file_path": "test/",
+      "file_type": "csv",
+      "chunk_size": " ",
+      "quote_char": "none",
+      "escape_char": "none",
+      "skip_footer": " ",
+      "skip_header": " ",
+      "parameter_type": "AWS S3",
+      "select_columns": " ",
+      "connection_name": "aws_connection"
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "False",
+      "header": "True",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "awss3_to_csv.csv",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/\"",
+      "file_type": "csv",
+      "quote_char": "none",
+      "audit_columns": "inactive",
+      "parameter_type": "Local Server",
+      "connection_name": ""
+    }
+  }
+}
