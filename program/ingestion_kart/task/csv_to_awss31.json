@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 198,
+  "pipeline_id": 14,
+  "task_name": "csv_to_awss31",
+  "task_description": "csv_to_awss31",
+  "task_type": "Ingestion",
+  "task_sequence": "77"
+}
