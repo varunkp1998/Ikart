@@ -1,0 +1,36 @@
+{
+  "task_id": 207,
+  "task_name": "sql_Tetst1",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "mysql_rds",
+    "restart": "normal | start"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "qwertyuio_8779_000000000000000000000000000000000",
+      "table_used_desc": "extract the table recordsdwdqw788828882"
+    },
+    {
+      "seq_no": 2,
+      "sql_query": "select * se;lectdqdq",
+      "table_used_desc": "fgdfddqdqd"
+    },
+    {
+      "seq_no": 3,
+      "sql_query": "qwdqdqdq",
+      "table_used_desc": "gddqdqd"
+    },
+    {
+      "seq_no": 4,
+      "sql_query": "ewqqdqdq",
+      "table_used_desc": "wrwdqqd"
+    },
+    {
+      "seq_no": 5,
+      "sql_query": "acaca",
+      "table_used_desc": "cadaa"
+    }
+  ]
+}
