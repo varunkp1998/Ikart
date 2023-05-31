@@ -1,0 +1,98 @@
+{
+  "id": 197,
+  "project_name": "HRMS",
+  "pipeline_name": "pipeline8",
+  "project_id": 3,
+  "pipeline_id": 9,
+  "task_name": "awss3_to_csv1",
+  "task_description": "awss3_to_csv1 descrption",
+  "task_type": "Ingestion",
+  "task_sequence": "66,77",
+  "source": "AWS S3",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "aws_s3_read",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "sales",
+      "file_path": "test/",
+      "file_type": "csv",
+      "chunk_size": 1000,
+      "quote_char": "\\\"",
+      "escape_char": "none",
+      "skip_footer": " ",
+      "skip_header": " ",
+      "alias_columns": " ",
+      "parameter_type": "AWS S3",
+      "select_columns": " ",
+      "connection_name": "aws_connection"
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "False",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "awss3_to_csv.csv",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
+      "file_type": "csv",
+      "quote_char": "'",
+      "audit_columns": "inactive",
+      "parameter_type": "Local Server",
+      "connection_name": ""
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "Y",
+      "post_check_enable": "N"
+    },
+    "data_quality_features": {
+      "dq_process_rejected_records": "N",
+      "dq_perform_qc_on_corrected_file": "N",
+      "dq_auto_correction_required": "N",
+      "dq_auto_correct_columns": {
+        "county": "county_nm",
+        "state": "stt"
+      },
+      "dq_lkup_key_column": {
+        "zip": "zip_code"
+      },
+      "dq_lookup_file_path": "C:/Users/PuneethS/Desktop/county_city_zip_lookup.csv",
+      "data_masking_required": "N",
+      "data_masking_columns": {
+        "msk_date": "0,DateOfBirth",
+        "msk_alpha": "x,PersonalEmail,IBAN",
+        "msk_numeric": "*,BSNNumber,account_no"
+      },
+      "data_encryption_required": "N",
+      "data_decryption_required": "N",
+      "data_encryption_columns": "LastName, IBAN, PersonalEmail",
+      "data_decryption_columns": "LastName, PersonalEmail"
+    },
+    "data_quality": [
+      {
+        "seq_no": "1",
+        "check": "column_values_to_not_be_null",
+        "parameters": {
+          "column": "ordernumber"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "pre_check"
+      },
+      {
+        "seq_no": "2",
+        "check": "table_row_count_to_be_between",
+        "parameters": {
+          "max": "100",
+          "min": "10"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "pre_check"
+      }
+    ]
+  }
+}
