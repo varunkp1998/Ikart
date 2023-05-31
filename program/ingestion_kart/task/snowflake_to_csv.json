@@ -1,0 +1,56 @@
+{
+  "id": 203,
+  "project_name": "Order Tracking",
+  "pipeline_name": "Open_Orders_Ingestion",
+  "project_id": 1,
+  "pipeline_id": 1,
+  "task_name": "snowflake_to_csv",
+  "task_description": "snowflake_to_csv desc",
+  "task_type": "Ingestion",
+  "task_sequence": "55",
+  "source": "Snowflake",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "snowflake_read",
+      "query": " ",
+      "schema": "public",
+      "chunk_size": 1000,
+      "table_name": "sales_data",
+      "parameter_type": "Snowflake",
+      "connection_name": "snowflake_connection"
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "False",
+      "header": "True",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "snow.csv",
+      "file_path": "/app/intel_new_1/Program/ingestion_kart/Pipeline/Task/target_files/",
+      "file_type": "csv",
+      "quote_char": "none",
+      "audit_columns": "active",
+      "parameter_type": "Local Server",
+      "connection_name": ""
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "Y",
+      "post_check_enable": "N"
+    },
+    "data_quality": [
+      {
+        "seq_no": "1",
+        "check": "column_values_to_not_be_null",
+        "parameters": {
+          "column": "ordernumber"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "pre_check"
+      }
+    ]
+  }
+}
