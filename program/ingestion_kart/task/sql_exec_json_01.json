@@ -1,0 +1,21 @@
+{
+  "task_id": 213,
+  "task_name": "sql_exec_json_01",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "ORDMSDB_MySql",
+    "restart": "normal | start"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "truncate table config.tbl_user1;",
+      "table_used_desc": "truncateing"
+    },
+    {
+      "seq_no": 2,
+      "sql_query": "insert into config.tbl_user1 select * from config.tbl_user where id not in (select id from config.tbl_user1);",
+      "table_used_desc": "insertion"
+    }
+  ]
+}
