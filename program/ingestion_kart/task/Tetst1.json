@@ -1,0 +1,21 @@
+{
+  "task_id": 211,
+  "task_name": "Tetst1",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "aws_connection",
+    "restart": "normal | start"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "insert into config.tbl_user1 select * from config.tbl_user where id not in (select id from config.tbl_user1);",
+      "table_used_desc": "insertion"
+    },
+    {
+      "seq_no": 2,
+      "sql_query": "update config.tbl_user\nset col1 = t.col1, col2 = t.col2\nfrom config.tbl_user t\nwhere tbl_user.id = t.id;\n\n ",
+      "table_used_desc": "updation"
+    }
+  ]
+}
