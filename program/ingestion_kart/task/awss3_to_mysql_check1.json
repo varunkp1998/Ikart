@@ -33,7 +33,7 @@
       "target_type": "mysql_write",
       "schema": "information_schema",
       "operation": "create",
-      "table_name": "sales987",
+      "table_name": "sales9876",
       "audit_columns": "active",
       "parameter_type": "MySQL",
       "connection_name": "mysql_rds"
