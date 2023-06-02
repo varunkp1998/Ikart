@@ -32,7 +32,7 @@
     "target": {
       "target_type": "mysql_write",
       "schema": "information_schema",
-      "operation": "create",
+      "operation": "append",
       "table_name": "salees_92",
       "audit_columns": "active",
       "parameter_type": "MySQL",
