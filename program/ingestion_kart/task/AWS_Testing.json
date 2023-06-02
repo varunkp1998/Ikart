@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 217,
+  "pipeline_id": 1,
+  "task_name": "AWS_Testing",
+  "task_description": "testing",
+  "task_type": "Ingestion",
+  "task_sequence": "2"
+}
