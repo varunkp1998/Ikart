@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 0,
-  "pipeline_id": 56,
-  "task_name": "snowflake_to_csvcheck",
-  "task_description": "snowflake_to_csvcheck desc",
-  "task_type": "Ingestion",
-  "task_sequence": "44"
-}
