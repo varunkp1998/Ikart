@@ -1,0 +1,21 @@
+{
+  "task_id": 218,
+  "task_name": "Testing",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "ORDMSDB_MySql",
+    "restart": "From Begining"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "select * from nan;",
+      "table_used_desc": "insertion"
+    },
+    {
+      "seq_no": 2,
+      "sql_query": "update core;",
+      "table_used_desc": "updation"
+    }
+  ]
+}
