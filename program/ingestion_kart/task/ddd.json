@@ -1,0 +1,17 @@
+{
+  "task_id": 220,
+  "task_name": "ddd",
+  "task_type": "SQL Execution",
+  "pipeline_id": 1,
+  "sql_execution": {
+    "connection_name": "mysql_rds",
+    "restart": "From Failure"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "select * from tbl_user;",
+      "table_used_desc": "extract the table records"
+    }
+  ]
+}
