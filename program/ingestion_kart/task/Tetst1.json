@@ -1,0 +1,17 @@
+{
+  "task_id": 190,
+  "pipeline_id": 1,
+  "task_name": "Tetst1",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "ORDMSDB_MySql",
+    "restart": "Skip Failed SQL"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "select * from tbl_user;",
+      "table_used_desc": "extract the table records"
+    }
+  ]
+}
