@@ -235,11 +235,11 @@ def download_connections(paths_data:str):
         main_logger.info("downloading connections.py from Github started..")
         is_exist = os.path.exists(connection_path_check)
         main_logger.info('connection file exists: %s', is_exist)
-        utility_py = ['curl', '-o', connection_path_check,
-        paths_data["GH_utility_path"]]
+        connections_py = ['curl', '-o', connection_path_check,
+        paths_data["GH_connections_path"]]
         if is_exist is False:
             main_logger.info("downloading the connections.py file form gihub completed")
-            subprocess.call(utility_py)
+            subprocess.call(connections_py)
             main_logger.info(DASH)
     except Exception as error:
         main_logger.exception("error in download_connections %s.", str(error))
