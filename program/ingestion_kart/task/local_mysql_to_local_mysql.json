@@ -13,14 +13,14 @@
       "query": "select * from sales",
       "schema": "information_schema",
       "chunk_size": 1000,
-      "connection_name": "local_mysql_connection",
+      "connection_name": "docker_mysql_connection",
       "select_columns": " "
     },
     "target": {
       "target_type": "mysql_write",
       "schema": "information_schema",
       "table_name": "my_sales_09_tgt123",
-      "connection_name": "local_mysql_connection",
+      "connection_name": "docker_mysql_connection",
       "operation": "create",
       "audit_columns": "active"
     },
