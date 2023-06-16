@@ -48,7 +48,7 @@
         "check": "table_row_count_to_be_between",
         "parameters": {
           "min_value": "0",
-          "max_value": "900" 
+          "max_value": "2900" 
         },
         "active": "Y",
         "ignore_bad_records": "N",
