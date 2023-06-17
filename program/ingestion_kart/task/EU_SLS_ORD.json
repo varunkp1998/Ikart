@@ -1,0 +1,17 @@
+{
+  "task_id": 191,
+  "pipeline_id": 1,
+  "task_name": "EU_SLS_ORD",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "mysql_rds",
+    "restart": "begin"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "select * from tbl_user;",
+      "table_used_desc": "extract the table records"
+    }
+  ]
+}
