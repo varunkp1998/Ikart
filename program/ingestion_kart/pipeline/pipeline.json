@@ -1,0 +1,26 @@
+[
+  {
+    "pipeline_id": 66,
+    "project_id": 39,
+    "pipeline_name": "pipeline",
+    "pipeline_cd": "trj",
+    "pipeline_description": "tshyrctfx",
+    "is_active": "Y",
+    "tasks_details": null,
+    "nodes": [
+      {
+        "id": "0",
+        "data": {
+          "label": "Start"
+        },
+        "type": "input",
+        "position": {
+          "x": "10",
+          "y": "10"
+        },
+        "sourcePosition": "right"
+      }
+    ],
+    "edges": null
+  }
+]
