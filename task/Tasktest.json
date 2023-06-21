@@ -1,0 +1,29 @@
+{
+  "id": 302,
+  "project_name": "Order Tracking",
+  "pipeline_name": "pipelineForgitupload",
+  "project_id": 1,
+  "pipeline_id": 61,
+  "task_name": "Tasktest",
+  "task_description": "Tasktest",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "REST API",
+  "target": "REST API",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "rest_api_read",
+      "content_type": "json",
+      "query_params": "?page=1&per_page=20",
+      "parameter_type": "REST API",
+      "connection_name": "38"
+    },
+    "target": {
+      "target_type": "rest_api_write",
+      "content_type": "json",
+      "parameter_type": "REST API",
+      "connection_name": "44"
+    }
+  }
+}
