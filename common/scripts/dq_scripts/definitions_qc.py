@@ -16,6 +16,7 @@ import pandas as pd
 import boto3
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 task_logger = logging.getLogger('task_logger')
 TABLE_RECORD_COUNT='Total number of records present in above table are %s'
@@ -25,17 +26,25 @@ PRE_OP_ENDED = 'Pre-Check Operation Completed'
 QC_REPORT_LOG='QC for %s check %s|%s|%s'
 JSON = '.json'
 
-def encrypt(data):
-    '''function to Encrypting the data'''
-    crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
-    crypto_iv= 'rBEssDfxofOveRxR'
-    block_size=16
-    key = bytes(crypto_key, 'utf-8')
-    key2 = bytes(crypto_iv, 'utf-8')
-    aes = AES.new(key, AES.MODE_CBC, key2)
-    encrypted = aes.encrypt(pad(data.encode(), block_size))
-    # Make sure to strip "=" padding since urlsafe-base64 node module strips "=" as well
-    return base64.urlsafe_b64encode(encrypted).decode("utf-8").rstrip("=")
+# def encrypt(data):
+#     '''function to Encrypting the data'''
+#     crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
+#     crypto_iv= 'rBEssDfxofOveRxR'
+#     block_size=16
+#     key = bytes(crypto_key, 'utf-8')
+#     key2 = bytes(crypto_iv, 'utf-8')
+#     aes = AES.new(key, AES.MODE_CBC, key2)
+#     encrypted = aes.encrypt(pad(data.encode(), block_size))
+#     # Make sure to strip "=" padding since urlsafe-base64 node module strips "=" as well
+#     return base64.urlsafe_b64encode(encrypted).decode("utf-8").rstrip("=")
+
+def encrypt(message):
+    '''function to encrypt the data'''
+    KEY = b'8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
+    IV = b'rBEssDfxofOveRxR'
+    aesgcm = AESGCM(KEY)
+    ciphertext = aesgcm.encrypt(IV, message.encode('utf-8'), None)
+    return ciphertext.hex()
 
 def write_to_txt1(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
