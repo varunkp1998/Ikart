@@ -1,0 +1,80 @@
+{
+  "id": 203,
+  "project_name": "Order Tracking",
+  "pipeline_name": "Open_Orders_Ingestion",
+  "project_id": 1,
+  "pipeline_id": 1,
+  "task_name": "restapi_to_csv",
+  "task_description": "restapi_to_csv desc",
+  "task_type": "Ingestion",
+  "task_sequence": "55",
+  "source": "rest_api",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+        "source_type": "rest_api_read",
+        "content_type": "json",
+        "query_params": "?page=1&per_page=20",
+        "parameter_type": "REST API",
+        "connection_name": "ORDMSDB_REST_API"
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "False",
+      "header": "True",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "fromapi.csv",
+      "file_path": "/home/puneeths/INGESTION/Program/ingestion_kart/Pipeline/Task/target_files/",
+      "file_type": "csv",
+      "quote_char": "none",
+      "audit_columns": "active",
+      "parameter_type": "Local Server",
+      "connection_name": ""
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    },
+    "data_quality": [
+      {
+        "seq_no": "1",
+        "check": "column_values_to_not_be_null",
+        "parameters": {
+          "column": "ordernumber"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "post_check"
+      },
+        {
+          "seq_no": "1",
+          "check": "column_values_to_be_between",
+          "parameters": {
+            
+            "min_value": "0",
+            "max_value": "10",
+            "column": "qtr_id"
+          },
+          "active": "Y",
+          "ignore_bad_records": "N",
+          "threshold_bad_records": 10,
+          "type": "post_check"
+        },
+        {
+          "seq_no": "2",
+          "check": "table_row_count_to_be_between",
+          "parameters": {
+            "min_value": "0",
+            "max_value": "2900" 
+          },
+          "active": "Y",
+          "ignore_bad_records": "N",
+          "threshold_bad_records": 10,
+          "type": "post_check"
+        }
+    ]
+  }
+}
