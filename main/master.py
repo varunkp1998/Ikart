@@ -31,7 +31,6 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
         stream_handler.setLevel(logging.INFO)
-
         logger.setLevel(level)
         logger.addHandler(file_handler)
         logger.addHandler(stream_handler)
@@ -57,9 +56,9 @@ def decrypt(edata):
         edata = base64.urlsafe_b64decode(edata + '=' * (-len(edata) % 4))
         aes = AES.new(key, AES.MODE_CBC, value)
         return unpad(aes.decrypt(edata), block_size).decode("utf-8")
-    except Exception as error2:
-        logging.exception("decrypt() is %s.", str(error2))
-        raise error2
+    except Exception as err:
+        logging.exception("decrypt() is %s.", str(err))
+        raise err
 
 # reading the connection.json file and passing the connection details as dictionary
 def get_config_section(config_path:str) -> dict:
@@ -72,40 +71,39 @@ def get_config_section(config_path:str) -> dict:
             json_data = json.load(json_file)
             # print("reading connection details completed")
             return dict(json_data["connection_details"].items())
-    except Exception as error1:
-        logging.exception("get_config_section() is %s.", str(error1))
-        raise error1
+    except Exception as err:
+        logging.exception("get_config_section() is %s.", str(err))
+        raise err
 
-
-def download_audit_conn_json(path_data:str):
+def download_audit_conn_json(path_json_data:str):
     """Function to download audit config JSON from Github to server"""
     try:
         # print("downloading audit_conn.json from Github started..")
-        audit_conn_json_path= path_data["folder_path"]
+        audit_conn_json_path= os.path.expanduser(path_json_data["folder_path"])
         # print("path:%s",audit_conn_json_path)
-        path_check = audit_conn_json_path+path_data["mysql_audit_json_conn_nm"]
+        path_check = audit_conn_json_path+path_json_data["mysql_audit_json_conn_nm"]
         is_exist = os.path.exists(path_check)
         # print('audit_conn.json file exists: %s', is_exist)
         if is_exist is False:
-            git_url=path_data["GH_audit_conn_json_path"]
+            git_url=path_json_data["GH_audit_conn_json_path"]
             response1 = requests.get(git_url,timeout=60)
             if response1.status_code != 200:
                 logging.error("The audit config json file %s DOES NOT exists in the GITHUB "
-                "repository \n PROCESS got ABORTED",path_data["mysql_audit_json_conn_nm"])
+                "repository \n PROCESS got ABORTED",path_json_data["mysql_audit_json_conn_nm"])
                 sys.exit()
             else:
-                dwn_json = ['curl', '-o',audit_conn_json_path+path_data["mysql_audit_json_conn_nm"],
-                path_data["GH_audit_conn_json_path"]]
-                subprocess.call(dwn_json)
-    except Exception as error1:
-        logging.exception("error in download_pipeline_json %s.", str(error1))
-        raise error1
+                download_json = ['curl', '-o',audit_conn_json_path+path_json_data[
+                "mysql_audit_json_conn_nm"], path_json_data["GH_audit_conn_json_path"]]
+                subprocess.call(download_json)
+    except Exception as err:
+        logging.exception("error in download_pipeline_json %s.", str(err))
+        raise err
 
 def execute_query(paths_json_data, pip_nm):
     """gets audit status from audit table for given pipeline"""
     try:
         download_audit_conn_json(paths_json_data)
-        config_file_path = paths_json_data["folder_path"]+\
+        config_file_path = os.path.expanduser(paths_json_data["folder_path"])+\
         paths_json_data["mysql_audit_json_conn_nm"]
         conn_details = get_config_section(config_file_path)
         pass_word = decrypt(conn_details["password"])
@@ -113,14 +111,12 @@ def execute_query(paths_json_data, pip_nm):
             host=conn_details["hostname"],
             user=conn_details["username"],
             password=pass_word,
-            database=conn_details["database"]
-        )
-
+            database=conn_details["database"])
         # Create cursor object
         cursor = mydb.cursor()
         query = f"select run_id,iteration,audit_value from tbl_etl_audit where\
         `task/pipeline_name` = '{pip_nm}' ORDER BY process_dttm desc limit 1;"
-        # log1.info(query)
+        # main_logger.info(query)
         # Execute query
         cursor.execute(query)
         # Get results
@@ -182,6 +178,7 @@ if __name__ == "__main__":
             #if pipeline name is not available
             # only task_nm is available in the command
             PATH=paths_data["folder_path"]
+            PATH=os.path.expanduser(PATH)
             IS_EXIST = os.path.exists(PATH+paths_data["Program"]+prj_nm+paths_data[
             "pipeline_log_path"])
             if IS_EXIST is True: #if log folder structure exists already
@@ -198,22 +195,23 @@ if __name__ == "__main__":
                         RUN_ID= str(uuid.uuid4())
                         LOGGING_PATH=PATH + paths_data["Program"]+prj_nm+\
                         paths_data["pipeline_log_path"]
-                        setup_logger('log1', LOGGING_PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log')
+                        setup_logger('main_logger', LOGGING_PATH+str(arg_job_nm)+"_TaskLog_"+
+                                     RUN_ID+'.log')
                         LOG_FILE_NAME = str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log'
-                        log1 = logging.getLogger('log1')
-                        log1.info("logging operation started.")
+                        main_logger = logging.getLogger('main_logger')
+                        main_logger.info("logging operation started.")
                         logging.info("The json file %s exists in the GITHUB repository",arg_job_nm)
                         IS_EXIST = os.path.exists(PATH+DOWNLOAD_FILE)
-                        log1.info("download.py file downloading operation started.. \ndownload.py \
-                        file exists: %s", IS_EXIST)
+                        main_logger.info("download.py file downloading operation "
+                                         "started.. \ndownload.py file exists: %s", IS_EXIST)
                         if IS_EXIST is False:
                             DOWNLOAD_PATH = PATH+DOWNLOAD_FILE
                             DOWNLOAD_FILE=['curl', '-o', DOWNLOAD_PATH,\
                             paths_data["GH_download_file_path"]]
                             subprocess.call(DOWNLOAD_FILE)
-                            log1.info(DOWNLOAD_LOG_STATEMENT)
+                            main_logger.info(DOWNLOAD_LOG_STATEMENT)
                         download = importlib.import_module("download")
-                        log1.info(MASTER_LOG_STATEMENT)
+                        main_logger.info(MASTER_LOG_STATEMENT)
                         download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                         arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
             else: #if log folder structure does not exists already
@@ -227,22 +225,23 @@ if __name__ == "__main__":
                     else: #task
                         RUN_ID= str(uuid.uuid4())
                         LOGGING_PATH=PATH
-                        setup_logger('log1', PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log')
+                        setup_logger('main_logger', PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log')
                         LOG_FILE_NAME = str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log'
-                        log1 = logging.getLogger('log1')
-                        log1.info("logging operation started...")
-                        log1.info("The json file %s exists in the  GITHUB repository",arg_job_nm)
+                        main_logger = logging.getLogger('main_logger')
+                        main_logger.info("logging operation started...")
+                        main_logger.info("The json file %s exists in the  GITHUB repository",\
+                                         arg_job_nm)
                         IS_EXIST = os.path.exists(PATH+DOWNLOAD_FILE)
-                        log1.info("download.py file downloading operation started.. \n download.py\
-                        file exists: %s", IS_EXIST)
+                        main_logger.info("download.py file downloading operation started.."
+                        "\n download.py file exists: %s", IS_EXIST)
                         if IS_EXIST is False:
                             DOWNLOAD_PATH = PATH+DOWNLOAD_FILE
                             DOWNLOAD_FILE=['curl', '-o', DOWNLOAD_PATH,
                             paths_data["GH_download_file_path"]]
                             subprocess.call(DOWNLOAD_FILE)
-                            log1.info(DOWNLOAD_LOG_STATEMENT)
+                            main_logger.info(DOWNLOAD_LOG_STATEMENT)
                         download = importlib.import_module("download")
-                        log1.info(MASTER_LOG_STATEMENT)
+                        main_logger.info(MASTER_LOG_STATEMENT)
                         download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                         arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
         elif arg_job_pip_nm != -9999:
@@ -267,23 +266,23 @@ if __name__ == "__main__":
                             LOGGING_PATH=PATH+paths_data["Program"]+prj_nm+\
                             paths_data["pipeline_log_path"]
                             RUN_ID=str(uuid.uuid4())
-                            setup_logger('log1',LOGGING_PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+
-                            '.log')
+                            setup_logger('main_logger',LOGGING_PATH+str(arg_job_nm)+
+                                         "_TaskLog_"+RUN_ID+'.log')
                             LOG_FILE_NAME = str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log'
-                            log1 = logging.getLogger('log1')
-                            log1.info("logging operation started. \n The json file %s \
+                            main_logger = logging.getLogger('main_logger')
+                            main_logger.info("logging operation started. \n The json file %s \
                             exists in the  GITHUB repository.", arg_job_nm)
                             IS_EXIST = os.path.exists(PATH+DOWNLOAD_FILE)
-                            log1.info("download.py file downloading operation started.. \
+                            main_logger.info("download.py file downloading operation started.. \
                             \n download.py file exists: %s", IS_EXIST)
                             if IS_EXIST is False:
                                 DOWNLOAD_PATH = PATH+DOWNLOAD_FILE
                                 DOWNLOAD_FILE=['curl', '-o', DOWNLOAD_PATH,
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
-                                log1.info(DOWNLOAD_LOG_STATEMENT)
+                                main_logger.info(DOWNLOAD_LOG_STATEMENT)
                             download = importlib.import_module("download")
-                            log1.info(MASTER_LOG_STATEMENT)
+                            main_logger.info(MASTER_LOG_STATEMENT)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
                     else:
@@ -309,36 +308,36 @@ if __name__ == "__main__":
                                         iter_value = iteration+1
                                         ITER_VALUE = str(iter_value)
                                         MODE = "RESTART"
-                                        setup_logger('log1',LOGGING_PATH+str(arg_job_pip_nm)+
+                                        setup_logger('main_logger',LOGGING_PATH+str(arg_job_pip_nm)+
                                         "_PipelineLog_"+RUN_ID+'_'+ITER_VALUE+'.log')
                                     else:
                                         RUN_ID= str(uuid.uuid4())
                                         ITER_VALUE = "1"
-                                        setup_logger('log1',LOGGING_PATH+str(arg_job_pip_nm)+
+                                        setup_logger('main_logger',LOGGING_PATH+str(arg_job_pip_nm)+
                                         "_PipelineLog_"+RUN_ID+'.log')
                             else:
                                 # print("entered if else")
                                 RUN_ID=str(uuid.uuid4())
                                 ITER_VALUE = "1"
-                                setup_logger('log1',LOGGING_PATH+str(arg_job_pip_nm)+"_PipelineLog_"
-                                +RUN_ID+'.log')
+                                setup_logger('main_logger',LOGGING_PATH+str(arg_job_pip_nm)+
+                                             "_PipelineLog_"+RUN_ID+'.log')
                             LOG_FILE_NAME = str(arg_job_pip_nm)+"_PipelineLog_"+RUN_ID+'.log'
-                            log1 = logging.getLogger('log1')
-                            log1.info("logging operation started.. \n The json file %s exists \
-                            in the  GITHUB repository.", arg_job_pip_nm)
-                            log1.info("RUN_ID:%s",RUN_ID)
+                            main_logger = logging.getLogger('main_logger')
+                            main_logger.info("logging operation started.. \n The json file %s \
+                            exists in the  GITHUB repository.", arg_job_pip_nm)
+                            main_logger.info("RUN_ID:%s",RUN_ID)
                             IS_EXIST = os.path.exists(PATH+DOWNLOAD_FILE)
-                            log1.info("download.py file downloading operation started.. \n \
+                            main_logger.info("download.py file downloading operation started.. \n \
                             download.py file exists: %s", IS_EXIST)
                             if IS_EXIST is False:
                                 DOWNLOAD_PATH = PATH+DOWNLOAD_FILE
                                 DOWNLOAD_FILE=['curl','-o',DOWNLOAD_PATH,
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
-                                log1.info(DOWNLOAD_LOG_STATEMENT)
+                                main_logger.info(DOWNLOAD_LOG_STATEMENT)
                             download = importlib.import_module("download")
-                            log1.info(MASTER_LOG_STATEMENT)
-                            # log1.info("MODE:%s", MODE)
+                            main_logger.info(MASTER_LOG_STATEMENT)
+                            # main_logger.info("MODE:%s", MODE)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE,ITER_VALUE)
                 else: #if log folder structure does not exists already
@@ -355,23 +354,24 @@ if __name__ == "__main__":
                         else:
                             RUN_ID=str(uuid.uuid4())
                             LOGGING_PATH=PATH
-                            setup_logger('log1', PATH+str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log')
+                            setup_logger('main_logger', PATH+str(arg_job_nm)+"_TaskLog_"+
+                                         RUN_ID+'.log')
                             LOG_FILE_NAME = str(arg_job_nm)+"_TaskLog_"+RUN_ID+'.log'
-                            log1 = logging.getLogger('log1')
-                            log1.info("logging operation started...")
-                            log1.info("The json file %s exists in the  GITHUB repository.",
+                            main_logger = logging.getLogger('main_logger')
+                            main_logger.info("logging operation started...")
+                            main_logger.info("The json file %s exists in the  GITHUB repository.",
                             arg_job_nm)
                             IS_EXIST = os.path.exists(PATH+DOWNLOAD_FILE)
-                            log1.info("download.py file downloading operation started..")
-                            log1.info('download.py file exists: %s', IS_EXIST)
+                            main_logger.info("download.py file downloading operation started..")
+                            main_logger.info('download.py file exists: %s', IS_EXIST)
                             if IS_EXIST is False:
                                 DOWNLOAD_PATH = PATH+DOWNLOAD_FILE
                                 DOWNLOAD_FILE=['curl', '-o', DOWNLOAD_PATH,
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
-                                log1.info(DOWNLOAD_LOG_STATEMENT)
+                                main_logger.info(DOWNLOAD_LOG_STATEMENT)
                             download = importlib.import_module("download")
-                            log1.info(MASTER_LOG_STATEMENT)
+                            main_logger.info(MASTER_LOG_STATEMENT)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm, RUN_ID,LOGGING_PATH,LOG_FILE_NAME,MODE)
                     else:
@@ -386,28 +386,28 @@ if __name__ == "__main__":
                         else:
                             RUN_ID=str(uuid.uuid4())
                             LOGGING_PATH=PATH
-                            setup_logger('log1', PATH+str(arg_job_pip_nm)+"_PipelineLog_"+RUN_ID+
-                            '.log')
+                            setup_logger('main_logger', PATH+str(arg_job_pip_nm)+
+                                         "_PipelineLog_"+RUN_ID+'.log')
                             LOG_FILE_NAME = str(arg_job_pip_nm)+"_PipelineLog_"+RUN_ID+'.log'
-                            log1 = logging.getLogger('log1')
-                            log1.info("logging operation started....")
-                            log1.info("The json file %s exists in the  GITHUB repository.",
+                            main_logger = logging.getLogger('main_logger')
+                            main_logger.info("logging operation started....")
+                            main_logger.info("The json file %s exists in the  GITHUB repository.",
                             arg_job_pip_nm)
                             IS_EXIST = os.path.exists(PATH+DOWNLOAD_FILE)
-                            log1.info("download.py file downloading operation started..")
-                            log1.info('download.py file exists: %s', IS_EXIST)
+                            main_logger.info("download.py file downloading operation started..")
+                            main_logger.info('download.py file exists: %s', IS_EXIST)
                             if IS_EXIST is False:
                                 DOWNLOAD_PATH = PATH+DOWNLOAD_FILE
                                 DOWNLOAD_FILE=['curl', '-o', DOWNLOAD_PATH,
                                 paths_data["GH_download_file_path"]]
                                 subprocess.call(DOWNLOAD_FILE)
-                                log1.info(DOWNLOAD_LOG_STATEMENT)
+                                main_logger.info(DOWNLOAD_LOG_STATEMENT)
                             download = importlib.import_module("download")
-                            log1.info(MASTER_LOG_STATEMENT)
+                            main_logger.info(MASTER_LOG_STATEMENT)
                             download.execute_pipeline_download(prj_nm,paths_data,arg_job_nm,
                             arg_job_pip_nm,RUN_ID,LOGGING_PATH,LOG_FILE_NAME,restart)
     except Exception as error:
-        log1.error("exception occured")
+        main_logger.error("exception occured")
         raise error
     finally:
         sys.exit()
