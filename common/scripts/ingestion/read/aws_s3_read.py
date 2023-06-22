@@ -14,7 +14,7 @@ decrypt = getattr(module, "decrypt")
 module = importlib.import_module("connections")
 establish_conn_for_s3 = getattr(module, "establish_conn_for_s3")
 
-log2 = logging.getLogger('log2')
+task_logger = logging.getLogger('task_logger')
 ITERATION = '%s iteration'
 CSV = '.csv'
 JSON = '.json'
@@ -24,14 +24,14 @@ def write_to_txt(task_id,status,file_path):
     try:
         is_exist = os.path.exists(file_path)
         if is_exist is True:
-            # log2.info("txt getting called")
+            # task_logger.info("txt getting called")
             data_fram =  pd.read_csv(file_path, sep='\t')
             data_fram.loc[data_fram['task_name']==task_id, 'Job_Status'] = status
             data_fram.to_csv(file_path ,mode='w', sep='\t',index = False, header=True)
         else:
-            log2.error("pipeline txt file does not exist")
+            task_logger.error("pipeline txt file does not exist")
     except Exception as error:
-        log2.exception("write_to_txt: %s.", str(error))
+        task_logger.exception("write_to_txt: %s.", str(error))
         raise error
 
 def get_files_from_bucket(conn, bucket_name, path, json_data):
@@ -127,24 +127,7 @@ def read_data_with_or_without_chunk(json_data,src_file,default_header,row_count,
     default_encoding = "utf-8" if source["encoding"]==" " else\
     source["encoding"]
     count1 = 0
-    if source['chunk_size'] != "None":
-        if source['file_type'] == 'csv':
-            for chunk in pd.read_csv(src_file,
-            names = default_alias_cols,header = default_header,sep = default_delimiter,
-            usecols = default_select_cols,skiprows = default_skip_header,nrows = row_count,
-            chunksize = source["chunk_size"],
-            quotechar = default_quotechar, escapechar = default_escapechar,
-            encoding = default_encoding):
-                count1 = 1 + count1
-                log2.info(ITERATION , str(count1))
-                yield chunk
-        elif source['file_type'] == 'json':
-            for chunk in pd.read_json(src_file, encoding=default_encoding,
-                                      chunksize = source["chunk_size"]):
-                count1 = 1 + count1
-                log2.info(ITERATION , str(count1))
-                yield chunk
-    else:
+    if source['chunk_size'] == "None":
         #chunk size must be greater than or equal to one
         if source['file_type'] == 'csv':
             datafram = pd.read_csv(src_file,
@@ -165,9 +148,29 @@ def read_data_with_or_without_chunk(json_data,src_file,default_header,row_count,
             datafram = pd.read_json(src_file, encoding=default_encoding)
             yield datafram
         elif source['file_type'] == 'parquet':
-            datafram = pd.read_parquet(src_file)
+            datafram = pd.read_parquet(src_file, engine='auto')
             yield datafram
-        log2.info("Reading data without using chunk")
+        count1 = 1 + count1
+        task_logger.info(ITERATION , str(count1))
+        task_logger.info("Number of rowes presnt in the above file are %s", datafram.shape[0])
+    else:
+        if source['file_type'] == 'csv':
+            for chunk in pd.read_csv(src_file,
+            names = default_alias_cols,header = default_header,sep = default_delimiter,
+            usecols = default_select_cols,skiprows = default_skip_header,nrows = row_count,
+            chunksize = source["chunk_size"],
+            quotechar = default_quotechar, escapechar = default_escapechar,
+            encoding = default_encoding):
+                count1 = 1 + count1
+                task_logger.info(ITERATION , str(count1))
+                yield chunk
+        elif source['file_type'] == 'json':
+            for chunk in pd.read_json(src_file, encoding=default_encoding,
+                                      chunksize = source["chunk_size"],lines=True):
+                count1 = 1 + count1
+                task_logger.info(ITERATION , str(count1))
+                yield chunk
+        task_logger.info("Reading data without using chunk")
 
 def read(json_data: dict,config_file_path,task_id,run_id,paths_data,file_path,
          iter_value, skip_header= 0,skip_footer= 0):
@@ -182,10 +185,10 @@ def read(json_data: dict,config_file_path,task_id,run_id,paths_data,file_path,
         bucket_name = connection_details["bucket_name"]
         path = source['file_path']+source['file_name']
         all_files = get_files_from_bucket(conn, bucket_name, path, json_data)
-        log2.info("list of files which were read")
-        log2.info(all_files)
+        task_logger.info("list of files which were read")
+        task_logger.info(all_files)
         if all_files == []:
-            log2.error("'%s' SOURCE FILE not found in the location",
+            task_logger.error("'%s' SOURCE FILE not found in the location",
             source["file_name"])
             write_to_txt(task_id,'FAILED',file_path)
             audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
@@ -220,5 +223,5 @@ def read(json_data: dict,config_file_path,task_id,run_id,paths_data,file_path,
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
         audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
-        log2.info("reading_s3() is %s", str(error))
+        task_logger.info("reading_s3() is %s", str(error))
         raise error
