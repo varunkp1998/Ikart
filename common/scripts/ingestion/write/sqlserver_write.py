@@ -34,7 +34,7 @@ def db_table_exists(sessions: dict, schema: str, tablename: str)-> bool:
         raise error
 
 # def establish_conn(json_data: dict, json_section: str) -> bool:
-#     """establishes connection for the postgres database
+#     """establishes connection for the sqlserver database
 #        you pass it through the json"""
 #     try:
 #         connection_details = get_config_section(json_data["task"][json_section]["connection_file_path"],\
@@ -52,6 +52,7 @@ def insert_data(json_data,conn_details,dataframe,sessions):
     """function for inserting df data in to table"""
     try:
         target = json_data["task"]["target"]
+        schema = target['schema_name']
         connection = sessions.connection()
         if target["audit_columns"] == "active":
             dataframe['CRTD_BY']=conn_details["username"]
@@ -60,12 +61,12 @@ def insert_data(json_data,conn_details,dataframe,sessions):
             dataframe['UPDT_DTTM']= " "
             task_logger.info(WITH_AUDIT_COLUMNS)
             dataframe.to_sql(target["table_name"], connection,\
-            index = False, if_exists = "append")
+            schema = schema,index = False, if_exists = "append")
             task_logger.info(SQLSERVER_LOG_STATEMENT)
         else:
             task_logger.info(WITH_OUT_AUDIT_COLUMNS)
             dataframe.to_sql(target["table_name"], connection,
-            index = False, if_exists = "append")
+            schema = schema,index = False, if_exists = "append")
             task_logger.info(SQLSERVER_LOG_STATEMENT)
     except Exception as error:
         # Rollback the transaction in case of an error
@@ -129,7 +130,7 @@ def truncate(json_data: dict, conn: dict,dataframe,counter: int, conn_details) -
                 truncate_query = sqlalchemy.text(f'TRUNCATE TABLE'
                 f'{target["schema_name"]}.{target["table_name"]}')
                 conn.execution_options(autocommit=True).execute(truncate_query)
-                task_logger.info("postgres truncating table completed")
+                task_logger.info("sqlserver truncating table completed")
                 insert_data(json_data,conn_details,dataframe,conn)
             else:
                 insert_data(json_data,conn_details,dataframe,conn)
@@ -157,7 +158,7 @@ def drop(json_data: dict, conn: dict) -> bool:
             drop_query = sqlalchemy.text(f'DROP TABLE {target["schema_name"]}.'
             f'{target["table_name"]}')
             conn.execution_options(autocommit=True).execute(drop_query)
-            task_logger.info("postgres dropping table completed")
+            task_logger.info("sqlserver dropping table completed")
             return True
         else:
             # if table is not there, then it will say table does not exist
@@ -224,7 +225,7 @@ def trgt_record_count(json_data,status,sessions,task_id,run_id,iter_value,audit)
 
 def write(json_data,datafram,counter,config_file_path,task_id,run_id,paths_data,
           file_path,iter_value,sessions) -> bool:
-    """ function for ingesting data to postgres based on the operation in json"""
+    """ function for ingesting data to sqlserver based on the operation in json"""
     try:
         target = json_data["task"]["target"]
         engine_code_path = os.path.expanduser(paths_data["folder_path"])+paths_data[
@@ -233,7 +234,7 @@ def write(json_data,datafram,counter,config_file_path,task_id,run_id,paths_data,
         #importing audit function from engine_code script
         module1 = importlib.import_module("engine_code")
         audit = getattr(module1, "audit")
-        task_logger.info("ingest data to postgres db initiated")
+        task_logger.info("ingest data to sqlserver db initiated")
         _ ,conn_details = establish_conn_for_sqlserver(json_data,'target',
                                                      config_file_path)
         status="Pass"
