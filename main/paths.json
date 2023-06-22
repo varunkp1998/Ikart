@@ -16,6 +16,7 @@
 	"task_json_path": "/Pipeline/Task/json/",
 	"status_txt_file_path": "/Pipeline/text/",
 	"source_files_path":"/Pipeline/Task/source_files/",
+	"target_files_path":"/Pipeline/Task/target_files/",
 	"qc_reports_path": "/Pipeline/Task/reports/",
 	"audit_path": "/Pipeline/Task/audit/",
 	"archive_path": "/Pipeline/Task/archive/",
@@ -36,6 +37,7 @@
 	"GH_mapping_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/engine_main/mapping.json",
 	"GH_definitions_qc_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/dq_scripts/definitions_qc.py",
 	"GH_utility_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/ingestion/read/utility.py",
+	"GH_connections_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/ingestion/read/connections.py",
 	"GH_orchestrate_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/orchestration/orchestrate.py",
 	"projects":{	      
 		"intellikart": {	
@@ -49,4 +51,3 @@
 						} 
 }
 	}
-
