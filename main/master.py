@@ -12,6 +12,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 import requests
 import mysql.connector
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 JSON = ".json"
@@ -42,23 +43,31 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
         logging.error('UDF Failed: setup_logger failed')
         raise ex
 
-def decrypt(edata):
-    """password decryption function"""
-    try:
-        crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
-        crypto_iv= 'rBEssDfxofOveRxR'
-        block_size=16
+# def decrypt(edata):
+#     """password decryption function"""
+#     try:
+#         crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
+#         crypto_iv= 'rBEssDfxofOveRxR'
+#         block_size=16
 
-        key = bytes(crypto_key, 'utf-8')
-        value = bytes(crypto_iv, 'utf-8')
+#         key = bytes(crypto_key, 'utf-8')
+#         value = bytes(crypto_iv, 'utf-8')
 
-        # Add "=" padding back before decoding
-        edata = base64.urlsafe_b64decode(edata + '=' * (-len(edata) % 4))
-        aes = AES.new(key, AES.MODE_CBC, value)
-        return unpad(aes.decrypt(edata), block_size).decode("utf-8")
-    except Exception as err:
-        logging.exception("decrypt() is %s.", str(err))
-        raise err
+#         # Add "=" padding back before decoding
+#         edata = base64.urlsafe_b64decode(edata + '=' * (-len(edata) % 4))
+#         aes = AES.new(key, AES.MODE_CBC, value)
+#         return unpad(aes.decrypt(edata), block_size).decode("utf-8")
+#     except Exception as err:
+#         logging.exception("decrypt() is %s.", str(err))
+#         raise err
+
+def decrypt(data):
+    '''function to decrypt the data'''
+    KEY = b'8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
+    IV = b'rBEssDfxofOveRxR'
+    aesgcm = AESGCM(KEY)
+    decrypted = aesgcm.decrypt(IV, bytes.fromhex(data), None)
+    return decrypted.decode('utf-8')
 
 # reading the connection.json file and passing the connection details as dictionary
 def get_config_section(config_path:str) -> dict:
