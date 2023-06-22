@@ -100,6 +100,6 @@ def read(json_data,config_file_path,task_id,run_id,paths_data,file_path,iter_val
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
         audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
-        task_logger.exception("read_data_from_postgres() is %s", str(error))
+        task_logger.exception("read_data_from_sqlserver() is %s", str(error))
         raise error
     
