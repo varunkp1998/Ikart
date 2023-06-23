@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 211,
+  "pipeline_id": 54,
+  "task_name": "newtaskmysql",
+  "task_description": "newtaskmysql",
+  "task_type": "Ingestion",
+  "task_sequence": "55"
+}
