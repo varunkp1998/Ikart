@@ -1,0 +1,14 @@
+{
+  "project_id": 3,
+  "connection_type": "Application",
+  "connection_subtype": "REST API",
+  "connection_name": "newaccess",
+  "connection_details": {
+    "url": "http://localhost:8080/api/columnreference",
+    "password": "cV-OY9AF7EMjdgrWTDP8lQ",
+    "username": "",
+    "api_token": "cV-OY9AF7EMjdgrWTDP8lQ",
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJvb3QiLCJpYXQiOjE2ODc1MDM0NjksImV4cCI6MTY4NzUwNzA2OX0.gWJV5osuA--NJht3otIjIEjQQTZPxjNixaAKDutZ0o4",
+    "authentication_type": "access_token"
+  }
+}
