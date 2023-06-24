@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "cxcacac",
+  "task_description": "zccc",
+  "task_type": "SQL Execution",
+  "task_sequence": "30",
+  "Input": "JDBC",
+  "Output": "Parquet"
+}
