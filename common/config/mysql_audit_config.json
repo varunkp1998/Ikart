@@ -7,7 +7,7 @@
     "port": "3306",
     "database": "config",
     "hostname": "ikart-dev.cpe2skhikiyu.us-east-1.rds.amazonaws.com",
-    "password": "zfcu33xXwboQup6U7HyTFQ",
+    "password": "a120eb2e85ad73cdf0a2136970367c12202e2cf4ef7b36240a1ac07eda48",
     "username": "config"
   }
 }
