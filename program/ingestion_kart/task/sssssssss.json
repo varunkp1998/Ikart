@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 9,
+  "task_name": "sssssssss",
+  "task_description": "sas",
+  "task_type": "Transformation",
+  "task_sequence": "30",
+  "Input": "ORC",
+  "Output": "Parquet"
+}
