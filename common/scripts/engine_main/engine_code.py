@@ -413,9 +413,10 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
                     write_to_txt1(task_id,'FAILED',file_path)
                     sys.exit()
-            else:
-                session.commit()
-                task_logger.info("Transaction commited successfully!")
+             else:
+                if target['target_type'] not in {'csv_write'}:
+                    session.commit()
+                    task_logger.info("Transaction commited successfully!")
         task_logger.info(TASK_LOG,task_id)
         write_to_txt1(task_id,'SUCCESS',file_path)
         audit(json_data, task_id,run_id,'STATUS','COMPLETED',iter_value)
