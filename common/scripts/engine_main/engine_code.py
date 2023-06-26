@@ -187,8 +187,9 @@ def establish_conn(paths_data,prj_nm,task_name):
         task_logger.exception("establish_conn() is %s", str(error))
         raise error
     
-def execute_query(prj_nm,paths_data:str,task_name:str,json_data,run_id,restart_point=None,iteration=None):
+def execute_query(prj_nm,paths_data:str,task_name:str,json_data,run_id,restart_point=None,query_iteration=None,task_iteration=None):
     try:
+        print("restart point value is",int(restart_point))
         #task_logger.info("restart_point value is: %s",restart_point)
         restart_mode = json_data['sql_execution']['restart']
         sql_list = json_data["sql_list"]
@@ -201,21 +202,41 @@ def execute_query(prj_nm,paths_data:str,task_name:str,json_data,run_id,restart_p
             # if restart_point is not None  : 
             sorted_queries = [query for query in sorted_queries if int(query["seq_no"]) >= int(restart_point)]
             task_logger.info(sorted_queries)
-            itervalue = iteration + 1
+            if restart_point == 1:
+                itervalue = 1
+            else:
+                itervalue = task_iteration + 1
 
         elif restart_mode == "skip":
             sorted_queries = [query for query in sorted_queries if int(query["seq_no"]) > int(restart_point)]
             task_logger.info(sorted_queries)
-            itervalue = iteration + 1
+            if restart_point == 1:
+                itervalue = 1
+            else:
+                itervalue = task_iteration + 1
 
         elif restart_mode == "begin":
             task_logger.info("going inside begin")
-            itervalue = iteration + 1
+            if restart_point == 1:
+                itervalue = 1
+            else:
+                itervalue = task_iteration + 1
         else:
             itervalue = 1
         audit(json_data, task_name,run_id,'STATUS','STARTED',itervalue)
+        pass_quries = []  # List to store the sequence numbers of executed queries
+        # query_iteration_values = {}
         for query in sorted_queries:
             seq_no = query["seq_no"]
+            print(seq_no)
+            print("type of seq_no",type(seq_no))
+        #     if seq_no in query_iteration_values:  
+        #         query_iteration = query_iteration_values[seq_no]
+        #     else:
+        #         query_iteration = 0
+            # query_iteration += 1
+            # query_iteration_values[seq_no] = query_iteration
+            # print("before try query iteration",query_iteration,"for seq_no",seq_no)
             sql_query = query["sql_query"]
             s_query = sql_query[:30]
             task_logger.info("Sequence number: %s",seq_no)
@@ -226,24 +247,76 @@ def execute_query(prj_nm,paths_data:str,task_name:str,json_data,run_id,restart_p
             cursor = connection.cursor()  
             try:
                 #if restart_mode=="normal":
+                print("seq_no in try condition",seq_no)
+                print("query iteration",query_iteration,"for seq_no",seq_no)
+                # if restart_mode != "" and int(restart_point) < seq_no:
+                    # iter_value = query_iteration + 1 
+                    # audit(json_data, task_name,run_id,"SQL QUERY",s_query,itervalue, restart_point)
+                    # audit(json_data,task_name,run_id,'ROWS AFFECTED',variable,itervalue, restart_point)
+                    # audit(json_data, task_name, run_id, "RESULT", "PASS", iter_value, restart_point)
                 task_logger.info("variable is %s",sql_query)
                 variable = cursor.execute(sql_query)
                 sql_commit = "Commit"
-                cursor.execute(sql_commit)
-                if restart_mode  != "":
-                    itervalue = iteration + 1
+                cursor.execute(sql_commit) 
+                print("seq_no in after commit",seq_no)
+                pass_quries.append(seq_no)  # Add the sequence number to the list of  PASS executed queries
+                task_logger.info("Sequence numbers of pass executed queries: %s", pass_quries)
+                # found = False
+                if restart_mode != "":
+                    if seq_no in pass_quries:
+                        print("Queries present in pass:", pass_quries)
+                        itervalue = query_iteration + 1
+                    else:
+                        print("Queries not present in pass")
+                        itervalue = 1
+
+
+                # previous_restart_point = int(restart_point) - 1
+                # if restart_mode  != "":
+                #     if int(restart_point) == seq_no:
+                #         itervalue = query_iteration + 1 
+                #     elif int(restart_point) < seq_no:
+                #         itervalue = 1   
+                #     else:
+                #         itervalue = task_iteration + 1
+               
                 audit(json_data, task_name,run_id,"SQL QUERY",s_query,itervalue,seq_no)
                 audit(json_data,task_name,run_id,'ROWS AFFECTED',variable,itervalue,seq_no)
                 audit(json_data, task_name,run_id,"RESULT","PASS",itervalue,seq_no)
+               
+
             except Exception as e:
                 logging.error("Error executing SQL query for sequence number %s: %s", seq_no, str(e))
-                if restart_mode  != "": 
-                    itervalue = iteration
-                    audit(json_data, task_name,run_id,"RESULT","FAIL",itervalue,seq_no)
+                if restart_mode !="":
+                    if restart_point != 1:   
+                        itervalue = task_iteration + 1
+                    else:
+                        itervalue = 1
+                    
+                    if int(restart_point) < seq_no:         # if fail query executing for the first time
+                        iter_value = 1
+                        
+                    else:                                   # fail query executing for multiple time
+                        iter_value = query_iteration + 1
+                        
+                else:
+                    iter_value = 1
+                    itervalue =  1
+                # if iter_value > 1:   # The query failed previously and is now passing
+                   
+                
+                audit(json_data, task_name,run_id,"RESULT","FAIL",iter_value,seq_no)
                 audit(json_data, task_name,run_id,'STATUS','FAILED',itervalue)
                 all_queries_passed = False 
                 break
-        if all_queries_passed:
+        if all_queries_passed :
+            if restart_mode =="":
+                itervalue = 1
+            else:
+                if restart_point != 1:   
+                    itervalue = task_iteration + 1
+                else:
+                    itervalue = 1
             audit(json_data, task_name,run_id,'STATUS','COMPLETED',itervalue)
         return all_queries_passed    # Return True if all queries executed successfully    
     except Exception as error:
@@ -300,34 +373,35 @@ def restart_sql_query(prj_nm, paths_data: str, task_name: str, json_data, run_id
         second_dict = result[1]
         audit_value_task = first_dict['audit_value']
         task_logger.info("audit value from first diction: %s",audit_value_task)
+        task_iteration = first_dict['iteration']
         audit_value_query = second_dict['audit_value']
         task_logger.info("audit value from second diction: %s",audit_value_query)
         sequence = second_dict['sequence']
         if audit_value_task != "COMPLETED":
             run_id = second_dict['run_id']
-            iteration = second_dict['iteration']
+            query_iteration = second_dict['iteration']
             if audit_value_query == "FAIL":
                 if restart_mode == "normal":
                     task_logger.info("restarting the code in normal mode as query got failed at seq_no.: %s", sequence)
                 elif restart_mode == "skip":
                     task_logger.info("restarting the code in skip mode as query got failed at seq_no.: %s", sequence)
                 restart_point = sequence
-                return execute_query(prj_nm, paths_data, task_name, json_data, run_id, restart_point=restart_point,iteration =iteration)
+                return execute_query(prj_nm, paths_data, task_name, json_data, run_id, restart_point=restart_point,query_iteration =query_iteration,task_iteration =task_iteration)
                 
             else:
                 task_logger.info("audit value is equal to fail that condition is not present ")
-                iteration = iteration + 1
-                audit(json_data, task_name,run_id,'STATUS','STARTED',iteration)
-                audit(json_data, task_name,run_id,'STATUS','FAILED',iteration)
+                task_iteration = task_iteration + 1
+                audit(json_data, task_name,run_id,'STATUS','STARTED',task_iteration)
+                audit(json_data, task_name,run_id,'STATUS','FAILED',task_iteration)
                                 
         else:
             task_logger.info("Previous task got completed so starting execution from the beginning.")
             restart_point = 1
-            iteration = 0
+            query_iteration = 0
             if restart_mode =="skip":
                 restart_point = 0 
             # Calling the execute_query function without restart_point
-            return execute_query(prj_nm, paths_data, task_name, json_data, run_id,restart_point,iteration=iteration)
+            return execute_query(prj_nm, paths_data, task_name, json_data, run_id,restart_point,query_iteration=query_iteration,task_iteration =task_iteration)
 
 
 def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
