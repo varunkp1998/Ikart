@@ -1,0 +1,396 @@
+{
+  "pipeline_id": 1,
+  "project_id": 1,
+  "pipeline_name": "Open_Orders_Ingestion",
+  "pipeline_cd": "ORD_INGST",
+  "pipeline_description": "Workflow to ingest EU Orders",
+  "is_active": "Y",
+  "tasks_details": {
+    "175_Tetst1": [
+      "164_csv_to_mysql"
+    ],
+    "176_Tetst1": [
+      "0"
+    ],
+    "161_csv_to_mysql": [
+      "164_csv_to_mysql"
+    ],
+    "164_csv_to_mysql": [
+      "0"
+    ],
+    "238_12345890_copy": [
+      "0"
+    ],
+    "113_awss3_to_mysqltable": [
+      "0"
+    ],
+    "189_awss3_to_mysqltable_copy": [
+      "161_csv_to_mysql"
+    ],
+    "178_awss3_excel_to_awss3_parquet": [
+      "176_Tetst1"
+    ],
+    "236_awss3_excel_to_awss3_parquet_copy": [
+      "161_csv_to_mysql"
+    ],
+    "237_awss3_excel_to_awss3_parquet_copy_copy": [
+      "0"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    },
+    {
+      "id": "113",
+      "data": {
+        "label": "113-awss3_to_mysqltable"
+      },
+      "position": {
+        "x": 50,
+        "y": 50
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "161",
+      "data": {
+        "label": "161-csv_to_mysql"
+      },
+      "position": {
+        "x": 50,
+        "y": 100
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "164",
+      "data": {
+        "label": "164-csv_to_mysql"
+      },
+      "position": {
+        "x": 50,
+        "y": 150
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "175",
+      "data": {
+        "label": "175-Tetst1"
+      },
+      "position": {
+        "x": 50,
+        "y": 200
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "176",
+      "data": {
+        "label": "176-Tetst1"
+      },
+      "position": {
+        "x": 50,
+        "y": 250
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "178",
+      "data": {
+        "label": "178-awss3_excel_to_awss3_parquet"
+      },
+      "position": {
+        "x": 50,
+        "y": 300
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "189",
+      "data": {
+        "label": "189-awss3_to_mysqltable_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 350
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "236",
+      "data": {
+        "label": "236-awss3_excel_to_awss3_parquet_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 400
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "237",
+      "data": {
+        "label": "237-awss3_excel_to_awss3_parquet_copy_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 450
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "238",
+      "data": {
+        "label": "238-12345890_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 500
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "239",
+      "data": {
+        "label": "239-12345890_copy123"
+      },
+      "position": {
+        "x": 50,
+        "y": 550
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "240",
+      "data": {
+        "label": "240-12345890_copy123456ef"
+      },
+      "position": {
+        "x": 50,
+        "y": 600
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "241",
+      "data": {
+        "label": "241-12345890_copy123456"
+      },
+      "position": {
+        "x": 50,
+        "y": 650
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "242",
+      "data": {
+        "label": "242-12345890_copy123456_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 700
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "243",
+      "data": {
+        "label": "243-12345890_copy123456_copy_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 750
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "244",
+      "data": {
+        "label": "244-tashop_copy_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 800
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "245",
+      "data": {
+        "label": "245-123458956_copy_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 850
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "276",
+      "data": {
+        "label": "276-e"
+      },
+      "position": {
+        "x": 50,
+        "y": 900
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "292",
+      "data": {
+        "label": "292-Task115"
+      },
+      "position": {
+        "x": 50,
+        "y": 950
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "294",
+      "data": {
+        "label": "294-Task115_copy"
+      },
+      "position": {
+        "x": 50,
+        "y": 1000
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "298",
+      "data": {
+        "label": "298-Task1785"
+      },
+      "position": {
+        "x": 50,
+        "y": 1050
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "299",
+      "data": {
+        "label": "299-Task1fd"
+      },
+      "position": {
+        "x": 50,
+        "y": 1100
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "301",
+      "data": {
+        "label": "301-Taskioioo"
+      },
+      "position": {
+        "x": 50,
+        "y": 1150
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "303",
+      "data": {
+        "label": "303-TaskRestapi"
+      },
+      "position": {
+        "x": 50,
+        "y": 1200
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    }
+  ],
+  "edges": [
+    {
+      "id": "flow-0-113",
+      "source": "0",
+      "target": "113"
+    },
+    {
+      "id": "flow-0-164",
+      "source": "0",
+      "target": "164"
+    },
+    {
+      "id": "flow-0-176",
+      "source": "0",
+      "target": "176"
+    },
+    {
+      "id": "flow-0-237",
+      "source": "0",
+      "target": "237"
+    },
+    {
+      "id": "flow-0-238",
+      "source": "0",
+      "target": "238"
+    },
+    {
+      "id": "flow-164-161",
+      "source": "164",
+      "target": "161"
+    },
+    {
+      "id": "flow-164-175",
+      "source": "164",
+      "target": "175"
+    },
+    {
+      "id": "flow-176-178",
+      "source": "176",
+      "target": "178"
+    },
+    {
+      "id": "flow-161-189",
+      "source": "161",
+      "target": "189"
+    },
+    {
+      "id": "flow-161-236",
+      "source": "161",
+      "target": "236"
+    }
+  ],
+  "created_dttm": "2023-06-27T06:30:12.434Z",
+  "updated_dttm": "2023-06-27T06:30:12.434Z"
+}
