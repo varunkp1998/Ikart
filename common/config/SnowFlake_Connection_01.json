@@ -1,0 +1,14 @@
+{
+  "project_id": 41,
+  "connection_type": "Cloud DB",
+  "connection_subtype": "Snowflake",
+  "connection_name": "SnowFlake_Connection_01",
+  "connection_details": {
+    "role": "accountadmin",
+    "account": "LZFXMGN-AA23817",
+    "database": "CORE1",
+    "password": "8b25f43388f0249dd9574e7340b51b7463439fa49595c98fd3",
+    "username": "Nandish",
+    "warehouse": "COMPUTE_WH"
+  }
+}
