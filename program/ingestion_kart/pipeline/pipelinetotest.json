@@ -1,0 +1,82 @@
+{
+  "pipeline_id": 61,
+  "project_id": 35,
+  "pipeline_name": "pipelinetotest",
+  "pipeline_cd": "1",
+  "pipeline_description": "pipelinetotest",
+  "is_active": "Y",
+  "tasks_details": {
+    "217_Task1totest": 0,
+    "218_Task1totest1": 0,
+    "219_testwithsnowflack": 0
+  },
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    },
+    {
+      "id": "217",
+      "data": {
+        "label": "217-Task1totest"
+      },
+      "position": {
+        "x": 50,
+        "y": 2650
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "218",
+      "data": {
+        "label": "218-Task1totest1"
+      },
+      "position": {
+        "x": 50,
+        "y": 2700
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "219",
+      "data": {
+        "label": "219-testwithsnowflack"
+      },
+      "position": {
+        "x": 50,
+        "y": 2750
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    }
+  ],
+  "edges": [
+    {
+      "id": "flow-0-219",
+      "source": "0",
+      "target": "219"
+    },
+    {
+      "id": "flow-0-218",
+      "source": "0",
+      "target": "218"
+    },
+    {
+      "id": "flow-0-217",
+      "source": "0",
+      "target": "217"
+    }
+  ],
+  "created_dttm": "2023-06-27T12:38:56.088Z",
+  "updated_dttm": "2023-06-27T12:38:56.088Z"
+}
