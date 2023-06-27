@@ -1,0 +1,52 @@
+{
+  "id": 218,
+  "project_name": "Tracking1",
+  "pipeline_name": "new_pipeline_for_sequence",
+  "project_id": 6,
+  "pipeline_id": 60,
+  "task_name": "snowflake_tosnowflake_test",
+  "task_description": "snowflake_tosnowflake_test",
+  "task_type": "Ingestion",
+  "task_sequence": "22",
+  "source": "Snowflake",
+  "target": "Snowflake",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "snowflake_read",
+      "schema": "public",
+      "chunk_size": 1000,
+      "table_name": "public",
+      "parameter_type": "Snowflake",
+      "connection_name": "snowflake_connection_test"
+    },
+    "target": {
+      "target_type": "snowflake_write",
+      "schema": "public",
+      "operation": "create",
+      "table_name": "test_target",
+      "audit_columns": "inactive",
+      "parameter_type": "Snowflake",
+      "connection_name": "snowflake_connection_test"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "Y",
+      "post_check_enable": "N"
+    },
+    "data_quality": [
+      {
+        "seq_no": "1",
+        "check": "column_values_to_be_between",
+        "parameters": {
+          "column": "tb_column",
+          "max_value": "100",
+          "min_value": "10"
+        },
+        "active": "N",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "pre_check"
+      }
+    ]
+  }
+}
