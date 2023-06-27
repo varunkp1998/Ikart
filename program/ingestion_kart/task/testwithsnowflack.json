@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 219,
-  "pipeline_id": 61,
-  "task_name": "testwithsnowflack",
-  "task_description": "testwithsnowflack",
-  "task_type": "Ingestion",
-  "task_sequence": "\"217\""
-}
