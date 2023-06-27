@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 217,
+  "pipeline_id": 60,
+  "task_name": "awss3_to_snowflake_test",
+  "task_description": "awss3_to_snowflake_test",
+  "task_type": "Ingestion",
+  "task_sequence": "4"
+}
