@@ -224,7 +224,7 @@ def execute_query(prj_nm,paths_data:str,task_name:str,json_data,run_id,restart_p
         else:
             itervalue = 1
         audit(json_data, task_name,run_id,'STATUS','STARTED',itervalue)
-        pass_quries = []  # List to store the sequence numbers of executed queries
+        # pass_quries = []  # List to store the sequence numbers of executed queries
         # query_iteration_values = {}
         for query in sorted_queries:
             seq_no = query["seq_no"]
@@ -259,26 +259,26 @@ def execute_query(prj_nm,paths_data:str,task_name:str,json_data,run_id,restart_p
                 sql_commit = "Commit"
                 cursor.execute(sql_commit) 
                 print("seq_no in after commit",seq_no)
-                pass_quries.append(seq_no)  # Add the sequence number to the list of  PASS executed queries
-                task_logger.info("Sequence numbers of pass executed queries: %s", pass_quries)
+                # pass_quries.append(seq_no)  # Add the sequence number to the list of  PASS executed queries
+                # task_logger.info("Sequence numbers of pass executed queries: %s", pass_quries)
                 # found = False
-                if restart_mode != "":
-                    if seq_no in pass_quries:
-                        print("Queries present in pass:", pass_quries)
-                        itervalue = query_iteration + 1
-                    else:
-                        print("Queries not present in pass")
-                        itervalue = 1
+                # if restart_mode != "":
+                #     if seq_no in pass_quries:
+                #         print("Queries present in pass:", pass_quries)
+                #         itervalue = query_iteration + 1
+                #     else:
+                #         print("Queries not present in pass")
+                #         itervalue = 1
 
 
                 # previous_restart_point = int(restart_point) - 1
-                # if restart_mode  != "":
-                #     if int(restart_point) == seq_no:
-                #         itervalue = query_iteration + 1 
-                #     elif int(restart_point) < seq_no:
-                #         itervalue = 1   
-                #     else:
-                #         itervalue = task_iteration + 1
+                if restart_mode  != "":
+                    if int(restart_point) == seq_no:
+                        itervalue = query_iteration + 1 
+                    elif int(restart_point) < seq_no:
+                        itervalue = 1   
+                    else:
+                        itervalue = task_iteration + 1
                
                 audit(json_data, task_name,run_id,"SQL QUERY",s_query,itervalue,seq_no)
                 audit(json_data,task_name,run_id,'ROWS AFFECTED',variable,itervalue,seq_no)
