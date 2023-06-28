@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 200,
-  "pipeline_id": 9,
-  "task_name": "rest_api_tset",
-  "task_description": "rest_api_tset",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
