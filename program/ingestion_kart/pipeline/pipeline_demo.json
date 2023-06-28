@@ -1,0 +1,12 @@
+{
+  "created_dttm": "2023-06-28T09:44:48.745Z",
+  "updated_dttm": "2023-06-28T09:44:48.745Z",
+  "id": 63,
+  "project_id": 38,
+  "pipeline_name": "pipeline_demo",
+  "pipeline_cd": "1",
+  "pipeline_description": "pipeline_demo",
+  "pipeline_sequence": "1",
+  "is_active": "Y",
+  "created_by": "system"
+}
