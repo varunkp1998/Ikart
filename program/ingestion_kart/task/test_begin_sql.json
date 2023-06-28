@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "test_begin_sql",
+  "task_description": "test_begin_sql_testing",
+  "task_type": "SQL Execution",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "XML"
+}
