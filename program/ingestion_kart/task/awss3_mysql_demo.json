@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 231,
+  "pipeline_id": 63,
+  "task_name": "awss3_mysql_demo",
+  "task_description": "awss3_mysql_demo",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
