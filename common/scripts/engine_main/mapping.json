@@ -1,6 +1,8 @@
 {
 "mapping":{
    "csv_read":"csv_read.py",
+   "rest_api_read":"rest_api_read.py",
+   "rest_api_write":"rest_api_write.py",
    "csv_write":"csv_write.py",
    "postgres_write":"postgres_write.py",
    "postgres_read": "postgres_read.py",
