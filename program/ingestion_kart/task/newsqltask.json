@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 232,
-  "pipeline_id": 62,
-  "task_name": "newsqltask",
-  "task_description": "newsqltask",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
