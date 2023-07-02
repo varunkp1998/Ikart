@@ -1,0 +1,11 @@
+# Ignore a specific file
+__pycache__
+
+# Ignore all files in a directory
+my_directory/
+
+# Ignore all .log files
+*.log
+
+# Ignore files with a specific extension in any directory
+**/*.bak
