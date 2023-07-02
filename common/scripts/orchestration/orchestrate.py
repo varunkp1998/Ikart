@@ -15,7 +15,6 @@ import multiprocessing as mp
 import pandas as pd
 import requests
 import download
-import importlib
 
 STATUS_LIST=[]
 
@@ -255,7 +254,7 @@ def node_visit(df_flat, u_1, discovered, finished):
     for v_1 in next_tasks:
         # Detect cycles
         if v_1 in discovered:
-            raise Exception(f"Cycle detected: found a back edge from {u_1} to {v_1}.")
+            raise ValueError(f"Cycle detected: found a back edge from {u_1} to {v_1}.")
 
         # Recurse into DFS tree
         if v_1 not in finished:
@@ -606,11 +605,6 @@ iter_value):
         main_logger.info("execution at task level")
         send_mail('STARTED', prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
         execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
-        # new_path = os.path.expanduser(paths_data["folder_path"]) +paths_data["engine_path"]
-        # sys.path.insert(0, new_path)
-        # engine_code =  importlib.import_module("engine_code")
-        # task_name = task_nm
-        # engine_code.execute_query(prj_nm,paths_data,task_name)
     except Exception as error:
         main_logger.exception("error in orchestrate_task_calling %s.", str(error))
         raise error
@@ -631,7 +625,6 @@ def pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_fil
 mode,iter_value):
     """pipeline execution block"""
     global STATUS_LIST
-    # STATUS_LIST=[]
     try:
         # main_logger.info("entered into pip")
         STATUS_LIST = pipeline_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,

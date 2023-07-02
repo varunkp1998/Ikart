@@ -8,6 +8,7 @@ import zipfile
 import subprocess
 import importlib
 import requests
+import urllib3
 import pandas as pd
 from sqlalchemy.orm import sessionmaker
 import mysql.connector
@@ -49,6 +50,14 @@ def audit(json_data, task_name,run_id,status,value,itervalue,seq_no=None):
                 }]
         response = requests.post(url, json=audit_data, timeout=60)
         task_logger.info("audit status code:%s",response.status_code)
+    # except requests.exceptions.ConnectionError as error:
+    #     task_logger.error("Please start the server for audit api")
+    #     raise error
+    except (urllib3.exceptions.NewConnectionError, requests.exceptions.ConnectionError) as err:
+        # Exception handling code goes here
+        task_logger.error(
+        "Please Make sure the server is running to post the audit values: %s",str(err))
+        sys.exit()
     except Exception as error:
         task_logger.exception("error in audit %s.", str(error))
         raise error
@@ -148,27 +157,28 @@ def task_success(task_id,file_path,json_data,run_id,iter_value):
 def data_quality_features(json_data,definitions_qc):
     """function for executing data quality features based on pre and post checks"""
     try:
-        dq_features = json_data['task']['data_quality_features']
-        if dq_features['dq_auto_correction_required'] == 'Y' \
-        and dq_features['data_masking_required'] == 'Y':
-            definitions_qc.auto_correction(json_data)
-            definitions_qc.data_masking(json_data)
-        elif dq_features['dq_auto_correction_required'] == 'Y' \
-        and dq_features['data_encryption_required'] == 'Y':
-            definitions_qc.auto_correction(json_data)
-            definitions_qc.data_encryption(json_data)
-        elif dq_features['dq_auto_correction_required'] == 'Y' \
-        and dq_features['data_masking_required'] == 'Y' \
-        and dq_features['data_encryption_required'] == 'Y':
-            definitions_qc.auto_correction(json_data)
-            definitions_qc.data_masking(json_data)
-            definitions_qc.data_encryption(json_data)
-        elif dq_features['dq_auto_correction_required'] == 'Y':
-            definitions_qc.auto_correction(json_data)
-        elif dq_features['data_masking_required'] == 'Y':
-            definitions_qc.data_masking(json_data)
-        elif dq_features['data_encryption_required'] == 'Y':
-            definitions_qc.data_encryption(json_data)
+        if "task" in json_data and "data_quality_features" in json_data["task"]:
+            dq_features = json_data['task']['data_quality_features']
+            if dq_features['dq_auto_correction_required'] == 'Y' \
+            and dq_features['data_masking_required'] == 'Y':
+                definitions_qc.auto_correction(json_data)
+                definitions_qc.data_masking(json_data)
+            elif dq_features['dq_auto_correction_required'] == 'Y' \
+            and dq_features['data_encryption_required'] == 'Y':
+                definitions_qc.auto_correction(json_data)
+                definitions_qc.data_encryption(json_data)
+            elif dq_features['dq_auto_correction_required'] == 'Y' \
+            and dq_features['data_masking_required'] == 'Y' \
+            and dq_features['data_encryption_required'] == 'Y':
+                definitions_qc.auto_correction(json_data)
+                definitions_qc.data_masking(json_data)
+                definitions_qc.data_encryption(json_data)
+            elif dq_features['dq_auto_correction_required'] == 'Y':
+                definitions_qc.auto_correction(json_data)
+            elif dq_features['data_masking_required'] == 'Y':
+                definitions_qc.data_masking(json_data)
+            elif dq_features['data_encryption_required'] == 'Y':
+                definitions_qc.data_encryption(json_data)
     except Exception as error:
         task_logger.exception("error in data_quality_features %s.", str(error))
         raise error
@@ -275,12 +285,12 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
         sys.path.insert(0, dq_scripts_path)
         definitions_qc = importlib.import_module("definitions_qc")
         dq_execution = json_data["task"]["data_quality_execution"]
+        # task_logger.info(json_data["task"]["data_quality_execution"])
         source = json_data["task"]["source"]
         target = json_data["task"]["target"]
         if target['target_type'] in {'mysql_write','postgres_write','snowflake_write',
                                      'sqlserver_write'}:
             session = begin_transaction(paths_data,json_data,config_file_path)
-
         # Precheck script execution starts here
         if dq_execution["pre_check_enable"] == 'Y' and\
         source["source_type"] in ('csv_read','postgres_read','mysql_read',
@@ -294,6 +304,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
 
         # ingestion execution starts here
         read, write =read_write_imports(paths_data,json_data)
+
         if source["source_type"] in ("postgres_read","mysql_read",
         "snowflake_read","sqlserver_read", "aws_s3_read"):
             data_fram = read(json_data,config_file_path,task_id,run_id,paths_data,
@@ -315,7 +326,44 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     if value is False:
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
                         return False
-        elif source["source_type"] == "csv_read":
+        elif source["source_type"] in ("csv_read"):
+            data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
+            counter=0
+            for i in data_fram :
+                counter+=1
+                if target["target_type"] == "rest_api_write":
+                    value=write(json_data,i,task_id,run_id,paths_data,file_path,iter_value)
+                    if value is False:
+                        task_failed(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                    if value is True:
+                        task_success(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                elif target["target_type"] == "aws_s3_write":
+                    value=write(json_data, i,config_file_path,task_id,run_id,
+                    paths_data,file_path,iter_value)
+                    if value is False:
+                        task_failed(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                    if value is True:
+                        task_success(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                elif target["target_type"] != "csv_write":
+                    value=write(json_data, i,counter,config_file_path,task_id,run_id,
+                    paths_data,file_path,iter_value,session)
+                    if value is False:
+                        task_failed(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                    if value is True:
+                        task_success(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                else:
+                    task_logger.info(type(i))
+                    value=write(json_data, i,counter)
+                    if value is False:
+                        task_failed(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+        elif source["source_type"] in ("rest_api_read"):
             data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
             counter=0
             for i in data_fram :
@@ -330,7 +378,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                         task_success(task_id,file_path,json_data,run_id,iter_value)
                         return False
                 else:
-                    value=write(json_data, i,counter)
+                    value=write(json_data, i,None)
                     if value is False:
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
                         return False
@@ -339,7 +387,6 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
             data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
             counter=0
             for i in data_fram :
-                # task_logger.info(i)
                 counter+=1
                 if target["target_type"] == "csvfile_write":
                     value=write(json_data, i,counter)
@@ -413,8 +460,8 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
                     write_to_txt1(task_id,'FAILED',file_path)
                     sys.exit()
-             else:
-                if target['target_type'] not in {'csv_write'}:
+            else:
+                if target['target_type'] not in {'csv_write','aws_s3_write'}:
                     session.commit()
                     task_logger.info("Transaction commited successfully!")
         task_logger.info(TASK_LOG,task_id)
