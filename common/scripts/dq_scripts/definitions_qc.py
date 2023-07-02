@@ -5,7 +5,6 @@ from multiprocessing.pool import ThreadPool
 import logging
 import os
 import sys
-import base64
 import glob
 import importlib
 import great_expectations as ge
@@ -14,8 +13,6 @@ import requests
 import numpy as np
 import pandas as pd
 import boto3
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 task_logger = logging.getLogger('task_logger')
@@ -25,23 +22,11 @@ PRE_OP_STARTED = 'Pre-Check Operation Started'
 PRE_OP_ENDED = 'Pre-Check Operation Completed'
 QC_REPORT_LOG='QC for %s check %s|%s|%s'
 JSON = '.json'
-
-# def encrypt(data):
-#     '''function to Encrypting the data'''
-#     crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
-#     crypto_iv= 'rBEssDfxofOveRxR'
-#     block_size=16
-#     key = bytes(crypto_key, 'utf-8')
-#     key2 = bytes(crypto_iv, 'utf-8')
-#     aes = AES.new(key, AES.MODE_CBC, key2)
-#     encrypted = aes.encrypt(pad(data.encode(), block_size))
-#     # Make sure to strip "=" padding since urlsafe-base64 node module strips "=" as well
-#     return base64.urlsafe_b64encode(encrypted).decode("utf-8").rstrip("=")
+KEY = b'8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
+IV = b'rBEssDfxofOveRxR'
 
 def encrypt(message):
     '''function to encrypt the data'''
-    KEY = b'8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
-    IV = b'rBEssDfxofOveRxR'
     aesgcm = AESGCM(KEY)
     ciphertext = aesgcm.encrypt(IV, message.encode('utf-8'), None)
     return ciphertext.hex()
@@ -452,6 +437,7 @@ main_json_file,task_id,run_id, file_path,iter_value):
 def connections(ing_type, conn_str, password, main_json_file,task_id,file_path,
                 iter_value, run_id):
     '''function to establish the different db connections'''
+    
     try:
         if ing_type in {'postgres_read', 'postgres_write'}:
             conn = sqlalchemy.create_engine(f'postgresql://{conn_str["username"]}'
@@ -690,7 +676,7 @@ def aws_s3_read(conn_str, ing_type, main_json_file,paths_data):
             'json': JSON,
             'xml': '.xml'}
         extension = extensions.get(source['file_type'], '')
-        file_obj = source['file_path']+source['file_name']+extension
+        file_obj = source['file_path']+source['file_name']
         bucket_name = conn_str["bucket_name"]
         src_file = conn.get_object(Bucket=bucket_name, Key=file_obj)['Body']
         ge_df = ge.read_csv(src_file)
