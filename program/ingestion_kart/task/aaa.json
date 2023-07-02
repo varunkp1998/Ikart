@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 0,
-  "pipeline_id": 1,
-  "task_name": "aaa",
-  "task_description": "aaa",
-  "task_type": "SQL Execution",
-  "task_sequence": "5"
-}
