@@ -2,7 +2,7 @@
 __pycache__
 
 # Ignore all files in a directory
-my_directory/
+__pycache__/
 
 # Ignore all .log files
 *.log
