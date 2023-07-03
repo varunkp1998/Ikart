@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 216,
+  "pipeline_id": 60,
+  "task_name": "just created to test",
+  "task_description": "just created to test",
+  "task_type": "Ingestion",
+  "task_sequence": "\"214\""
+}
