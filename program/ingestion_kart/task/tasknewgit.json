@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 217,
+  "pipeline_id": 60,
+  "task_name": "tasknewgit",
+  "task_description": "tasknewgit",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
