@@ -1,0 +1,20 @@
+{
+  "id": 219,
+  "project_name": "Order Tracking",
+  "pipeline_name": "Open_Orders_Ingestion",
+  "project_id": 1,
+  "pipeline_id": 1,
+  "task_name": "testingallconnections",
+  "task_description": "testingallconnections",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "none",
+  "target": "none",
+  "is_active": "Y",
+  "task": {
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
