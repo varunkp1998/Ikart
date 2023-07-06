@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 59,
+  "task_name": "postgres_to_mysql",
+  "task_description": "postgres_to_mysql",
+  "task_type": "Ingestion",
+  "task_sequence": "33",
+  "Input": "JDBC",
+  "Output": "ORC"
+}
