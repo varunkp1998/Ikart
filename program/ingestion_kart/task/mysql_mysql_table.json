@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 63,
+  "task_name": "mysql_mysql_table",
+  "task_description": "mysql_mysql_table",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
