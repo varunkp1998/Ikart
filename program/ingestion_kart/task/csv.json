@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 1,
+  "task_name": "csv",
+  "task_description": "testing",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "AVRO",
+  "Output": "Parquet"
+}
