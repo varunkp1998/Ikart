@@ -1,0 +1,44 @@
+{
+  "id": 223,
+  "project_name": "Order Tracking",
+  "pipeline_name": "Open_Orders_Ingestion",
+  "project_id": 1,
+  "pipeline_id": 1,
+  "task_name": "csv",
+  "task_description": "testing",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "REST API",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "rest_api_read",
+      "timeout": "100",
+      "content_type": "json",
+      "query_params": "?page=1&per_page=20",
+      "parameter_type": "REST API",
+      "connection_name": "rest_to_mysql_test",
+      "response_headers": "2",
+      "chunk_size": null
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "True",
+      "header": "False",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "column.csv",
+      "file_path": "\\home\\madhu\\ingcode\\Program\\ingestion_kart\\Pipeline\\Task\\target_files",
+      "file_type": "csv",
+      "quote_char": "'",
+      "audit_columns": "inactive",
+      "parameter_type": "Local Server",
+      "connection_name": "local_connection"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
