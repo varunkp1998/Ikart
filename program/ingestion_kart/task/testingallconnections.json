@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 219,
+  "pipeline_id": 1,
+  "task_name": "testingallconnections",
+  "task_description": "testingallconnections",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
