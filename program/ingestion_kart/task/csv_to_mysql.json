@@ -1,0 +1,47 @@
+{
+  "id": 167,
+  "project_name": "Sales",
+  "pipeline_name": "pipeline1",
+  "project_id": 4,
+  "pipeline_id": 10,
+  "task_name": "csv_to_mysql",
+  "task_description": "csv_to_mysql",
+  "task_type": "csv write to mysql",
+  "task_sequence": "\"157\"",
+  "source": "Local Server",
+  "target": "MySQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "csv_read",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "Data7602DescendingYearOrder.csv",
+      "file_path": "../../../../../Downloads/CSV-data-load_data_metadata/",
+      "file_type": "csv",
+      "chunk_size": 1000,
+      "quote_char": "none",
+      "escape_char": "none",
+      "skip_footer": " 0",
+      "skip_header": " 1",
+      "alias_columns": " ",
+      "parameter_type": "Local Server",
+      "select_columns": " ",
+      "connection_name": "Local server"
+    },
+    "target": {
+      "target_type": "mysql_write",
+      "schema": "core",
+      "operation": "create",
+      "table_name": "csv_metadata",
+      "schema_name": "INFORMATION_SCHEMA1",
+      "audit_columns": "active",
+      "parameter_type": "MySQL",
+      "connection_name": "ORDMSDB"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
