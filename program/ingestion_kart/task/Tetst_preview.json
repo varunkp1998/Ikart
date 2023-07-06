@@ -1,0 +1,17 @@
+{
+  "task_id": 191,
+  "pipeline_id": 9,
+  "task_name": "Tetst_preview",
+  "task_type": "Ingestion",
+  "sql_execution": {
+    "connection_name": "ORDMSDB_MySql",
+    "restart": "normal"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "select * from tbl_user;",
+      "table_used_desc": "extract the table records"
+    }
+  ]
+}
