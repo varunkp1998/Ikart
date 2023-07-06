@@ -1,0 +1,38 @@
+{
+  "id": 226,
+  "project_name": "project_demo_test",
+  "pipeline_name": "pipeline_demo_test",
+  "project_id": 35,
+  "pipeline_id": 63,
+  "task_name": "restapi_mysql_test123",
+  "task_description": "restapi_mysql_test123",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "REST API",
+  "target": "MySQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "rest_api_read",
+      "timeout": "100",
+      "content_type": "json",
+      "query_params": "?page=1&per_page=5",
+      "parameter_type": "REST API",
+      "connection_name": "restapi_connection",
+      "chunk_size": null
+    },
+    "target": {
+      "target_type": "mysql_write",
+      "schema": "public",
+      "operation": "create",
+      "table_name": "tbl_rest_api",
+      "audit_columns": "inactive",
+      "parameter_type": "MySQL",
+      "connection_name": "mysql_connection_1"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
