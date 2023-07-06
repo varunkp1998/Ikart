@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 167,
+  "pipeline_id": 10,
+  "task_name": "csv_to_mysql",
+  "task_description": "csv_to_mysql",
+  "task_type": "csv write to mysql",
+  "task_sequence": "\"157\""
+}
