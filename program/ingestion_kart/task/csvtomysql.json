@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 58,
+  "task_name": "csvtomysql",
+  "task_description": "csvtomysql",
+  "task_type": "Ingestion",
+  "task_sequence": "2",
+  "Input": "Parquet",
+  "Output": "Parquet"
+}
