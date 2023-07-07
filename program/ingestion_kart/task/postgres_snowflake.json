@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 237,
-  "pipeline_id": 66,
-  "task_name": "postgres_snowflake",
-  "task_description": "postgres_snowflake",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
