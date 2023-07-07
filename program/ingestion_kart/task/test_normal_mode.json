@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 66,
+  "task_name": "test_normal_mode",
+  "task_description": "test_normal_mode",
+  "task_type": "SQL Execution",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
