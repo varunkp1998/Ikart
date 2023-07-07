@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 234,
+  "pipeline_id": 66,
+  "task_name": "test3_restapi_mysql",
+  "task_description": "test3_restapi_mysql",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
