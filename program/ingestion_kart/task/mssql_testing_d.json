@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 236,
-  "pipeline_id": 66,
-  "task_name": "mssql_testing_d",
-  "task_description": "mssql_testing_d",
-  "task_type": "Ingestion",
-  "task_sequence": "\"0\""
-}
