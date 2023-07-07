@@ -1,0 +1,10 @@
+{
+    "program_id":"1234",
+    "project_id":"",
+    "pipeline_id":"P_111",
+    "pipeline_name":"",
+    "tasks_details":{
+		"csv":0,
+		"csvtomysql":0
+    }
+}
