@@ -1,0 +1,12 @@
+{
+  "created_dttm": "2023-07-07T01:27:58.433Z",
+  "updated_dttm": "2023-07-07T01:27:58.433Z",
+  "id": 36,
+  "program_id": 213,
+  "project_name": "Project_P1",
+  "project_description": "project for the Program_t1",
+  "project_manager": "admin",
+  "project_lead": "admin",
+  "is_active": "Y",
+  "created_by": "system"
+}
