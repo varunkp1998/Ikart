@@ -1,0 +1,27 @@
+{
+  "task_id": 210,
+  "pipeline_id": 59,
+  "task_name": "sql_exec444",
+  "task_type": "SQL Execution",
+  "sql_execution": {
+    "connection_name": "mysql_rds",
+    "restart": "normal"
+  },
+  "sql_list": [
+    {
+      "seq_no": 1,
+      "sql_query": "INSERT INTO ingestion.sales_00 (ORDERLINENUMBER, PRODUCTLINE) VALUES ( 1234, 'demo');",
+      "table_used_desc": "insertion"
+    },
+    {
+      "seq_no": 2,
+      "sql_query": "UPDATE ingestion.TestTableForICPCDataset SET Countr = 'demo_country', City= 'demo_city' WHERE Year= 1999;",
+      "table_used_desc": "updation"
+    },
+    {
+      "seq_no": 3,
+      "sql_query": "truncate table ingestion.sales987;",
+      "table_used_desc": "truncating"
+    }
+  ]
+}
