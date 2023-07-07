@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 248,
-  "pipeline_id": 67,
-  "task_name": "test13_csv_restapi",
-  "task_description": "test13_csv_restapi",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
