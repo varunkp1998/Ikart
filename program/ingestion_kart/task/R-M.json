@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 242,
-  "pipeline_id": 66,
-  "task_name": "R-M",
-  "task_description": "R-M",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
