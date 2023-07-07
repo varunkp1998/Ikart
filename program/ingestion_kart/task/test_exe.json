@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 64,
+  "task_name": "test_exe",
+  "task_description": "test_exe",
+  "task_type": "SQL Execution",
+  "task_sequence": "21",
+  "Input": "ORC",
+  "Output": "JDBC"
+}
