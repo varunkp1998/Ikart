@@ -1,11 +1,11 @@
 {
   "task_id": 208,
   "pipeline_id": 48,
-  "task_name": "sarthak_TT",
+  "task_name": "sarthak_TT33",
   "task_type": "SQL Execution",
   "sql_execution": {
     "connection_name": "mysql_rds",
-    "restart": "normal"
+    "restart": "skip"
   },
   "sql_list": [
     {
