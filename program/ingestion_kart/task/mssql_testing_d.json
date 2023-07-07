@@ -1,0 +1,39 @@
+{
+  "id": 236,
+  "project_name": "Project_P1",
+  "pipeline_name": "Pipeline_Pi1",
+  "project_id": 36,
+  "pipeline_id": 66,
+  "task_name": "mssql_testing_d",
+  "task_description": "mssql_testing_d",
+  "task_type": "Ingestion",
+  "task_sequence": "\"0\"",
+  "source": "MySQL",
+  "target": "PostgreSQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "mysql_read",
+      "query": "select id,project_id,connection_type,connection_subtype from tbl_connection",
+      "schema": "public",
+      "chunk_size": 1000,
+      "table_name": "tbl_connection",
+      "parameter_type": "MySQL",
+      "select_columns": "id,project_id,connection_type,connection_subtype",
+      "connection_name": "mysql_connection_demo2"
+    },
+    "target": {
+      "target_type": "postgres_write",
+      "schema": "public",
+      "operation": "create",
+      "table_name": "mysql_postgres",
+      "audit_columns": "inactive",
+      "parameter_type": "PostgreSQL",
+      "connection_name": "postgres_connection_demo2"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
