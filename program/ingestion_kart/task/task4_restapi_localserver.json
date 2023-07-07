@@ -1,0 +1,44 @@
+{
+  "id": 235,
+  "project_name": "Project_P1",
+  "pipeline_name": "Pipeline_Pi1",
+  "project_id": 36,
+  "pipeline_id": 66,
+  "task_name": "task4_restapi_localserver",
+  "task_description": "task4_restapi_localserver",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "REST API",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "rest_api_read",
+      "timeout": "1000",
+      "content_type": "json",
+      "query_params": "",
+      "parameter_type": "REST API",
+      "connection_name": "restapi_connection_demo2",
+      "response_headers": "Authorization",
+      "chunk_size": null
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "True",
+      "header": "True",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "sales.csv",
+      "file_path": "/home/madhu/ingcode/Program/ingestion_kart/Pipeline/Task/target_files",
+      "file_type": "csv",
+      "quote_char": "\"",
+      "audit_columns": "active",
+      "parameter_type": "Local Server",
+      "connection_name": "localserver_connection_demo2"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
