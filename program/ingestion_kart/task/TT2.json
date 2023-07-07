@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 48,
+  "task_name": "TT2",
+  "task_description": "Sql Execution",
+  "task_type": "SQL Execution",
+  "task_sequence": "1234",
+  "Input": "JSON",
+  "Output": "Parquet"
+}
