@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 247,
+  "pipeline_id": 67,
+  "task_name": "test123_rest_mysql",
+  "task_description": "test123_rest_mysql",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
