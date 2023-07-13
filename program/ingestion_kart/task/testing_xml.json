@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 59,
+  "task_name": "testing_xml",
+  "task_description": "testing_xml",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "Parquet",
+  "Output": "CSV"
+}
