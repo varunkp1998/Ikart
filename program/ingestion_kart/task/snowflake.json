@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 67,
+  "task_name": "snowflake",
+  "task_description": "snowflake",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "ORC",
+  "Output": "ORC"
+}
