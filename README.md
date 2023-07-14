@@ -29,7 +29,7 @@ names of json file as to pipeline_name and task_name
 all json files names has no whitespaces replace it with underscore (_) has to lowercase
 
 #### Folder for program, project, pipelines, task and connction files
-- $INGKART_REPO/programs   -> save the file as json program_name.json 
+- $INGKART_REPO/programs   -> save the file as json program_name.json  in my meta data i have 7 programs and 6 projects records, i.e. this folder should have 7 projram.json files and 6 project folders.
 - $INGKART_REPO/programs/projects_names   -> create a project_folder and save the file as project_name.json
 - $INGKART_REPO/programs/projects_names/pipelines  -> save the files as pipeline_name.json
 - $INGKART_REPO/programs/projects_names/pipelines/tasks -> save the files as task_name.json
