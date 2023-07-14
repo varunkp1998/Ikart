@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 249,
-  "pipeline_id": 67,
-  "task_name": "taskLazyQuery",
-  "task_description": "taskLazyQuery",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
