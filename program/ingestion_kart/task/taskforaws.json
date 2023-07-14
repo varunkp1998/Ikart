@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 196,
+  "pipeline_id": 10,
+  "task_name": "taskforaws",
+  "task_description": "taskforaws",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
