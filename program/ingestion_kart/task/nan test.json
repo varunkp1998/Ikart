@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 214,
+  "pipeline_id": 59,
+  "task_name": "nan test",
+  "task_description": "testing",
+  "task_type": "Ingestion",
+  "task_sequence": "1"
+}
