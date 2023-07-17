@@ -1,0 +1,13 @@
+{
+  "id": null,
+  "pipeline_id": 61,
+  "task_name": "yyy1_copy",
+  "task_description": "yyy1",
+  "task_type": "Ingestion",
+  "task_sequence": "111",
+  "is_active": "Y",
+  "created_by": "admin",
+  "created_dttm": "2023-07-17T07:55:22.000Z",
+  "updated_by": "admin",
+  "updated_dttm": "2023-07-17T07:55:22.000Z"
+}
