@@ -5,9 +5,11 @@
 	"email_password":"otqvwijdyvommrcm",
 	"from_addr": "ikart1927@gmail.com",
 	"to_addr": "ingestionkart@gmail.com",
+	"github_repo_name":"shrikhaparul/Ikart",
+	"repo_path": "program",
 	"cc_addr": "",
 	"team_nm": "Ingestion Team",
-    "folder_path": "/app/intel_new_1/",
+    "folder_path": "/home/nandishms/backend_project/",
 	"Program":"Program/",
 	"pipeline_log_path": "/Pipeline/logs/",
 	"task_log_path": "/Pipeline/Task/logs/",
@@ -28,7 +30,7 @@
 	"audit_api_url":"http://localhost:8080/api/audit",
 	"mysql_audit_json_conn_nm":"mysql_audit_config.json",
 	"GH_audit_conn_json_path":"https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/config/mysql_audit_config.json",
-	"GH_download_file_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/engine_main/download.py",	
+	"GH_download_file_path": "common/scripts/engine_main/download.py",	
 	"GH_config_file_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/config/",
 	"GH_source_ingestion_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/ingestion/read/",
 	"GH_target_ingestion_path": "https://raw.githubusercontent.com/shrikhaparul/Ikart/main/common/scripts/ingestion/write/",
@@ -51,3 +53,4 @@
 						} 
 }
 	}
+
