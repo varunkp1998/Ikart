@@ -353,7 +353,7 @@ def audit(json_data, task_name,run_id,status,value,itervalue):
         url = "http://localhost:8080/api/audit"
         audit_data = [{
                     "pipeline_id": json_data["pipeline_id"],
-                    TASK_OR_PIPE_LINE_NM: task_name,
+                    "taskorpipeline_name": task_name,
                     "run_id": run_id,
                     "iteration": itervalue,
                     "audit_type": status,
@@ -506,6 +506,7 @@ def create_status_txt_file(paths_data1,task_name,proj_nm,run_id1):
         df_1['task_name']= task_name
         df_1['task_depended_on']= 0
         df_1['Job_Status']= 'Start'
+        main_logger.info("nnnnnnnnnnnnnnnnnnnnn %s , %s",proj_nm,task_name)
         file_path1=os.path.expanduser(paths_data1["folder_path"])+paths_data1["Program"]+proj_nm+\
         paths_data1["status_txt_file_path"]+task_name+'_Task_'+run_id1+".txt"
         df_1.to_csv(file_path1,mode='w', sep='\t',index = False, header=True)
@@ -526,7 +527,7 @@ def pipeline_execution(proj_nm,path_data,pipe_nm,run_id1,log_file_path1,log_file
         file_path=os.path.expanduser(path_data["folder_path"])+path_data["Program"]+proj_nm+\
         path_data["status_txt_file_path"]+pipe_nm+'_Pipeline_'+run_id1+".txt"
         main_logger.info("execution at pipeline level")
-        send_mail('STARTED', proj_nm,run_id1,path_data,pipe_nm,log_file_path1,log_file_name1)
+        # send_mail('STARTED', proj_nm,run_id1,path_data,pipe_nm,log_file_path1,log_file_name1)
         main_job(proj_nm,path_data,pipe_nm) #this checks for cyclic dependency
         text_filepath=os.path.expanduser(path_data["folder_path"])+path_data["Program"]+proj_nm+\
         path_data["status_txt_file_path"]
@@ -604,7 +605,7 @@ iter_value):
         file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
         # main_logger.info("entered into task")
         main_logger.info("execution at task level")
-        send_mail('STARTED', prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
+        # send_mail('STARTED', prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
         execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
         # new_path = os.path.expanduser(paths_data["folder_path"]) +paths_data["engine_path"]
         # sys.path.insert(0, new_path)
@@ -620,11 +621,11 @@ iter_value):
         result = all(x == "SUCCESS" for x in task_status_list)
         if result is False:
             main_logger.info("Task %s Execution failed.",task_nm)
-            send_mail("FAILED",prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
+            # send_mail("FAILED",prj_nm,run_id,paths_data,task_nm,log_file_path,log_file_name)
         else:
             main_logger.info("Task %s Execution ended successfully.",task_nm)
-            send_mail("COMPLETED", prj_nm,run_id,paths_data,task_nm,log_file_path,
-            log_file_name)
+            # send_mail("COMPLETED", prj_nm,run_id,paths_data,task_nm,log_file_path,
+            # log_file_name)
         main_logger.handlers.clear()
 
 def pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_file_name,
@@ -647,7 +648,7 @@ mode,iter_value):
             audit(json_data, pip_nm,run_id,'STATUS',
             'FAILED DUE TO CYCLIC DEPENDENCY',iter_value)
             main_logger.info("pipeline %s Execution FAILED DUE TO CYCLIC DEPENDENCY", pip_nm)
-            send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,log_file_name)
+            # send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,log_file_name)
             main_logger.handlers.clear()
         else:
             result = all(x == "SUCCESS" for x in STATUS_LIST)
@@ -657,15 +658,15 @@ mode,iter_value):
                 #calling audit or pipeline failure
                 audit(json_data, pip_nm,run_id,'STATUS','FAILED',iter_value)
                 main_logger.info("pipeline %s Execution failed.", pip_nm)
-                send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,
-                log_file_name)
+                # send_mail("FAILED", prj_nm,run_id,paths_data,pip_nm,log_file_path,
+                # log_file_name)
                 sys.exit()
             else:
                 #calling audit or pipeline success
                 audit(json_data, pip_nm,run_id,'STATUS','COMPLETED',iter_value)
                 main_logger.info("pipeline %s Execution ended successfully.", pip_nm)
-                send_mail("COMPLETED",prj_nm,run_id,paths_data,pip_nm,log_file_path,
-                log_file_name)
+                # send_mail("COMPLETED",prj_nm,run_id,paths_data,pip_nm,log_file_path,
+                # log_file_name)
             main_logger.handlers.clear()
 
 
@@ -675,11 +676,10 @@ mode,iter_value):
     """executes the orchestration at task or
     pipeline level based on the command given"""
     try:
-        if (task_nm != -9999 and pip_nm != -9999) or (str(task_nm) != "-9999") or\
-        str(pip_nm) == "-9999":
+        if task_nm != None:
             task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
             iter_value)
-        elif task_nm == -9999 and pip_nm != -9999:
+        elif pip_nm != None:
             pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_file_name,
             mode,iter_value)
         else:
