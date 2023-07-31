@@ -80,10 +80,10 @@ def read (json_data,task_id,run_id,paths_data,file_path,iter_value):
                 iter_value)
         else:
             # Print an error message if the request was unsuccessful
-            task_logger('Error:', response.status_code)
+            task_logger.info('Error:', response.status_code)
         return datafram
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
         audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
-        task_logger("error in rest_api read(), %s", error)
+        task_logger.info("error in rest_api read(), %s", error)
         raise error
