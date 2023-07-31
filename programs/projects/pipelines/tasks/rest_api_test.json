@@ -27,7 +27,7 @@
       "schema": "information_schema",
       "operation": "create",
       "table_name": "rest_api_data19",
-      "audit_columns": "inactive",
+      "audit_columns": "active",
       "parameter_type": "MySQL",
       "connection_name": "mysql_rds"
     },
