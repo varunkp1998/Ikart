@@ -31,18 +31,26 @@ def write_to_txt(task_id,status,file_path):
         raise error
 
 def to_get_api_details(json_data: dict, json_section: str,config_file_path:str):
-    """establishes connection for the mysql database
-       you pass it through the json"""
+    """get the required config details"""
     try:
         connection_details = get_config_section(config_file_path+json_data["task"][json_section]\
         ["connection_name"]+JSON)
         auth_type = connection_details['authentication_type']
-        access_token = connection_details["access_token"]
-        username = connection_details["username"]
-        password = decrypt(connection_details["password"])
-        api_token = connection_details["api_token"]
         url = connection_details["url"]
-        return auth_type,access_token,username,password,api_token,url
+        if auth_type == "access_token":
+            # access_token = decrypt(connection_details["access_token"])
+            access_token = decrypt(connection_details["access_token"])
+            return auth_type, url, access_token, None, None, None
+        if auth_type == "basic":
+            username = connection_details["username"]
+            password = decrypt(connection_details["password"])
+            return auth_type, url, None, username, password, None
+        if auth_type == "api_token":
+            api_token = connection_details["api_token"]
+            return auth_type, url, None, None, None, api_token
+        else:
+            # Handle the case when auth_type is unknown or not supported
+            return None, None, None, None, None, None
     except Exception as error:
         task_logger.exception("error in to_get_api_details(), %s", str(error))
         raise error
@@ -53,37 +61,59 @@ def read (json_data,task_id,run_id,paths_data,file_path,iter_value):
         engine_code_path = os.path.expanduser(paths_data["folder_path"])+paths_data[
             "ingestion_path"]
         sys.path.insert(0, engine_code_path)
-        config_file_path = os.path.expanduser(paths_data["folder_path"])+paths_data[
+        config_file_pathh = os.path.expanduser(paths_data["folder_path"])+paths_data[
             "config_path"]
         #importing audit function from orchestrate script
         module1 = importlib.import_module("engine_code")
         audit = getattr(module1, "audit")
-        auth_type,access_token,username,password,_,url = \
-        to_get_api_details(json_data, 'source',config_file_path)
+        auth_type,url,access_token,username,password,_ = \
+        to_get_api_details(json_data, "source",config_file_pathh)
+        timeout = json_data["task"]["source"]["timeout"]
+        if timeout == "":
+            timeout = 100  
+        else:
+             timeout = int(timeout)
+        task_logger.info("timeouttttttttttttttttttt %s", timeout )
+        query_params = json_data["task"]["source"]["query_params"]
+        if query_params  == "":
+            url = url
+        else:
+            url = url + query_params
+            task_logger.info("urllllllllllll %s", url )
         if auth_type == "basic":
             # Create the HTTPBasicAuth object
             auth = HTTPBasicAuth(username, password)
             # Make a GET request to the API endpoint with authentication
-            response = requests.get(url, auth=auth, timeout=100)
+            response = requests.get(url, auth=auth, timeout=timeout)
         elif auth_type == "access_token":
             # Create the headers dictionary with the access token
             headers = {'Authorization': f'Bearer {access_token}'}
             # Make a GET request to the API endpoint with the headers
-            response = requests.get(url, headers=headers, timeout=100)
+            response = requests.get(url, headers=headers, timeout=timeout)
+        if len(url) > 30:
+            restricted_url = url[:30]+"..."
+        else:
+            restricted_url = url
+        task_logger.info("URL specified in the config json is: %s", restricted_url)
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
             # Extract the response data in JSON format
             data = response.json()
             # Convert the JSON data to a polars DataFrame
             datafram = pd.DataFrame(data)
+            task_logger.info("number of records present in %s is: %s",restricted_url,
+                             datafram.shape[0])
             audit(json_data, task_id,run_id,'SRC_RECORD_COUNT',datafram.shape[0],
                 iter_value)
         else:
             # Print an error message if the request was unsuccessful
-            task_logger.info('Error:', response.status_code)
-        return datafram
+            task_logger.error('Error: %s', response.text)
+            write_to_txt(task_id,'FAILED',file_path)
+            audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
+            sys.exit()
+        yield datafram
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
         audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
-        task_logger.info("error in rest_api read(), %s", error)
+        task_logger.exception("error in rest_api read(), %s", error)
         raise error
