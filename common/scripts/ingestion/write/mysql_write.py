@@ -8,6 +8,7 @@ from sqlalchemy.exc import OperationalError
 import sqlalchemy
 import pandas as pd
 import pymysql
+from sqlalchemy import text
 module = importlib.import_module("utility")
 get_config_section = getattr(module, "get_config_section")
 decrypt = getattr(module, "decrypt")
@@ -40,7 +41,7 @@ def db_table_exists(sessions: dict, tablename: str)-> bool:
     """ function for checking whether a table exists or not in mysql """
     try:
         # checking whether the table exists in database or not
-        sql = f"select table_name from information_schema.tables where table_name='{tablename}'"
+        sql = text(f"select table_name from information_schema.tables where table_name='{tablename}'")
         connection = sessions.connection()
         result = connection.execute(sql)
         return bool(result.rowcount)
@@ -208,7 +209,7 @@ def write_to_txt(task_id,status,file_path):
 def trgt_record_count(json_data,status,sessions,task_id,run_id,iter_value,audit):
     """function to get target record count"""
     if json_data["task"]["target"]["operation"] != "drop" and status is not False:
-        sql = f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};'
+        sql =text(f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};')
         record_count = sessions.execute(sql).fetchall()
         audit(json_data, task_id,run_id,'TRGT_RECORD_COUNT',record_count[-1][-1],
         iter_value)
