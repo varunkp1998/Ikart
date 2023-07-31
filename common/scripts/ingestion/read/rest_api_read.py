@@ -39,6 +39,7 @@ def to_get_api_details(json_data: dict, json_section: str,config_file_path:str):
         url = connection_details["url"]
         if auth_type == "access_token":
             # access_token = decrypt(connection_details["access_token"])
+            # access_token = decrypt(connection_details["access_token"])
             access_token = decrypt(connection_details["access_token"])
             return auth_type, url, access_token, None, None, None
         if auth_type == "basic":
