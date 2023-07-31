@@ -26,7 +26,7 @@
       "target_type": "mysql_write",
       "schema": "information_schema",
       "operation": "create",
-      "table_name": "rest_api_data",
+      "table_name": "rest_api_data19",
       "audit_columns": "inactive",
       "parameter_type": "MySQL",
       "connection_name": "mysql_rds"
