@@ -5,7 +5,7 @@
   "pipeline_name":"pipeline_demo_07282023",
   "tasks_details":{
   "task_csv_to_mysql":0,
-  "aws_to_mysql_test_demo ":0,
+  "aws_to_mysql_test_demo":0,
   "rapi_to_mysql_demo":0	
   }
 }
