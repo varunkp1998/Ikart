@@ -1,0 +1,63 @@
+2023-07-31 14:31:22,142 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 14:31:22,143 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 14:31:22,143 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 14:31:24,797 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 14:31:24,809 | main_logger | MainProcess  |        create_status_txt_file | ERROR | create_status_txt_file 'Program'
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 509, in create_status_txt_file
+    file_path1=os.path.expanduser(paths_data1["folder_path"])+paths_data1["Program"]+proj_nm+\
+KeyError: 'Program'
+2023-07-31 14:31:24,810 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling 'Program'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 604, in task_orc_execution
+    file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 515, in create_status_txt_file
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 509, in create_status_txt_file
+    file_path1=os.path.expanduser(paths_data1["folder_path"])+paths_data1["Program"]+proj_nm+\
+KeyError: 'Program'
+2023-07-31 14:31:24,810 | main_logger | MainProcess  |        orchestrate_calling    | ERROR | error in orchestrate_calling local variable 'file_path' referenced before assignment.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 616, in task_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 604, in task_orc_execution
+    file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 515, in create_status_txt_file
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 509, in create_status_txt_file
+    file_path1=os.path.expanduser(paths_data1["folder_path"])+paths_data1["Program"]+proj_nm+\
+KeyError: 'Program'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 680, in orchestrate_calling
+    task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 619, in task_orc_execution
+    task_status_list = get_ind_task_status(file_path)
+UnboundLocalError: local variable 'file_path' referenced before assignment
+2023-07-31 14:31:24,810 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download local variable 'file_path' referenced before assignment.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 616, in task_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 604, in task_orc_execution
+    file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 515, in create_status_txt_file
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 509, in create_status_txt_file
+    file_path1=os.path.expanduser(paths_data1["folder_path"])+paths_data1["Program"]+proj_nm+\
+KeyError: 'Program'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 213, in execute_pipeline_download
+    orchestrate.orchestrate_calling(prj_nm,config_path,task_name,pipeline_name,run_id,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 689, in orchestrate_calling
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 680, in orchestrate_calling
+    task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 619, in task_orc_execution
+    task_status_list = get_ind_task_status(file_path)
+UnboundLocalError: local variable 'file_path' referenced before assignment
+2023-07-31 14:31:24,811 | main_logger | MainProcess  |        <module>               | ERROR | exception occured local variable 'file_path' referenced before assignment

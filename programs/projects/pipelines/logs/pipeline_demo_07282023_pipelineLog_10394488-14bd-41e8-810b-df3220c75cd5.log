@@ -1,0 +1,114 @@
+2023-08-01 11:00:45,859 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-08-01 11:00:45,859 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-08-01 11:01:00,964 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-08-01 11:01:02,307 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-08-01 11:01:02,308 | main_logger | MainProcess  |        pipeline_json_read     | ERROR | error in pipeline_json_read [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+2023-08-01 11:01:02,308 | main_logger | MainProcess  |        pipeline_execution     | ERROR | pipeline_execution [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 521, in pipeline_execution
+    json_data = pipeline_json_read(path_data,proj_nm,pipe_nm) #pipeline json read
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+2023-08-01 11:01:02,308 | main_logger | MainProcess  |        pipeline_orc_execution | ERROR | error in orchestrate_calling [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 637, in pipeline_orc_execution
+    STATUS_LIST = pipeline_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 570, in pipeline_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 521, in pipeline_execution
+    json_data = pipeline_json_read(path_data,proj_nm,pipe_nm) #pipeline json read
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+2023-08-01 11:01:02,309 | main_logger | MainProcess  |        pipeline_json_read     | ERROR | error in pipeline_json_read [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 641, in pipeline_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 637, in pipeline_orc_execution
+    STATUS_LIST = pipeline_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 570, in pipeline_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 521, in pipeline_execution
+    json_data = pipeline_json_read(path_data,proj_nm,pipe_nm) #pipeline json read
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+2023-08-01 11:01:02,309 | main_logger | MainProcess  |        orchestrate_calling    | ERROR | error in orchestrate_calling [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 641, in pipeline_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 637, in pipeline_orc_execution
+    STATUS_LIST = pipeline_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 570, in pipeline_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 521, in pipeline_execution
+    json_data = pipeline_json_read(path_data,proj_nm,pipe_nm) #pipeline json read
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 679, in orchestrate_calling
+    pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_file_name,mode,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 645, in pipeline_orc_execution
+    json_data = pipeline_json_read(paths_data,prj_nm,pip_nm)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+2023-08-01 11:01:02,309 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 641, in pipeline_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 637, in pipeline_orc_execution
+    STATUS_LIST = pipeline_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 570, in pipeline_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 521, in pipeline_execution
+    json_data = pipeline_json_read(path_data,proj_nm,pipe_nm) #pipeline json read
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 182, in execute_pipeline_download
+    orchestrate.orchestrate_calling(prj_nm,config_path,task_name,pipeline_name,run_id,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 684, in orchestrate_calling
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 679, in orchestrate_calling
+    pipeline_orc_execution(prj_nm,paths_data,pip_nm,run_id,log_file_path,log_file_name,mode,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 645, in pipeline_orc_execution
+    json_data = pipeline_json_read(paths_data,prj_nm,pip_nm)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 50, in pipeline_json_read
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 45, in pipeline_json_read
+    with open(r""+new_path,"r", encoding='utf-8') as jsonfile:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'
+2023-08-01 11:01:02,309 | main_logger | MainProcess  |        <module>               | ERROR | exception occured [Errno 2] No such file or directory: '/home/nandishms/test/programs/projects/pipelines/json/pipeline_demo_07282023.json'

@@ -1,0 +1,33 @@
+2023-08-01 13:17:40,815 | task_logger | Process_aws_to_mysql_test_demo |        execute_engine         | INFO  | entered into execute_engine
+2023-08-01 13:17:40,815 | task_logger | Process_aws_to_mysql_test_demo |        execute_engine         | INFO  | calling the task_json_download function
+2023-08-01 13:17:44,836 | task_logger | Process_aws_to_mysql_test_demo |        download_task_files    | INFO  | entered into downloading task related files
+2023-08-01 13:17:45,016 | task_logger | Process_aws_to_mysql_test_demo |        execute_engine         | INFO  | #####################################################
+2023-08-01 13:17:45,016 | task_logger | Process_aws_to_mysql_test_demo |        execute_engine         | INFO  | calling the engine_main
+2023-08-01 13:17:45,017 | task_logger | Process_aws_to_mysql_test_demo |        engine_main            | INFO  | entered into engine_main
+2023-08-01 13:17:45,017 | task_logger | Process_aws_to_mysql_test_demo |        task_json_read         | INFO  | reading TASK JSON data started aws_to_mysql_test_demo
+2023-08-01 13:17:45,017 | task_logger | Process_aws_to_mysql_test_demo |        task_json_read         | INFO  | reading TASK JSON data completed
+2023-08-01 13:17:45,035 | task_logger | Process_aws_to_mysql_test_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 13:17:45,036 | task_logger | Process_aws_to_mysql_test_demo |        checks_mapping_read    | INFO  | reading checks mapping json data started
+2023-08-01 13:17:45,036 | task_logger | Process_aws_to_mysql_test_demo |        checks_mapping_read    | INFO  | reading checks mapping data completed
+2023-08-01 13:17:46,573 | task_logger | Process_aws_to_mysql_test_demo |        begin_transaction      | INFO  | =================================================================
+2023-08-01 13:17:46,573 | task_logger | Process_aws_to_mysql_test_demo |        begin_transaction      | INFO  | Transaction Started
+2023-08-01 13:17:46,573 | task_logger | Process_aws_to_mysql_test_demo |        qc_pre_check           | INFO  | Data quality feature is not present in the json
+2023-08-01 13:17:46,574 | task_logger | Process_aws_to_mysql_test_demo |        qc_pre_check           | INFO  | Pre-Check Operation Started
+2023-08-01 13:17:46,695 | task_logger | Process_aws_to_mysql_test_demo |        aws_s3_conn            | INFO  | s3 connection established successfully!
+2023-08-01 13:17:47,452 | task_logger | Process_aws_to_mysql_test_demo |        aws_s3_read            | INFO  | Total number of records present in above table are 2823
+2023-08-01 13:17:47,457 | task_logger | Process_aws_to_mysql_test_demo |        run_checks_in_parallel | INFO  | QC for column_values_to_not_be_null check started
+2023-08-01 13:17:47,458 | task_logger | Process_aws_to_mysql_test_demo |        ge_checks              | INFO  | GE function generated - ge_df.expect_column_values_to_not_be_null('ORDERNUMBER', result_format='COMPLETE')
+2023-08-01 13:17:47,460 | task_logger | Process_aws_to_mysql_test_demo |        ge_checks              | INFO  | QC for column_values_to_not_be_null check has been PASS
+2023-08-01 13:17:47,521 | task_logger | Process_aws_to_mysql_test_demo |        qc_pre_check           | INFO  | Pre-Check Operation Completed
+2023-08-01 13:17:47,522 | task_logger | Process_aws_to_mysql_test_demo |        read_write_imports     | INFO  | read imports started
+2023-08-01 13:17:47,522 | task_logger | Process_aws_to_mysql_test_demo |        read_write_imports     | INFO  | write imports started
+2023-08-01 13:17:47,605 | task_logger | Process_aws_to_mysql_test_demo |        establish_conn_for_s3  | INFO  | connection established
+2023-08-01 13:17:47,864 | task_logger | Process_aws_to_mysql_test_demo |        read                   | INFO  | list of files which were read
+2023-08-01 13:17:47,864 | task_logger | Process_aws_to_mysql_test_demo |        read                   | INFO  | ['test/sales.csv']
+2023-08-01 13:17:48,244 | task_logger | Process_aws_to_mysql_test_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 13:17:48,395 | task_logger | Process_aws_to_mysql_test_demo |        read_data_with_or_without_chunk | INFO  | 1 iteration
+2023-08-01 13:17:48,395 | task_logger | Process_aws_to_mysql_test_demo |        write                  | INFO  | ingest data to mysql db initiated
+2023-08-01 13:17:48,416 | task_logger | Process_aws_to_mysql_test_demo |        replace                | ERROR | mysql_demo does not exists, give correct table name
+2023-08-01 13:17:48,441 | task_logger | Process_aws_to_mysql_test_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 13:17:48,441 | task_logger | Process_aws_to_mysql_test_demo |        task_failed            | WARNING | aws_to_mysql_test_demo got failed engine
+2023-08-01 13:17:48,443 | task_logger | Process_aws_to_mysql_test_demo |        execute_engine         | INFO  | #####################################################

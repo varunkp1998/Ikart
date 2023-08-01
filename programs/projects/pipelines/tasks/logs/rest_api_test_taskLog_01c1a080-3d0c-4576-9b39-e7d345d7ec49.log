@@ -1,0 +1,9 @@
+2023-07-31 16:22:33,924 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 16:22:33,924 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 16:22:33,925 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 16:22:36,139 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 16:22:36,149 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
+2023-07-31 16:22:39,061 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
+2023-07-31 16:22:47,340 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is STARTED
+2023-07-31 16:22:47,340 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
+2023-07-31 16:22:50,553 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent

@@ -1,0 +1,30 @@
+2023-08-01 11:53:56,783 | task_logger | Process_rapi_to_mysql_demo |        execute_engine         | INFO  | entered into execute_engine
+2023-08-01 11:53:56,783 | task_logger | Process_rapi_to_mysql_demo |        execute_engine         | INFO  | calling the task_json_download function
+2023-08-01 11:53:57,789 | task_logger | Process_rapi_to_mysql_demo |        download_task_files    | INFO  | entered into downloading task related files
+2023-08-01 11:54:01,890 | task_logger | Process_rapi_to_mysql_demo |        execute_engine         | INFO  | #####################################################
+2023-08-01 11:54:01,890 | task_logger | Process_rapi_to_mysql_demo |        execute_engine         | INFO  | calling the engine_main
+2023-08-01 11:54:01,890 | task_logger | Process_rapi_to_mysql_demo |        engine_main            | INFO  | entered into engine_main
+2023-08-01 11:54:01,890 | task_logger | Process_rapi_to_mysql_demo |        task_json_read         | INFO  | reading TASK JSON data started rapi_to_mysql_demo
+2023-08-01 11:54:01,890 | task_logger | Process_rapi_to_mysql_demo |        task_json_read         | INFO  | reading TASK JSON data completed
+2023-08-01 11:54:01,917 | task_logger | Process_rapi_to_mysql_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 11:54:01,917 | task_logger | Process_rapi_to_mysql_demo |        checks_mapping_read    | INFO  | reading checks mapping json data started
+2023-08-01 11:54:01,917 | task_logger | Process_rapi_to_mysql_demo |        checks_mapping_read    | INFO  | reading checks mapping data completed
+2023-08-01 11:54:03,321 | task_logger | Process_rapi_to_mysql_demo |        begin_transaction      | INFO  | =================================================================
+2023-08-01 11:54:03,321 | task_logger | Process_rapi_to_mysql_demo |        begin_transaction      | INFO  | Transaction Started
+2023-08-01 11:54:03,321 | task_logger | Process_rapi_to_mysql_demo |        read_write_imports     | INFO  | read imports started
+2023-08-01 11:54:03,321 | task_logger | Process_rapi_to_mysql_demo |        read_write_imports     | INFO  | write imports started
+2023-08-01 11:54:03,325 | task_logger | Process_rapi_to_mysql_demo |        read                   | INFO  | timeouttttttttttttttttttt 100
+2023-08-01 11:54:03,325 | task_logger | Process_rapi_to_mysql_demo |        read                   | INFO  | urllllllllllll https://gorest.co.in/public/v2/users?page=1&per_page=5
+2023-08-01 11:54:03,673 | task_logger | Process_rapi_to_mysql_demo |        read                   | INFO  | URL specified in the config json is: https://gorest.co.in/public/v2...
+2023-08-01 11:54:03,675 | task_logger | Process_rapi_to_mysql_demo |        read                   | INFO  | number of records present in https://gorest.co.in/public/v2... is: 5
+2023-08-01 11:54:03,693 | task_logger | Process_rapi_to_mysql_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 11:54:03,694 | task_logger | Process_rapi_to_mysql_demo |        write                  | INFO  | ingest data to mysql db initiated
+2023-08-01 11:54:03,714 | task_logger | Process_rapi_to_mysql_demo |        append                 | INFO  | Rest123 table exists, started appending the data to table
+2023-08-01 11:54:03,714 | task_logger | Process_rapi_to_mysql_demo |        insert_data            | INFO  | data ingesting with out audit columns
+2023-08-01 11:54:03,741 | task_logger | Process_rapi_to_mysql_demo |        insert_data            | INFO  | mysql ingestion completed
+2023-08-01 11:54:03,755 | task_logger | Process_rapi_to_mysql_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 11:54:03,756 | task_logger | Process_rapi_to_mysql_demo |        trgt_record_count      | INFO  | the number of records present in target table after ingestion:10
+2023-08-01 11:54:03,764 | task_logger | Process_rapi_to_mysql_demo |        engine_main            | INFO  | Transaction commited successfully!
+2023-08-01 11:54:03,765 | task_logger | Process_rapi_to_mysql_demo |        engine_main            | INFO  | Task rapi_to_mysql_demo Execution Completed
+2023-08-01 11:54:03,780 | task_logger | Process_rapi_to_mysql_demo |        audit                  | INFO  | audit status code:200
+2023-08-01 11:54:03,780 | task_logger | Process_rapi_to_mysql_demo |        execute_engine         | INFO  | #####################################################

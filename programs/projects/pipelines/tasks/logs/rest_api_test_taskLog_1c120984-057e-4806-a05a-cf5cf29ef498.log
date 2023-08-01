@@ -1,0 +1,85 @@
+2023-07-31 17:23:49,767 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 17:23:49,768 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 17:23:49,769 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 17:23:51,502 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 17:23:51,508 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
+2023-07-31 17:23:54,705 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
+2023-07-31 17:24:13,405 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/shrikhaparul/Ikart (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7fb3fb654a90>, 'Connection to api.github.com timed out. (connect timeout=15)')).
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connection.py", line 174, in _new_conn
+    conn = connection.create_connection(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/util/connection.py", line 95, in create_connection
+    raise err
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    sock.connect(sa)
+TimeoutError: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 714, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 403, in _make_request
+    self._validate_conn(conn)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1053, in _validate_conn
+    conn.connect()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connection.py", line 363, in connect
+    self.sock = conn = self._new_conn()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connection.py", line 179, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.HTTPSConnection object at 0x7fb3fb654a90>, 'Connection to api.github.com timed out. (connect timeout=15)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 798, in urlopen
+    retries = retries.increment(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/shrikhaparul/Ikart (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7fb3fb654a90>, 'Connection to api.github.com timed out. (connect timeout=15)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 608, in task_orc_execution
+    execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 38, in execute_job
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 35, in execute_job
+    download.execute_engine(prj_nm,task_id,paths_data,run_id,file_path,iter_value)
+  File "/home/nandishms/test/download.py", line 267, in execute_engine
+    raise error
+  File "/home/nandishms/test/download.py", line 257, in execute_engine
+    download_task_files(prj_nm,task_name, config_path, repo_name,GIT_BRANCH)
+  File "/home/nandishms/test/download.py", line 220, in download_task_files
+    raise error
+  File "/home/nandishms/test/download.py", line 200, in download_task_files
+    download_file_from_github(repo_name, branch,
+  File "/home/nandishms/test/master.py", line 120, in downlaod_file_from_git
+    repo = g.get_repo(repo)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/MainClass.py", line 363, in get_repo
+    headers, data = self.__requester.requestJsonAndCheck("GET", url)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 443, in requestJsonAndCheck
+    *self.requestJson(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 580, in requestJson
+    return self.__requestEncode(cnx, verb, url, parameters, headers, input, encode)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 685, in __requestEncode
+    status, responseHeaders, output = self.__requestRaw(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 719, in __requestRaw
+    response = cnx.getresponse()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 164, in getresponse
+    r = verb(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/adapters.py", line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/shrikhaparul/Ikart (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7fb3fb654a90>, 'Connection to api.github.com timed out. (connect timeout=15)'))
+2023-07-31 17:24:13,410 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is Start
+2023-07-31 17:24:13,411 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
+2023-07-31 17:24:16,845 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent

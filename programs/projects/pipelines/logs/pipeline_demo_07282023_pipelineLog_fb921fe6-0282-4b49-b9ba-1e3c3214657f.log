@@ -1,0 +1,144 @@
+2023-08-01 10:59:57,393 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-08-01 10:59:57,393 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-08-01 10:59:58,426 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-08-01 11:00:13,626 | main_logger | MainProcess  |        required_files_download | ERROR | error in common_downloads HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15).
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 466, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 461, in _make_request
+    httplib_response = conn.getresponse()
+  File "/usr/lib/python3.10/http/client.py", line 1374, in getresponse
+    response.begin()
+  File "/usr/lib/python3.10/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib/python3.10/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/usr/lib/python3.10/socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+  File "/usr/lib/python3.10/ssl.py", line 1274, in recv_into
+    return self.read(nbytes, buffer)
+  File "/usr/lib/python3.10/ssl.py", line 1130, in read
+    return self._sslobj.read(len, buffer)
+TimeoutError: The read operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 798, in urlopen
+    retries = retries.increment(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/util/retry.py", line 550, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/packages/six.py", line 770, in reraise
+    raise value
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 714, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 468, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 357, in _raise_timeout
+    raise ReadTimeoutError(
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 65, in required_files_download
+    download_file_from_github(repo_name,branch, file_path=paths_data[
+  File "/home/nandishms/test/master.py", line 120, in downlaod_file_from_git
+    repo = g.get_repo(repo)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/MainClass.py", line 363, in get_repo
+    headers, data = self.__requester.requestJsonAndCheck("GET", url)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 443, in requestJsonAndCheck
+    *self.requestJson(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 580, in requestJson
+    return self.__requestEncode(cnx, verb, url, parameters, headers, input, encode)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 685, in __requestEncode
+    status, responseHeaders, output = self.__requestRaw(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 719, in __requestRaw
+    response = cnx.getresponse()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 164, in getresponse
+    r = verb(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/adapters.py", line 532, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15)
+2023-08-01 11:00:13,660 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15).
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 466, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 461, in _make_request
+    httplib_response = conn.getresponse()
+  File "/usr/lib/python3.10/http/client.py", line 1374, in getresponse
+    response.begin()
+  File "/usr/lib/python3.10/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib/python3.10/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/usr/lib/python3.10/socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+  File "/usr/lib/python3.10/ssl.py", line 1274, in recv_into
+    return self.read(nbytes, buffer)
+  File "/usr/lib/python3.10/ssl.py", line 1130, in read
+    return self._sslobj.read(len, buffer)
+TimeoutError: The read operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 798, in urlopen
+    retries = retries.increment(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/util/retry.py", line 550, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/packages/six.py", line 770, in reraise
+    raise value
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 714, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 468, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/urllib3/connectionpool.py", line 357, in _raise_timeout
+    raise ReadTimeoutError(
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 177, in execute_pipeline_download
+    required_files_download(config_path,repo_name,git_branch)
+  File "/home/nandishms/test/download.py", line 81, in required_files_download
+    raise error
+  File "/home/nandishms/test/download.py", line 65, in required_files_download
+    download_file_from_github(repo_name,branch, file_path=paths_data[
+  File "/home/nandishms/test/master.py", line 120, in downlaod_file_from_git
+    repo = g.get_repo(repo)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/MainClass.py", line 363, in get_repo
+    headers, data = self.__requester.requestJsonAndCheck("GET", url)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 443, in requestJsonAndCheck
+    *self.requestJson(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 580, in requestJson
+    return self.__requestEncode(cnx, verb, url, parameters, headers, input, encode)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 685, in __requestEncode
+    status, responseHeaders, output = self.__requestRaw(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 719, in __requestRaw
+    response = cnx.getresponse()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 164, in getresponse
+    r = verb(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/requests/adapters.py", line 532, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15)
+2023-08-01 11:00:13,660 | main_logger | MainProcess  |        <module>               | ERROR | exception occured HTTPSConnectionPool(host='api.github.com', port=443): Read timed out. (read timeout=15)

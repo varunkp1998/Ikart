@@ -1,0 +1,26 @@
+2023-07-31 14:43:01,530 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 14:43:01,531 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 14:43:01,533 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 14:43:05,383 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 14:43:05,403 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
+2023-07-31 14:43:08,150 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
+2023-07-31 14:43:08,409 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling 'gh_tasks_path'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 608, in task_orc_execution
+    execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 38, in execute_job
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 35, in execute_job
+    download.execute_engine(prj_nm,task_id,paths_data,run_id,file_path,iter_value)
+  File "/home/nandishms/test/download.py", line 237, in execute_engine
+    raise error
+  File "/home/nandishms/test/download.py", line 227, in execute_engine
+    download_task_files(prj_nm,task_name, config_path, repo_name,GIT_BRANCH)
+  File "/home/nandishms/test/download.py", line 192, in download_task_files
+    raise error
+  File "/home/nandishms/test/download.py", line 150, in download_task_files
+    file_path=f'{config_path["programs"]}{prj_nm}{config_path["gh_tasks_path"]}{task_name}{JSON}',
+KeyError: 'gh_tasks_path'
+2023-07-31 14:43:08,423 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is Start
+2023-07-31 14:43:08,424 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
+2023-07-31 14:43:11,858 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent

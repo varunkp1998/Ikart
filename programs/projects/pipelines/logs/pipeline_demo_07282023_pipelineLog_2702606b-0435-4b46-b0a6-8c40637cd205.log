@@ -1,0 +1,8 @@
+2023-08-01 10:43:13,987 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-08-01 10:43:13,987 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-08-01 10:43:13,988 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download 'task_pipeline_path'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 173, in execute_pipeline_download
+    save_dir =f'{homepath}{config_path["programs"]}{prj_nm}{config_path["task_pipeline_path"]}')
+KeyError: 'task_pipeline_path'
+2023-08-01 10:43:13,988 | main_logger | MainProcess  |        <module>               | ERROR | exception occured 'task_pipeline_path'

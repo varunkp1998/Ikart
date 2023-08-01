@@ -1,0 +1,45 @@
+2023-07-31 17:31:19,445 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 17:31:19,454 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 17:31:19,460 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 17:31:26,151 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 17:31:26,170 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
+2023-07-31 17:31:29,947 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
+2023-07-31 17:32:00,452 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'".
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1408, in execute
+    meth = statement._execute_on_connection
+AttributeError: 'str' object has no attribute '_execute_on_connection'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 608, in task_orc_execution
+    execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 38, in execute_job
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 35, in execute_job
+    download.execute_engine(prj_nm,task_id,paths_data,run_id,file_path,iter_value)
+  File "/home/nandishms/test/download.py", line 267, in execute_engine
+    raise error
+  File "/home/nandishms/test/download.py", line 263, in execute_engine
+    engine_code.engine_main(prj_nm,task_name,config_path,run_id,file_path,iter_value)
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 476, in engine_main
+    raise error
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 373, in engine_main
+    value=write(json_data, i,counter,config_file_path,task_id,run_id,
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 266, in write
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 235, in write
+    status=create(json_data, sessions, datafram, conn_details)
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 81, in create
+    if db_table_exists(conn, target["table_name"]) is False:
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 49, in db_table_exists
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 45, in db_table_exists
+    result = connection.execute(sql)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1410, in execute
+    raise exc.ObjectNotExecutableError(statement) from err
+sqlalchemy.exc.ObjectNotExecutableError: Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"
+2023-07-31 17:32:00,465 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is FAILED
+2023-07-31 17:32:00,466 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
+2023-07-31 17:32:04,252 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent

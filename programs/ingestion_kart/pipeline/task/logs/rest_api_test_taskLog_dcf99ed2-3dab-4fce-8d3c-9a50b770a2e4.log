@@ -1,0 +1,18 @@
+2023-07-31 13:55:23,118 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 13:55:23,120 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 13:55:23,124 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 13:55:23,128 | main_logger | MainProcess  |        required_files_download | ERROR | error in common_downloads downlaod_file_from_git() got multiple values for argument 'file_path'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 59, in required_files_download
+    download_file_from_github(repo_name,branch, file_path=paths_data[
+TypeError: downlaod_file_from_git() got multiple values for argument 'file_path'
+2023-07-31 13:55:23,132 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download downlaod_file_from_git() got multiple values for argument 'file_path'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 208, in execute_pipeline_download
+    required_files_download(config_path,repo_name,git_branch)
+  File "/home/nandishms/test/download.py", line 81, in required_files_download
+    raise error
+  File "/home/nandishms/test/download.py", line 59, in required_files_download
+    download_file_from_github(repo_name,branch, file_path=paths_data[
+TypeError: downlaod_file_from_git() got multiple values for argument 'file_path'
+2023-07-31 13:55:23,134 | main_logger | MainProcess  |        <module>               | ERROR | exception occured downlaod_file_from_git() got multiple values for argument 'file_path'

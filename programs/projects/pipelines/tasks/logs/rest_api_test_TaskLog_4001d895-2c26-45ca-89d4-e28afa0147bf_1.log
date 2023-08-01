@@ -1,0 +1,86 @@
+2023-07-31 17:29:06,543 | task_logger | MainProcess  |        execute_engine         | INFO  | entered into execute_engine
+2023-07-31 17:29:06,544 | task_logger | MainProcess  |        execute_engine         | INFO  | calling the task_json_download function
+2023-07-31 17:29:08,235 | task_logger | MainProcess  |        download_task_files    | INFO  | entered into downloading task related files
+2023-07-31 17:29:17,230 | task_logger | MainProcess  |        execute_engine         | INFO  | #####################################################
+2023-07-31 17:29:17,231 | task_logger | MainProcess  |        execute_engine         | INFO  | calling the engine_main
+2023-07-31 17:29:17,231 | task_logger | MainProcess  |        engine_main            | INFO  | entered into engine_main
+2023-07-31 17:29:17,232 | task_logger | MainProcess  |        task_json_read         | INFO  | reading TASK JSON data started rest_api_test
+2023-07-31 17:29:17,234 | task_logger | MainProcess  |        task_json_read         | INFO  | reading TASK JSON data completed
+2023-07-31 17:29:17,341 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:29:17,345 | task_logger | MainProcess  |        checks_mapping_read    | INFO  | reading checks mapping json data started
+2023-07-31 17:29:17,346 | task_logger | MainProcess  |        checks_mapping_read    | INFO  | reading checks mapping data completed
+2023-07-31 17:29:31,151 | task_logger | MainProcess  |        begin_transaction      | INFO  | =================================================================
+2023-07-31 17:29:31,152 | task_logger | MainProcess  |        begin_transaction      | INFO  | Transaction Started
+2023-07-31 17:29:31,153 | task_logger | MainProcess  |        read_write_imports     | INFO  | read imports started
+2023-07-31 17:29:31,153 | task_logger | MainProcess  |        read_write_imports     | INFO  | write imports started
+2023-07-31 17:29:31,190 | task_logger | MainProcess  |        to_get_api_details     | ERROR | error in to_get_api_details(), 
+Traceback (most recent call last):
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 43, in to_get_api_details
+    access_token = decrypt(connection_details["access_token"])
+  File "/home/nandishms/test//src/scripts/ingestion/utility.py", line 85, in decrypt
+    decrypted = aesgcm.decrypt(IV, bytes.fromhex(data), None)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/ciphers/aead.py", line 202, in decrypt
+    return aead._decrypt(backend, self, nonce, data, associated_data, 16)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/backends/openssl/aead.py", line 163, in _decrypt
+    raise InvalidTag
+cryptography.exceptions.InvalidTag
+2023-07-31 17:29:31,317 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:29:31,323 | task_logger | MainProcess  |        read                   | ERROR | error in rest_api read(), 
+Traceback (most recent call last):
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 71, in read
+    to_get_api_details(json_data, "source",config_file_pathh)
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 57, in to_get_api_details
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 43, in to_get_api_details
+    access_token = decrypt(connection_details["access_token"])
+  File "/home/nandishms/test//src/scripts/ingestion/utility.py", line 85, in decrypt
+    decrypted = aesgcm.decrypt(IV, bytes.fromhex(data), None)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/ciphers/aead.py", line 202, in decrypt
+    return aead._decrypt(backend, self, nonce, data, associated_data, 16)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/backends/openssl/aead.py", line 163, in _decrypt
+    raise InvalidTag
+cryptography.exceptions.InvalidTag
+2023-07-31 17:29:31,393 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:29:31,419 | task_logger | MainProcess  |        engine_main            | WARNING | rest_api_test got failed engine
+2023-07-31 17:29:31,420 | task_logger | MainProcess  |        engine_main            | ERROR | error in  .
+Traceback (most recent call last):
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 370, in engine_main
+    for i in data_fram :
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 120, in read
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 71, in read
+    to_get_api_details(json_data, "source",config_file_pathh)
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 57, in to_get_api_details
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 43, in to_get_api_details
+    access_token = decrypt(connection_details["access_token"])
+  File "/home/nandishms/test//src/scripts/ingestion/utility.py", line 85, in decrypt
+    decrypted = aesgcm.decrypt(IV, bytes.fromhex(data), None)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/ciphers/aead.py", line 202, in decrypt
+    return aead._decrypt(backend, self, nonce, data, associated_data, 16)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/backends/openssl/aead.py", line 163, in _decrypt
+    raise InvalidTag
+cryptography.exceptions.InvalidTag
+2023-07-31 17:29:31,424 | task_logger | MainProcess  |        execute_engine         | ERROR | error in executing engine .
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 263, in execute_engine
+    engine_code.engine_main(prj_nm,task_name,config_path,run_id,file_path,iter_value)
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 476, in engine_main
+    raise error
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 370, in engine_main
+    for i in data_fram :
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 120, in read
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 71, in read
+    to_get_api_details(json_data, "source",config_file_pathh)
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 57, in to_get_api_details
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/rest_api_read.py", line 43, in to_get_api_details
+    access_token = decrypt(connection_details["access_token"])
+  File "/home/nandishms/test//src/scripts/ingestion/utility.py", line 85, in decrypt
+    decrypted = aesgcm.decrypt(IV, bytes.fromhex(data), None)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/ciphers/aead.py", line 202, in decrypt
+    return aead._decrypt(backend, self, nonce, data, associated_data, 16)
+  File "/usr/lib/python3/dist-packages/cryptography/hazmat/backends/openssl/aead.py", line 163, in _decrypt
+    raise InvalidTag
+cryptography.exceptions.InvalidTag

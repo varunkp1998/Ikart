@@ -1,0 +1,4 @@
+task_name	task_depended_on	Job_Status
+task_csv_to_mysql	0	FAILED
+aws_to_mysql_test_demo	0	FAILED
+rapi_to_mysql_demo	0	SUCCESS

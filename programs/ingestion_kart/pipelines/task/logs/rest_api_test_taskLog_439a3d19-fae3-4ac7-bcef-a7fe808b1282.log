@@ -1,0 +1,22 @@
+2023-07-31 14:35:46,752 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 14:35:46,754 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 14:35:46,756 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 14:35:50,630 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 14:35:50,665 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
+2023-07-31 14:35:54,624 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
+2023-07-31 14:35:54,840 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling 'repo_name'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 608, in task_orc_execution
+    execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 38, in execute_job
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 35, in execute_job
+    download.execute_engine(prj_nm,task_id,paths_data,run_id,file_path,iter_value)
+  File "/home/nandishms/test/download.py", line 236, in execute_engine
+    raise error
+  File "/home/nandishms/test/download.py", line 222, in execute_engine
+    repo_name = config_path['repo_name']
+KeyError: 'repo_name'
+2023-07-31 14:35:54,878 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is Start
+2023-07-31 14:35:54,879 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
+2023-07-31 14:35:58,429 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent

@@ -1,0 +1,32 @@
+2023-08-01 13:17:39,391 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-08-01 13:17:39,392 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-08-01 13:17:40,343 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-08-01 13:17:40,732 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-08-01 13:17:40,762 | main_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-08-01 13:17:40,770 | main_logger | MainProcess  |        pipeline_execution     | INFO  | execution at pipeline level
+2023-08-01 13:17:40,775 | main_logger | MainProcess  |        main_job               | INFO  | success
+2023-08-01 13:17:40,776 | main_logger | MainProcess  |        main_job               | INFO  | {'aws_to_mysql_test_demo', 'rapi_to_mysql_demo', 'task_csv_to_mysql'}
+2023-08-01 13:17:40,776 | main_logger | MainProcess  |        main_job               | INFO  | reading pipeline json completed
+2023-08-01 13:17:40,776 | main_logger | MainProcess  |        pipeline_execution     | INFO  | entered inside existing previous files
+2023-08-01 13:17:40,776 | main_logger | MainProcess  |        pipeline_execution     | INFO  | previous txt file path:/home/nandishms/test/programs/projects/pipelines/text/pipeline_demo_07282023_Pipeline_d813eebe-0a6b-481c-8ed5-929bd2f8a180.txt
+2023-08-01 13:17:40,776 | main_logger | MainProcess  |        pipeline_execution     | INFO  | execution of pipeline in RESTART mode
+2023-08-01 13:17:40,779 | main_logger | MainProcess  |        pipeline_execution     | INFO  | list of tasks that are success in previous run:['rapi_to_mysql_demo']
+2023-08-01 13:17:40,781 | main_logger | MainProcess  |        pipeline_execution     | INFO  | current txt file path:/home/nandishms/test/programs/projects/pipelines/text/pipeline_demo_07282023_Pipeline_d813eebe-0a6b-481c-8ed5-929bd2f8a180.txt
+2023-08-01 13:17:40,798 | main_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-08-01 13:17:40,799 | main_logger | MainProcess  |        pipeline_execution     | INFO  |                 task_name  task_depended_on Job_Status
+0       task_csv_to_mysql                 0      Start
+1  aws_to_mysql_test_demo                 0      Start
+2      rapi_to_mysql_demo                 0    SUCCESS
+2023-08-01 13:17:40,806 | main_logger | MainProcess  |        restart_orchestration_execution | INFO  | Pipeline execution initiated
+2023-08-01 13:17:40,807 | main_logger | MainProcess  |        restart_orchestration_execution | INFO  | current txt file path:/home/nandishms/test/programs/projects/pipelines/text/pipeline_demo_07282023_Pipeline_d813eebe-0a6b-481c-8ed5-929bd2f8a180.txt
+2023-08-01 13:17:40,808 | main_logger | MainProcess  |        restart_orchestration_execution | INFO  | independent_tasks running:['aws_to_mysql_test_demo', 'task_csv_to_mysql']
+2023-08-01 13:17:40,808 | main_logger | MainProcess  |        restart_orchestration_execution | INFO  | dependent_tasks running:[]
+2023-08-01 13:17:40,808 | main_logger | MainProcess  |        independent_task_loop  | INFO  | triggering the task run aws_to_mysql_test_demo
+2023-08-01 13:17:40,809 | main_logger | MainProcess  |        independent_task_loop  | INFO  | Starting process Process_aws_to_mysql_test_demo
+2023-08-01 13:17:40,813 | main_logger | MainProcess  |        independent_task_loop  | INFO  | triggering the task run task_csv_to_mysql
+2023-08-01 13:17:40,814 | main_logger | MainProcess  |        independent_task_loop  | INFO  | Starting process Process_task_csv_to_mysql
+2023-08-01 13:17:48,459 | main_logger | MainProcess  |        orc_get_log_status     | INFO  | task_csv_to_mysql task is FAILED
+2023-08-01 13:17:48,459 | main_logger | MainProcess  |        orc_get_log_status     | INFO  | aws_to_mysql_test_demo task is FAILED
+2023-08-01 13:17:48,459 | main_logger | MainProcess  |        orc_get_log_status     | INFO  | rapi_to_mysql_demo task is SUCCESS
+2023-08-01 13:17:48,475 | main_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-08-01 13:17:48,475 | main_logger | MainProcess  |        pipeline_orc_execution | INFO  | pipeline pipeline_demo_07282023 Execution failed.

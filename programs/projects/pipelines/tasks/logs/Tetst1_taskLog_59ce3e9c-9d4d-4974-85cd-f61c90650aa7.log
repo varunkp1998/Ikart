@@ -1,0 +1,25 @@
+2023-07-31 14:55:52,223 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 14:55:52,223 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 14:55:52,223 | main_logger | MainProcess  |        create_folder_structure | ERROR | error in create_folder_structure [Errno 13] Permission denied: '/programs'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 45, in create_folder_structure
+    os.makedirs(folder, exist_ok=True)
+  File "/usr/lib/python3.10/os.py", line 215, in makedirs
+    makedirs(head, exist_ok=exist_ok)
+  File "/usr/lib/python3.10/os.py", line 225, in makedirs
+    mkdir(name, mode)
+PermissionError: [Errno 13] Permission denied: '/programs'
+2023-07-31 14:55:52,237 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download [Errno 13] Permission denied: '/programs'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 202, in execute_pipeline_download
+    create_folder_structure(prj_nm,os.path.expanduser(
+  File "/home/nandishms/test/download.py", line 50, in create_folder_structure
+    raise error
+  File "/home/nandishms/test/download.py", line 45, in create_folder_structure
+    os.makedirs(folder, exist_ok=True)
+  File "/usr/lib/python3.10/os.py", line 215, in makedirs
+    makedirs(head, exist_ok=exist_ok)
+  File "/usr/lib/python3.10/os.py", line 225, in makedirs
+    mkdir(name, mode)
+PermissionError: [Errno 13] Permission denied: '/programs'
+2023-07-31 14:55:52,237 | main_logger | MainProcess  |        <module>               | ERROR | exception occured [Errno 13] Permission denied: '/programs'

@@ -1,0 +1,110 @@
+2023-07-31 17:31:30,256 | task_logger | MainProcess  |        execute_engine         | INFO  | entered into execute_engine
+2023-07-31 17:31:30,257 | task_logger | MainProcess  |        execute_engine         | INFO  | calling the task_json_download function
+2023-07-31 17:31:31,915 | task_logger | MainProcess  |        download_task_files    | INFO  | entered into downloading task related files
+2023-07-31 17:31:43,419 | task_logger | MainProcess  |        execute_engine         | INFO  | #####################################################
+2023-07-31 17:31:43,420 | task_logger | MainProcess  |        execute_engine         | INFO  | calling the engine_main
+2023-07-31 17:31:43,420 | task_logger | MainProcess  |        engine_main            | INFO  | entered into engine_main
+2023-07-31 17:31:43,421 | task_logger | MainProcess  |        task_json_read         | INFO  | reading TASK JSON data started rest_api_test
+2023-07-31 17:31:43,422 | task_logger | MainProcess  |        task_json_read         | INFO  | reading TASK JSON data completed
+2023-07-31 17:31:43,536 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:31:43,538 | task_logger | MainProcess  |        checks_mapping_read    | INFO  | reading checks mapping json data started
+2023-07-31 17:31:43,540 | task_logger | MainProcess  |        checks_mapping_read    | INFO  | reading checks mapping data completed
+2023-07-31 17:31:54,732 | task_logger | MainProcess  |        begin_transaction      | INFO  | =================================================================
+2023-07-31 17:31:54,734 | task_logger | MainProcess  |        begin_transaction      | INFO  | Transaction Started
+2023-07-31 17:31:54,735 | task_logger | MainProcess  |        read_write_imports     | INFO  | read imports started
+2023-07-31 17:31:54,736 | task_logger | MainProcess  |        read_write_imports     | INFO  | write imports started
+2023-07-31 17:31:54,764 | task_logger | MainProcess  |        read                   | INFO  | timeouttttttttttttttttttt 100
+2023-07-31 17:31:54,766 | task_logger | MainProcess  |        read                   | INFO  | urllllllllllll https://gorest.co.in/public/v2/users/2341/posts?page=1&per_page=10
+2023-07-31 17:31:55,757 | task_logger | MainProcess  |        read                   | INFO  | URL specified in the config json is: https://gorest.co.in/public/v2...
+2023-07-31 17:31:55,761 | task_logger | MainProcess  |        read                   | INFO  | number of records present in https://gorest.co.in/public/v2... is: 1
+2023-07-31 17:31:55,849 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:31:55,852 | task_logger | MainProcess  |        write                  | INFO  | ingest data to mysql db initiated
+2023-07-31 17:32:00,264 | task_logger | MainProcess  |        db_table_exists        | ERROR | db_table_exists() is Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1408, in execute
+    meth = statement._execute_on_connection
+AttributeError: 'str' object has no attribute '_execute_on_connection'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 45, in db_table_exists
+    result = connection.execute(sql)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1410, in execute
+    raise exc.ObjectNotExecutableError(statement) from err
+sqlalchemy.exc.ObjectNotExecutableError: Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"
+2023-07-31 17:32:00,345 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:32:00,347 | task_logger | MainProcess  |        write                  | ERROR | write() is Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1408, in execute
+    meth = statement._execute_on_connection
+AttributeError: 'str' object has no attribute '_execute_on_connection'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 235, in write
+    status=create(json_data, sessions, datafram, conn_details)
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 81, in create
+    if db_table_exists(conn, target["table_name"]) is False:
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 49, in db_table_exists
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 45, in db_table_exists
+    result = connection.execute(sql)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1410, in execute
+    raise exc.ObjectNotExecutableError(statement) from err
+sqlalchemy.exc.ObjectNotExecutableError: Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"
+2023-07-31 17:32:00,417 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 17:32:00,442 | task_logger | MainProcess  |        engine_main            | WARNING | rest_api_test got failed engine
+2023-07-31 17:32:00,443 | task_logger | MainProcess  |        engine_main            | ERROR | error in  Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'".
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1408, in execute
+    meth = statement._execute_on_connection
+AttributeError: 'str' object has no attribute '_execute_on_connection'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 373, in engine_main
+    value=write(json_data, i,counter,config_file_path,task_id,run_id,
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 266, in write
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 235, in write
+    status=create(json_data, sessions, datafram, conn_details)
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 81, in create
+    if db_table_exists(conn, target["table_name"]) is False:
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 49, in db_table_exists
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 45, in db_table_exists
+    result = connection.execute(sql)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1410, in execute
+    raise exc.ObjectNotExecutableError(statement) from err
+sqlalchemy.exc.ObjectNotExecutableError: Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"
+2023-07-31 17:32:00,445 | task_logger | MainProcess  |        execute_engine         | ERROR | error in executing engine Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'".
+Traceback (most recent call last):
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1408, in execute
+    meth = statement._execute_on_connection
+AttributeError: 'str' object has no attribute '_execute_on_connection'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 263, in execute_engine
+    engine_code.engine_main(prj_nm,task_name,config_path,run_id,file_path,iter_value)
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 476, in engine_main
+    raise error
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 373, in engine_main
+    value=write(json_data, i,counter,config_file_path,task_id,run_id,
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 266, in write
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 235, in write
+    status=create(json_data, sessions, datafram, conn_details)
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 81, in create
+    if db_table_exists(conn, target["table_name"]) is False:
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 49, in db_table_exists
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/mysql_write.py", line 45, in db_table_exists
+    result = connection.execute(sql)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1410, in execute
+    raise exc.ObjectNotExecutableError(statement) from err
+sqlalchemy.exc.ObjectNotExecutableError: Not an executable object: "select table_name from information_schema.tables where table_name='rest_api_data'"

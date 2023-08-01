@@ -1,0 +1,103 @@
+2023-07-31 14:33:15,598 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 14:33:15,601 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 14:33:15,604 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 14:33:20,283 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 14:33:20,309 | main_logger | MainProcess  |        create_status_txt_file | ERROR | create_status_txt_file Cannot save file into a non-existent directory: '/home/nandishms/test/programs/ingestion_kart/pipeline/text'
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 511, in create_status_txt_file
+    df_1.to_csv(file_path1,mode='w', sep='\t',index = False, header=True)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/core/generic.py", line 3772, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/format.py", line 1186, in to_csv
+    csv_formatter.save()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/csvs.py", line 240, in save
+    with get_handle(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 737, in get_handle
+    check_parent_directory(str(handle))
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 600, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/home/nandishms/test/programs/ingestion_kart/pipeline/text'
+2023-07-31 14:33:20,346 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling Cannot save file into a non-existent directory: '/home/nandishms/test/programs/ingestion_kart/pipeline/text'.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 604, in task_orc_execution
+    file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 515, in create_status_txt_file
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 511, in create_status_txt_file
+    df_1.to_csv(file_path1,mode='w', sep='\t',index = False, header=True)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/core/generic.py", line 3772, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/format.py", line 1186, in to_csv
+    csv_formatter.save()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/csvs.py", line 240, in save
+    with get_handle(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 737, in get_handle
+    check_parent_directory(str(handle))
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 600, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/home/nandishms/test/programs/ingestion_kart/pipeline/text'
+2023-07-31 14:33:20,350 | main_logger | MainProcess  |        orchestrate_calling    | ERROR | error in orchestrate_calling local variable 'file_path' referenced before assignment.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 616, in task_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 604, in task_orc_execution
+    file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 515, in create_status_txt_file
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 511, in create_status_txt_file
+    df_1.to_csv(file_path1,mode='w', sep='\t',index = False, header=True)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/core/generic.py", line 3772, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/format.py", line 1186, in to_csv
+    csv_formatter.save()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/csvs.py", line 240, in save
+    with get_handle(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 737, in get_handle
+    check_parent_directory(str(handle))
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 600, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/home/nandishms/test/programs/ingestion_kart/pipeline/text'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 680, in orchestrate_calling
+    task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 619, in task_orc_execution
+    task_status_list = get_ind_task_status(file_path)
+UnboundLocalError: local variable 'file_path' referenced before assignment
+2023-07-31 14:33:20,353 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download local variable 'file_path' referenced before assignment.
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 616, in task_orc_execution
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 604, in task_orc_execution
+    file_path = create_status_txt_file(paths_data,task_nm,prj_nm,run_id)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 515, in create_status_txt_file
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 511, in create_status_txt_file
+    df_1.to_csv(file_path1,mode='w', sep='\t',index = False, header=True)
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/core/generic.py", line 3772, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/format.py", line 1186, in to_csv
+    csv_formatter.save()
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/formats/csvs.py", line 240, in save
+    with get_handle(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 737, in get_handle
+    check_parent_directory(str(handle))
+  File "/home/nandishms/.local/lib/python3.10/site-packages/pandas/io/common.py", line 600, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/home/nandishms/test/programs/ingestion_kart/pipeline/text'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 213, in execute_pipeline_download
+    orchestrate.orchestrate_calling(prj_nm,config_path,task_name,pipeline_name,run_id,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 689, in orchestrate_calling
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 680, in orchestrate_calling
+    task_orc_execution(prj_nm,paths_data,task_nm,run_id,log_file_path,log_file_name,
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 619, in task_orc_execution
+    task_status_list = get_ind_task_status(file_path)
+UnboundLocalError: local variable 'file_path' referenced before assignment
+2023-07-31 14:33:20,362 | main_logger | MainProcess  |        <module>               | ERROR | exception occured local variable 'file_path' referenced before assignment

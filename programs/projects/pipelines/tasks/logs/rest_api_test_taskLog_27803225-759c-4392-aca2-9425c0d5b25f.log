@@ -1,0 +1,1 @@
+2023-07-31 15:07:52,967 | main_logger | MainProcess  |        <module>               | ERROR | exception occured unterminated string literal (detected at line 162) (download.py, line 162)

@@ -1,0 +1,16 @@
+2023-08-01 10:46:35,264 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-08-01 10:46:35,265 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-08-01 10:46:36,263 | main_logger | MainProcess  |        execute_pipeline_download | ERROR | error in execute_pipeline_download 404 {"message": "Not Found", "documentation_url": "https://docs.github.com/rest/repos/contents#get-repository-content"}.
+Traceback (most recent call last):
+  File "/home/nandishms/test/download.py", line 172, in execute_pipeline_download
+    download_file_from_github(repo_name, git_branch, file_path= f'{config_path["programs"]}{prj_nm}{config_path["gh_pipeline_path"]}{pipeline_name}{JSON}',
+  File "/home/nandishms/test/master.py", line 121, in downlaod_file_from_git
+    file_contents = repo.get_contents(file_path,ref=branch).decoded_content
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Repository.py", line 2107, in get_contents
+    headers, data = self._requester.requestJsonAndCheck(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 442, in requestJsonAndCheck
+    return self.__check(
+  File "/home/nandishms/.local/lib/python3.10/site-packages/github/Requester.py", line 487, in __check
+    raise self.__createException(status, responseHeaders, data)
+github.GithubException.UnknownObjectException: 404 {"message": "Not Found", "documentation_url": "https://docs.github.com/rest/repos/contents#get-repository-content"}
+2023-08-01 10:46:36,279 | main_logger | MainProcess  |        <module>               | ERROR | exception occured 404 {"message": "Not Found", "documentation_url": "https://docs.github.com/rest/repos/contents#get-repository-content"}

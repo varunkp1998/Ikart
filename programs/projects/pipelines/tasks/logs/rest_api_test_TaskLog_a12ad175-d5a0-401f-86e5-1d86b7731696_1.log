@@ -1,0 +1,30 @@
+2023-07-31 19:07:18,353 | task_logger | MainProcess  |        execute_engine         | INFO  | entered into execute_engine
+2023-07-31 19:07:18,353 | task_logger | MainProcess  |        execute_engine         | INFO  | calling the task_json_download function
+2023-07-31 19:07:19,277 | task_logger | MainProcess  |        download_task_files    | INFO  | entered into downloading task related files
+2023-07-31 19:07:23,205 | task_logger | MainProcess  |        execute_engine         | INFO  | #####################################################
+2023-07-31 19:07:23,205 | task_logger | MainProcess  |        execute_engine         | INFO  | calling the engine_main
+2023-07-31 19:07:23,205 | task_logger | MainProcess  |        engine_main            | INFO  | entered into engine_main
+2023-07-31 19:07:23,205 | task_logger | MainProcess  |        task_json_read         | INFO  | reading TASK JSON data started rest_api_test
+2023-07-31 19:07:23,205 | task_logger | MainProcess  |        task_json_read         | INFO  | reading TASK JSON data completed
+2023-07-31 19:07:23,226 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 19:07:23,227 | task_logger | MainProcess  |        checks_mapping_read    | INFO  | reading checks mapping json data started
+2023-07-31 19:07:23,227 | task_logger | MainProcess  |        checks_mapping_read    | INFO  | reading checks mapping data completed
+2023-07-31 19:07:24,404 | task_logger | MainProcess  |        begin_transaction      | INFO  | =================================================================
+2023-07-31 19:07:24,404 | task_logger | MainProcess  |        begin_transaction      | INFO  | Transaction Started
+2023-07-31 19:07:24,404 | task_logger | MainProcess  |        read_write_imports     | INFO  | read imports started
+2023-07-31 19:07:24,404 | task_logger | MainProcess  |        read_write_imports     | INFO  | write imports started
+2023-07-31 19:07:24,407 | task_logger | MainProcess  |        read                   | INFO  | timeouttttttttttttttttttt 100
+2023-07-31 19:07:24,407 | task_logger | MainProcess  |        read                   | INFO  | urllllllllllll https://gorest.co.in/public/v2/users/2341/posts?page=1&per_page=10
+2023-07-31 19:07:25,112 | task_logger | MainProcess  |        read                   | INFO  | URL specified in the config json is: https://gorest.co.in/public/v2...
+2023-07-31 19:07:25,114 | task_logger | MainProcess  |        read                   | INFO  | number of records present in https://gorest.co.in/public/v2... is: 0
+2023-07-31 19:07:25,143 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 19:07:25,144 | task_logger | MainProcess  |        write                  | INFO  | ingest data to mysql db initiated
+2023-07-31 19:07:25,164 | task_logger | MainProcess  |        create                 | INFO  | rest_api_data19 does not exists so creating a new table
+2023-07-31 19:07:25,165 | task_logger | MainProcess  |        insert_data            | INFO  | data ingesting with audit columns
+2023-07-31 19:07:25,263 | task_logger | MainProcess  |        insert_data            | INFO  | mysql ingestion completed
+2023-07-31 19:07:25,284 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 19:07:25,284 | task_logger | MainProcess  |        trgt_record_count      | INFO  | the number of records present in target table after ingestion:0
+2023-07-31 19:07:25,287 | task_logger | MainProcess  |        engine_main            | INFO  | Transaction commited successfully!
+2023-07-31 19:07:25,288 | task_logger | MainProcess  |        engine_main            | INFO  | Task rest_api_test Execution Completed
+2023-07-31 19:07:25,308 | task_logger | MainProcess  |        audit                  | INFO  | audit status code:200
+2023-07-31 19:07:25,308 | task_logger | MainProcess  |        execute_engine         | INFO  | #####################################################

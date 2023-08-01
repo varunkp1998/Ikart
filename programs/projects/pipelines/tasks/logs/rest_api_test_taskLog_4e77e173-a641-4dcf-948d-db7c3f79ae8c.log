@@ -1,0 +1,37 @@
+2023-07-31 15:21:43,248 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
+2023-07-31 15:21:43,249 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
+2023-07-31 15:21:43,249 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
+2023-07-31 15:21:44,634 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
+2023-07-31 15:21:44,637 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
+2023-07-31 15:21:47,349 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
+2023-07-31 15:21:58,246 | main_logger | MainProcess  |        task_orc_execution     | ERROR | error in orchestrate_task_calling Invalid argument(s) 'encoding' sent to create_engine(), using configuration MySQLDialect_pymysql/QueuePool/Engine.  Please check that the keyword arguments are appropriate for this combination of components..
+Traceback (most recent call last):
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 608, in task_orc_execution
+    execute_job(prj_nm,paths_data,task_nm,run_id,file_path,iter_value)
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 38, in execute_job
+    raise error
+  File "/home/nandishms/test/src/scripts/orchestration/orchestrate.py", line 35, in execute_job
+    download.execute_engine(prj_nm,task_id,paths_data,run_id,file_path,iter_value)
+  File "/home/nandishms/test/download.py", line 242, in execute_engine
+    raise error
+  File "/home/nandishms/test/download.py", line 238, in execute_engine
+    engine_code.engine_main(prj_nm,task_name,config_path,run_id,file_path,iter_value)
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 476, in engine_main
+    raise error
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 294, in engine_main
+    session = begin_transaction(paths_data,json_data,config_file_path)
+  File "/home/nandishms/test//src/scripts/engine_main/engine_code.py", line 257, in begin_transaction
+    engine,_ = establish_conn_for_mysql(json_data,'target',config_file_path)
+  File "/home/nandishms/test//src/scripts/ingestion/connections.py", line 61, in establish_conn_for_mysql
+    raise error
+  File "/home/nandishms/test//src/scripts/ingestion/connections.py", line 54, in establish_conn_for_mysql
+    mysql_conn = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["username"]}'
+  File "<string>", line 2, in create_engine
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/util/deprecations.py", line 281, in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+  File "/home/nandishms/.local/lib/python3.10/site-packages/sqlalchemy/engine/create.py", line 680, in create_engine
+    raise TypeError(
+TypeError: Invalid argument(s) 'encoding' sent to create_engine(), using configuration MySQLDialect_pymysql/QueuePool/Engine.  Please check that the keyword arguments are appropriate for this combination of components.
+2023-07-31 15:21:58,250 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is FAILED
+2023-07-31 15:21:58,250 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
+2023-07-31 15:22:01,526 | main_logger | MainProcess  |        send_mail              | INFO  | mail sent
