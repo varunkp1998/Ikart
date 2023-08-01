@@ -29,7 +29,7 @@
       "table_name": "rest_api_data",
       "audit_columns": "inactive",
       "parameter_type": "MySQL",
-      "connection_name": "mysql_rds"
+      "connection_name": "mysql_connection_demo2"
     },
     "data_quality_execution": {
       "pre_check_enable": "N",
