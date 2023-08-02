@@ -1,0 +1,13 @@
+boto3==1.27.1
+cryptography==3.4.8
+great-expectations==0.17.2
+github==1.2.7
+pandas==2.0.3
+PyGithub==1.59.0
+PyMySQL==1.1.0
+requests==2.31.0
+SQLAlchemy==2.0.18
+python-dotenv==1.0.0
+mysql.connector==2.2.9
+pycryptodome==3.18.0
+Crypto==1.4.1
