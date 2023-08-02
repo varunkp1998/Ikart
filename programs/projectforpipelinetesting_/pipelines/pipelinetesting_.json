@@ -6,7 +6,7 @@
   "pipeline_description": "PipelineTesting ",
   "is_active": "Y",
   "tasks_details": {
-    "257_TasktotestPipeline": 0
+    "257_aws_to_mysql_test_demo": 0
   },
   "nodes": [
     {
