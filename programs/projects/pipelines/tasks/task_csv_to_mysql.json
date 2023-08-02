@@ -21,11 +21,6 @@
       "file_type": "csv",
       "chunk_size": 1000,
       "quote_char": "\"",
-      "escape_char": "none",
-      "skip_footer": " ",
-      "select_columns":" ",
-      "skip_header": " ",
-      "alias_columns": " ",
       "parameter_type": "Local Server",
       "connection_name": "localserver_connection_demo2"
     },
