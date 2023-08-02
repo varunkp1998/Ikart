@@ -5,6 +5,7 @@ import os
 import json
 import importlib
 from pathlib import Path
+import re
 import master
 from master import downlaod_file_from_git as download_file_from_github
 from master import setup_logger
@@ -106,6 +107,7 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
         homepath = str(Path(config_path['folder_path']).expanduser())
         task_logger.info("entered into downloading task related files")
         #to download task json from git
+        task_name = re.sub(r'^\d+_?', '', task_name)
         try:
             if not Path(f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}{task_name}{JSON}').exists():
                 download_file_from_github(repo_name, branch,
