@@ -30,7 +30,7 @@
     "target": {
       "target_type": "mysql_write",
       "schema": "public",
-      "operation": "replace",
+      "operation": "append",
       "table_name": "mysql_demo",
       "audit_columns": "active",
       "parameter_type": "MySQL",
