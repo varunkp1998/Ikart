@@ -112,20 +112,13 @@ def read_data_with_or_without_chunk(json_data,src_file,default_header,row_count,
         delimiter = ",", skip_header= 0, quotechar = '"', escapechar = None):
     '''read data with or without considering the json'''
     source = json_data['task']['source']
-    default_delimiter = delimiter if source["delimiter"]==" " else\
-    source["delimiter"]
-    default_skip_header = skip_header if source["skip_header"]==" " else \
-    source["skip_header"]
-    default_quotechar = quotechar if source["quote_char"]==" " else\
-    source["quote_char"]
-    default_escapechar=escapechar if source["escape_char"]=="none" \
-    else source["escape_char"]
-    default_select_cols = None if source["select_columns"]==" " else\
-    list(source["select_columns"].split(","))
-    default_alias_cols = None if source["alias_columns"]==" " else\
-    list(source["alias_columns"].split(","))
-    default_encoding = "utf-8" if source["encoding"]==" " else\
-    source["encoding"]
+    default_delimiter = delimiter if "delimiter" not in source else source["delimiter"]
+    default_skip_header = skip_header if "skip_header" not in source else source["skip_header"]
+    default_quotechar = quotechar if "quote_char" not in source else source["quote_char"]
+    default_escapechar=escapechar if "escape_char" not in source else source["escape_char"]
+    default_select_cols = None if "select_columns" not in source else list(source["select_columns"].split(","))
+    default_alias_cols = None if "alias_columns" not in source else list(source["alias_columns"].split(","))
+    default_encoding = "utf-8" if "encoding" not in source else source["encoding"]
     count1 = 0
     if source['chunk_size'] == "None":
         #chunk size must be greater than or equal to one
@@ -194,10 +187,12 @@ def read(json_data: dict,config_file_path,task_id,run_id,paths_data,file_path,
             audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
             sys.exit()
         else:
-            default_skip_header = skip_header if source["skip_header"] ==" " else \
-            source["skip_header"]
-            default_skip_footer = skip_footer if source["skip_footer"] ==" " else \
-            source["skip_footer"]
+            default_skip_header = skip_header if "skip_header" not in source else source["skip_header"]
+            default_skip_footer = skip_footer if "skip_footer" not in source else source["skip_footer"]
+            default_select_cols = None if "select_columns" not in source else \
+            list(source["select_columns"].split(","))
+            default_alias_cols = None if "alias_columns" not in source else \
+            list(source["alias_columns"].split(","))
             for file in all_files:
                 file_extension = source['file_type']
                 rows_count = get_row_count_s3(conn,bucket_name,file,file_extension)
@@ -205,18 +200,17 @@ def read(json_data: dict,config_file_path,task_id,run_id,paths_data,file_path,
                 iter_value)
                 row_count = rows_count-default_skip_header-default_skip_footer
                 src_file = conn.get_object(Bucket=bucket_name, Key=file)['Body']
-                if source["select_columns"] != " " and source["alias_columns"] != " ":
+                if default_select_cols != None and default_alias_cols != None:
                     default_header = 0
                     var = read_data_with_or_without_chunk(json_data,src_file,
                                                           default_header,row_count)
-                elif (source["select_columns"] != " " and source["alias_columns"] == " ") or \
-                (source["select_columns"] == " " and source["alias_columns"] != " "):
-                    default_header = 'infer' if source["alias_columns"]== " " else 0
+                elif (default_select_cols != None and default_alias_cols == None) or \
+                (default_select_cols == None and default_alias_cols != None):
+                    default_header = 'infer' if default_alias_cols == None else 0
                     var = read_data_with_or_without_chunk(json_data,src_file,
                                                             default_header,row_count)
-                elif source["select_columns"] == " " and source["alias_columns"] == " ":
-                    default_header ='infer' if source["alias_columns"] ==\
-                    " " else None
+                elif default_select_cols == None and default_alias_cols == None:
+                    default_header ='infer' if default_alias_cols == None else None
                     var = read_data_with_or_without_chunk(json_data,src_file,
                                                           default_header,row_count)
                 return var
