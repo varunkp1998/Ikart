@@ -9,13 +9,11 @@ import master
 from master import downlaod_file_from_git as download_file_from_github
 from master import setup_logger
 
-
 args = master.parse_arguments()
 GIT_BRANCH = args.git_branch
 main_logger = logging.getLogger('main_logger')
 task_logger = logging.getLogger('task_logger')
 JSON = ".json"
-
 
 def create_folder_structure(prj_nm, path: str,paths_data:str):
     """Function to create program folder structure in server"""
@@ -49,7 +47,6 @@ def create_folder_structure(prj_nm, path: str,paths_data:str):
         main_logger.exception("error in create_folder_structure %s.", str(error))
         raise error
 
-# variables in config.path needs in lowercase GH_ should be gh_
 def required_files_download(paths_data:str,repo_name,branch):
     """Function to download engine_code.py,checks_mapping.json,mapping.json,
     definitions_qc,utility from Github to server"""
@@ -78,15 +75,21 @@ def required_files_download(paths_data:str,repo_name,branch):
                 "gh_definitions_qc_path"],save_dir =home_path+paths_data["dq_scripts_path"])
             main_logger.info("downloading of definitions_qc code completed!")
         if not Path(home_path+paths_data["ingestion_path"]+'utility.py').exists():
-            main_logger.info("downloading of utility code started...")
-            download_file_from_github(repo_name,branch, file_path=paths_data[
-                "gh_utility_path"],save_dir =home_path+paths_data["ingestion_path"])
-            main_logger.info("downloading of utility code completed!")
+            try:
+                main_logger.info("downloading of utility code started...")
+                download_file_from_github(repo_name,branch, file_path=paths_data[
+                    "gh_utility_path"],save_dir =home_path+paths_data["ingestion_path"])
+                main_logger.info("downloading of utility code completed!")
+            except Exception as error:
+                main_logger.info("error in downloading of utility code %s", str(error))
         if not Path(home_path+paths_data["ingestion_path"]+'connections.py').exists():
-            main_logger.info("downloading of connections code started...")
-            download_file_from_github(repo_name,branch, file_path=paths_data[
-                "gh_connections_path"],save_dir =home_path+paths_data["ingestion_path"])
-            main_logger.info("downloading of connections code completed!")
+            try:
+                main_logger.info("downloading of connections code started...")
+                download_file_from_github(repo_name,branch, file_path=paths_data[
+                    "gh_connections_path"],save_dir =home_path+paths_data["ingestion_path"])
+                main_logger.info("downloading of connections code completed!")
+            except Exception as error:
+                main_logger.info("error in downloading of connections code %s", str(error))
         if not Path(home_path+paths_data["orchestration_path"]+'orchestrate.py').exists():
             main_logger.info("downloading of orchestarte code started...")
             download_file_from_github(repo_name,branch, file_path=paths_data[
@@ -96,40 +99,20 @@ def required_files_download(paths_data:str,repo_name,branch):
         main_logger.exception("error in common_downloads %s.", str(error))
         raise error
 
-def download_read_write_files(task_json,config_json,repo_name,branch):
-    """function to download source.py, target.py
-    files from github to server for execution"""
-    try:
-
-        source_type = task_json['task']['source']['source_type']
-        target_type = task_json['task']['target']['target_type']
-        with open(r""+os.path.expanduser(config_json["folder_path"])+config_json[
-        "engine_path"]+'mapping.json',"r",encoding='utf-8') as mapjson:
-            config_new_json = json.load(mapjson)
-        source_file_name=config_new_json["mapping"][source_type]
-        target_file_name= config_new_json["mapping"][target_type]
-        download_file_from_github(repo_name, branch,file_path = config_json["gh_source_ingestion_path"]+ \
-        source_file_name,  save_dir = config_json["folder_path"]+config_json["ingestion_path"])
-
-        download_file_from_github(repo_name, branch,file_path = config_json["gh_target_ingestion_path"]+ \
-        target_file_name,  save_dir = config_json["folder_path"]+config_json["ingestion_path"])
-    except Exception as error:
-        task_logger.exception("error in download_task_source_target_files %s.", str(error))
-        raise error
-
 def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch):
     """function to download source_connection, target_connection, source.py, target.py
     files from github to server for execution"""
     try:
         homepath = str(Path(config_path['folder_path']).expanduser())
-
-        #to download task json from git
-        if not Path(f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}{task_name}{JSON}').exists():
-            download_file_from_github(repo_name, branch,
-            file_path=f'{config_path["programs"]}{prj_nm}{config_path["gh_tasks_path"]}{task_name}{JSON}',
-            save_dir = f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}') 
-
         task_logger.info("entered into downloading task related files")
+        #to download task json from git
+        try:
+            if not Path(f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}{task_name}{JSON}').exists():
+                download_file_from_github(repo_name, branch,
+                file_path=f'{config_path["programs"]}{prj_nm}{config_path["gh_tasks_path"]}{task_name}{JSON}',
+                save_dir = f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}')
+        except Exception as error:
+            main_logger.error("Task name not found in the git hub: %s",task_name)
         try:
             with open(r""+os.path.expanduser(config_path["folder_path"])+config_path[
             "programs"]+prj_nm+config_path["task_json_path"]+task_name+JSON,"r",
@@ -138,25 +121,28 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
         except FileNotFoundError as exc:
             task_logger.warning("the %s.json path or folder specified does not exists",task_name)
             raise exc
-
          #to download task source connection files
         if (task_json['task']['source']['source_type'])  not in ("csv_read","csvfile_read",
         "excel_read","parquet_read","json_read","xml_read","text_read"):
             source_conn_file_name = task_json['task']['source']['connection_name']
             if not Path(f'{config_path["folder_path"]}{config_path["conn_path"]}{source_conn_file_name}{JSON}').exists():
-                download_file_from_github(repo_name, branch,
-                file_path = f'{config_path["gh_connections_json_path"]}{source_conn_file_name}{JSON}',
-                save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
-
+                try:
+                    download_file_from_github(repo_name, branch,
+                    file_path = f'{config_path["gh_connections_json_path"]}{source_conn_file_name}{JSON}',
+                    save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
+                except Exception as error:
+                    task_logger.error("source connection file not found in the git hub: %s", source_conn_file_name)
         #to download task target connection files
         if (task_json['task']['target']['target_type'])  not in ("csv_write","csvfile_write",
         "parquet_write","excel_write","json_write","xml_write","text_write"):
             target_conn_file_name = task_json['task']['target']['connection_name']
             if not Path(f'{config_path["folder_path"]}{config_path["conn_path"]}{target_conn_file_name}{JSON}').exists():
-                download_file_from_github(repo_name, branch,
-                file_path = f'{config_path["gh_connections_json_path"]}{target_conn_file_name}{JSON}',
-                save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
-
+                try:
+                    download_file_from_github(repo_name, branch,
+                    file_path = f'{config_path["gh_connections_json_path"]}{target_conn_file_name}{JSON}',
+                    save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
+                except Exception as error:
+                    task_logger.error("target connection file not found in the git hub: %s",target_conn_file_name)
         # to download read and write script files
         source_type = task_json['task']['source']['source_type']
         target_type = task_json['task']['target']['target_type']
@@ -167,13 +153,19 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
         target_file_name= config_new_json["mapping"][target_type] 
 
         if not Path(homepath+config_path["ingestion_path"]+source_file_name).exists():
-            download_file_from_github(repo_name, branch,
-            file_path = config_path["gh_source_ingestion_path"]+source_file_name,
-            save_dir = config_path["folder_path"]+config_path["ingestion_path"])
+            try:
+                download_file_from_github(repo_name, branch,
+                file_path = config_path["gh_source_ingestion_path"]+source_file_name,
+                save_dir = config_path["folder_path"]+config_path["ingestion_path"])
+            except Exception as error:
+                main_logger.error("%s not found in the github repository",source_file_name)
         if not Path(homepath+config_path["ingestion_path"]+target_file_name).exists():
-            download_file_from_github(repo_name, branch,
-            file_path = config_path["gh_target_ingestion_path"]+target_file_name,
-            save_dir = config_path["folder_path"]+config_path["ingestion_path"])
+            try:
+                download_file_from_github(repo_name, branch,
+                file_path = config_path["gh_target_ingestion_path"]+target_file_name,
+                save_dir = config_path["folder_path"]+config_path["ingestion_path"])
+            except Exception as error:
+                main_logger.error("%s not found in the github repository",target_file_name)
     except Exception as error:
         task_logger.exception("error in download_task_files %s.", str(error))
         raise error
@@ -188,7 +180,8 @@ def execute_pipeline_download(prj_nm,config_path:str,task_name:str,pipeline_name
         create_folder_structure(prj_nm,os.path.expanduser(
             config_path["folder_path"]),config_path)
         if task_name is None :
-            download_file_from_github(repo_name, git_branch, file_path= f'{config_path["programs"]}{prj_nm}{config_path["gh_pipeline_path"]}{pipeline_name}{JSON}', 
+            download_file_from_github(repo_name, git_branch, 
+            file_path= f'{config_path["programs"]}{prj_nm}{config_path["gh_pipeline_path"]}{pipeline_name}{JSON}', 
             save_dir =f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_pipeline_path"]}')
 
         main_logger.info("calling the common_files_downloads function")
