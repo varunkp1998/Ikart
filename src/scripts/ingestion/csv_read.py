@@ -49,22 +49,14 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
             audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
             sys.exit()
         else:
-            default_delimiter = delimiter if source["delimiter"]==" " else\
-            source["delimiter"]
-            default_skip_header = skip_header if source["skip_header"]\
-            ==" " else source["skip_header"]
-            default_skip_footer = skip_footer if source["skip_footer"]\
-            ==" " else source["skip_footer"]
-            default_quotechar = quotechar if source["quote_char"]==" " else\
-            source["quote_char"]
-            default_escapechar=escapechar if source["escape_char"]=="none" \
-            else source["escape_char"]
-            default_select_cols = None if source["select_columns"]==" " else\
-            list(source["select_columns"].split(","))
-            default_alias_cols = None if source["alias_columns"]==" " else\
-            list(source["alias_columns"].split(","))
-            default_encoding = "utf-8" if source["encoding"]==" " else\
-            source["encoding"]
+            default_delimiter = delimiter if "delimiter" not in source else source["delimiter"]
+            default_skip_header = skip_header if "skip_header" not in source else source["skip_header"]
+            default_skip_footer = skip_footer if "skip_footer" not in source else source["skip_footer"]
+            default_quotechar = quotechar if "quote_char" not in source else source["quote_char"]
+            default_escapechar=escapechar if "escape_char" not in source else source["escape_char"]
+            default_select_cols = None if "select_columns" not in source else list(source["select_columns"].split(","))
+            default_alias_cols = None if "alias_columns" not in source else list(source["alias_columns"].split(","))
+            default_encoding = "utf-8" if "encoding" not in source else source["encoding"]
             for file in all_files:
                 data = pd.read_csv(filepath_or_buffer = file,encoding=default_encoding,
                 low_memory=False)
@@ -72,10 +64,8 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
                 iter_value)
                 row_count = data.shape[0]-default_skip_header-default_skip_footer
                 count1 = 0
-                if source["select_columns"] != " " and \
-                source["alias_columns"] != " ":
+                if default_select_cols != None and default_alias_cols != None:
                     default_header = 0
-                    # print(row_count)
                     for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
                     header = default_header,engine='python',sep = default_delimiter,
                     usecols = default_select_cols, skiprows = default_skip_header,nrows = row_count,
@@ -84,13 +74,10 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
                     encoding = default_encoding):
                         count1 = 1 + count1
                         task_logger.info(ITERATION , str(count1))
-                        # print(list(chunk.columns))
                         yield chunk
-                elif (source["select_columns"] != " " and source["alias_columns"] == " ") or \
-                (source["select_columns"] == " " and source["alias_columns"] != " "):
-                    default_header = 'infer' if source[
-                        "alias_columns"]== " " else 0
-                    # print(row_count)
+                elif (default_select_cols != None and default_alias_cols == None) or \
+                (default_select_cols == None and default_alias_cols != None):
+                    default_header = 'infer' if default_alias_cols == None else 0
                     for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
                     header = default_header,sep = default_delimiter, usecols = default_select_cols,
                     skiprows = default_skip_header,nrows = row_count,
@@ -99,12 +86,9 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
                     encoding = default_encoding):
                         count1 = 1 + count1
                         task_logger.info(ITERATION , str(count1))
-                        # print(list(chunk.columns))
                         yield chunk
-                elif source["select_columns"] == " " and \
-                source["alias_columns"] == " ":
-                    default_header ='infer' if source["alias_columns"] ==\
-                     " " else None
+                elif default_select_cols == None and default_alias_cols == None:
+                    default_header ='infer' if default_alias_cols == None else None
                     # print(row_count)
                     for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
                     header = default_header,sep = default_delimiter, usecols = default_select_cols,
