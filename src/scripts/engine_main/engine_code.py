@@ -5,13 +5,11 @@ import sys
 import os
 from datetime import datetime
 import zipfile
-import subprocess
 import importlib
 import requests
 import urllib3
 import pandas as pd
 from sqlalchemy.orm import sessionmaker
-import mysql.connector
 
 task_logger = logging.getLogger('task_logger')
 FAIL_LOG_STATEMENT = "%s got failed engine"
@@ -61,30 +59,6 @@ def audit(json_data, task_name,run_id,status,value,itervalue,seq_no=None):
     except Exception as error:
         task_logger.exception("error in audit %s.", str(error))
         raise error
-
-def download_audit_conn_json(path_data:str):
-    """Function to download audit config JSON from Github to server"""
-    try:
-        # print("downloading audit_conn.json from Github started..")
-        audit_conn_json_path= os.path.expanduser(path_data["folder_path"])
-        # print("path:%s",audit_conn_json_path)
-        path_check = audit_conn_json_path+path_data["mysql_audit_json_conn_nm"]
-        is_exist = os.path.exists(path_check)
-        # print('audit_conn.json file exists: %s', is_exist)
-        if is_exist is False:
-            git_url=path_data["GH_audit_conn_json_path"]
-            response1 = requests.get(git_url,timeout=60)
-            if response1.status_code != 200:
-                logging.error("The audit config json file %s DOES NOT exists in the GITHUB "
-                "repository \n PROCESS got ABORTED",path_data["mysql_audit_json_conn_nm"])
-                sys.exit()
-            else:
-                dwn_json = ['curl', '-o',audit_conn_json_path+path_data["mysql_audit_json_conn_nm"],
-                path_data["GH_audit_conn_json_path"]]
-                subprocess.call(dwn_json)
-    except Exception as error1:
-        logging.exception("error in download_pipeline_json %s.", str(error1))
-        raise error1
 
 def task_json_read(paths_data,task_id,prj_nm):
     """function to read task json"""
@@ -187,45 +161,20 @@ def postcheck_status(paths_json_data,task_json_data,run_id):
     '''function to check whether all the checks has been passed
     or failed at target level'''
     try:
-        download_audit_conn_json(paths_json_data)
-        utility_ing_path=paths_json_data["folder_path"]+paths_json_data[
-            "ingestion_path"]
-        sys.path.insert(0, utility_ing_path)
-        module = importlib.import_module("utility")
-        decrypt = getattr(module, "decrypt")
-        get_config_section = getattr(module, "get_config_section")
-        config_file_path = os.path.expanduser(paths_json_data["folder_path"])+\
-        paths_json_data["mysql_audit_json_conn_nm"]
-        conn_details = get_config_section(config_file_path)
-        pass_word = decrypt(conn_details["password"])
-        mydb = mysql.connector.connect(
-            host=conn_details["hostname"],
-            user=conn_details["username"],
-            password=pass_word,
-            database=conn_details["database"])
-        # Create cursor object
-        cursor = mydb.cursor()
-        seq_nos = [item['seq_no'] for item in task_json_data['task'][
-            'data_quality'] if item['type'] == 'post_check']
-        query = f"SELECT audit_value FROM config.tbl_etl_audit WHERE\
-        run_id = '{run_id}' AND audit_type = 'RESULT' AND sequence IN ({','.join(seq_nos)});"
-        cursor.execute(query)
-        result = cursor.fetchall()
-        # Close cursor and database connection
-        cursor.close()
-        mydb.close()
-        return result
-    except mysql.connector.Error as err:
-        if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-            task_logger.error("Something is wrong with audit config username or password")
-        elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
-            task_logger.error("Database does not exist")
+        seq_nos = [item['seq_no'] for item in task_json_data['task']['data_quality'] if item['type'] == 'post_check']
+        seq_nos_str = ','.join(seq_nos)
+        url = f"{paths_json_data['audit_api_url']}/getPostCheckResult/{run_id}/{seq_nos_str}"
+        task_logger.info("URL from API: %s", url)    
+        response = requests.get(url, timeout=100) 
+        if response.status_code == 200:
+            task_logger.info("Task name from API response: %s", response.json())
+            result = response.json()
         else:
-            task_logger.error("Error:%s ", err)
-        raise err
-    except Exception as error1:
-        task_logger.exception("execute_query() is %s.", str(error1))
-        raise error1
+            task_logger.info("Request failed with status code: %s", response.status_code)
+        return result
+    except Exception as error:
+        task_logger.exception("postcheck_status() is %s.", str(error))
+        raise error
 
 def archive_files(inp_file_names, out_zip_file):
     """Function to Archive files"""
@@ -436,7 +385,8 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
             if dq_execution['post_check_enable'] == 'Y':
                 result = postcheck_status(paths_data,json_data,run_id)
                 # Checking if all results are 'PASS'
-                all_pass = all(item[0] == 'PASS' for item in result)
+                # all_pass = all(item[0] == 'PASS' for item in result)
+                all_pass = all(item.get('audit_value', '') == 'PASS' for item in result)
                 if all_pass:
                     if target['target_type'] in {'mysql_write',
                     'snowflake_write','postgres_write','sqlserver_write'}:
