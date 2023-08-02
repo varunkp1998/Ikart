@@ -21,10 +21,6 @@
       "file_type": "csv",
       "chunk_size": 1000,
       "quote_char": "\"",
-      "escape_char": "none",
-      "skip_footer": " ",
-      "skip_header": " ",
-      "alias_columns": " ",
       "parameter_type": "AWS S3",
       "select_columns": "ORDERNUMBER,QUANTITYORDERED,PRICEEACH,ORDERLINENUMBER,SALES,ORDERDATE",
       "connection_name": "aws_connection_new1"
