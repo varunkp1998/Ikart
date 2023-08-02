@@ -1,7 +1,0 @@
-2023-08-01 13:42:39,809 | main_logger | MainProcess  |        <module>               | INFO  | Master execution started
-2023-08-01 13:42:39,809 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the create_folder_structure function
-2023-08-01 13:42:39,809 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the common_files_downloads function
-2023-08-01 13:42:40,117 | main_logger | MainProcess  |        execute_pipeline_download | INFO  | calling the orchestrate_calling function
-2023-08-01 13:42:40,129 | main_logger | MainProcess  |        task_orc_execution     | INFO  | execution at task level
-2023-08-01 13:42:42,201 | main_logger | MainProcess  |        get_ind_task_status    | INFO  | rest_api_test task is FAILED
-2023-08-01 13:42:42,201 | main_logger | MainProcess  |        task_orc_execution     | INFO  | Task rest_api_test Execution failed.
