@@ -1,4 +1,5 @@
 """ importing modules """
+from distutils.util import run_2to3
 import json
 import logging
 import sys
@@ -9,6 +10,7 @@ import importlib
 import requests
 import urllib3
 import pandas as pd
+import re
 from sqlalchemy.orm import sessionmaker
 
 task_logger = logging.getLogger('task_logger')
@@ -62,6 +64,7 @@ def audit(json_data, task_name,run_id,status,value,itervalue,seq_no=None):
 
 def task_json_read(paths_data,task_id,prj_nm):
     """function to read task json"""
+    task_id = re.sub(r'^\d+_?', '', task_id)
     try:
         with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data["programs"]+prj_nm+\
         paths_data["task_json_path"]+task_id+".json","r",encoding='utf-8') as jsonfile:
@@ -120,6 +123,7 @@ def task_failed(task_id,file_path,json_data,run_id,iter_value):
 def task_success(task_id,file_path,json_data,run_id,iter_value):
     """function to log and audit if task is success"""
     try:
+        task_id = re.sub(r'^\d+_?', '', task_id)
         write_to_txt1(task_id,'SUCCESS',file_path)
         audit(json_data,task_id,run_id,'STATUS','COMPLETED',
                 iter_value)
@@ -164,10 +168,9 @@ def postcheck_status(paths_json_data,task_json_data,run_id):
         seq_nos = [item['seq_no'] for item in task_json_data['task']['data_quality'] if item['type'] == 'post_check']
         seq_nos_str = ','.join(seq_nos)
         url = f"{paths_json_data['audit_api_url']}/getPostCheckResult/{run_id}/{seq_nos_str}"
-        task_logger.info("URL from API: %s", url)    
+        task_logger.info("URL from API: %s", url[:30]+" ...")    
         response = requests.get(url, timeout=100) 
         if response.status_code == 200:
-            task_logger.info("Task name from API response: %s", response.json())
             result = response.json()
         else:
             task_logger.info("Request failed with status code: %s", response.status_code)
@@ -224,6 +227,7 @@ def begin_transaction(paths_data,json_data,config_file_path):
 def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
     """function consists of pre_checks,conversion,ingestion,post_checks, qc report"""
     try:
+        task_id = re.sub(r'^\d+_?', '', task_id)
         task_logger.info("entered into engine_main")
         json_data = task_json_read(paths_data,task_id,prj_nm)
         write_to_txt1(task_id,'STARTED',file_path)
