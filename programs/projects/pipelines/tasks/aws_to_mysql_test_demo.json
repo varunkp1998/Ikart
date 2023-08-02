@@ -24,7 +24,6 @@
       "escape_char": "none",
       "skip_footer": 0,
       "skip_header": 0,
-      "alias_columns": " ",
       "parameter_type": "AWS S3",
       "select_columns": "ORDERNUMBER,QUANTITYORDERED,PRICEEACH,ORDERLINENUMBER,SALES,ORDERDATE",
       "connection_name": "aws_connection_new1"
