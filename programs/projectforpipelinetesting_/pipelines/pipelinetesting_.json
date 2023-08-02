@@ -1,0 +1,46 @@
+{
+  "pipeline_id": 118,
+  "project_id": 163,
+  "pipeline_name": "PipelineTesting ",
+  "pipeline_cd": "1",
+  "pipeline_description": "PipelineTesting ",
+  "is_active": "Y",
+  "tasks_details": {
+    "257_TasktotestPipeline": 0
+  },
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    },
+    {
+      "id": "257",
+      "data": {
+        "label": "257-TasktotestPipeline"
+      },
+      "position": {
+        "x": 50,
+        "y": 1300
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    }
+  ],
+  "edges": [
+    {
+      "id": "flow-0-257",
+      "source": "0",
+      "target": "257"
+    }
+  ],
+  "created_dttm": "2023-08-02T08:30:56.265Z",
+  "updated_dttm": "2023-08-02T08:30:56.265Z"
+}
