@@ -113,8 +113,10 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
                 download_file_from_github(repo_name, branch,
                 file_path=f'{config_path["programs"]}{prj_nm}{config_path["gh_tasks_path"]}{task_name}{JSON}',
                 save_dir = f'{homepath}{"/"}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}')
-        except Exception as error:
+        except Exception:
             main_logger.error("Task name not found in the git hub: %s",task_name)
+            main_logger.warning("Process Aborted.")
+            sys.exit()
         try:
             with open(r""+os.path.expanduser(config_path["folder_path"])+config_path[
             "programs"]+prj_nm+config_path["task_json_path"]+task_name+JSON,"r",
@@ -132,8 +134,10 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
                     download_file_from_github(repo_name, branch,
                     file_path = f'{config_path["gh_connections_json_path"]}{source_conn_file_name}{JSON}',
                     save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
-                except Exception as error:
+                except Exception:
                     task_logger.error("source connection file not found in the git hub: %s", source_conn_file_name)
+                    task_logger.warning("Process Aborted.")
+                    sys.exit()
         #to download task target connection files
         if (task_json['task']['target']['target_type'])  not in ("csv_write","csvfile_write",
         "parquet_write","excel_write","json_write","xml_write","text_write"):
@@ -143,8 +147,10 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
                     download_file_from_github(repo_name, branch,
                     file_path = f'{config_path["gh_connections_json_path"]}{target_conn_file_name}{JSON}',
                     save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
-                except Exception as error:
+                except Exception:
                     task_logger.error("target connection file not found in the git hub: %s",target_conn_file_name)
+                    task_logger.warning("Process Aborted.")
+                    sys.exit()
         # to download read and write script files
         source_type = task_json['task']['source']['source_type']
         target_type = task_json['task']['target']['target_type']
@@ -161,6 +167,7 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
                 save_dir = config_path["folder_path"]+config_path["ingestion_path"])
             except Exception as error:
                 main_logger.error("%s not found in the github repository",source_file_name)
+                raise error
         if not Path(homepath+config_path["ingestion_path"]+target_file_name).exists():
             try:
                 download_file_from_github(repo_name, branch,
@@ -168,9 +175,10 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
                 save_dir = config_path["folder_path"]+config_path["ingestion_path"])
             except Exception as error:
                 main_logger.error("%s not found in the github repository",target_file_name)
+                raise error
     except Exception as error:
         task_logger.exception("error in download_task_files %s.", str(error))
-        raise error
+        sys.exit()
 
 def execute_pipeline_download(prj_nm,config_path:str,task_name:str,pipeline_name:str,run_id:str,
     log_file_path,log_file_name,mode,git_branch,iter_value = "1"):
