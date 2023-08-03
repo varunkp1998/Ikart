@@ -1,0 +1,13 @@
+{
+  "id": 105,
+  "project_id": 40,
+  "pipeline_name": "testPipe",
+  "pipeline_cd": "TP1",
+  "pipeline_description": "testPipe desctt",
+  "pipeline_sequence": 31,
+  "is_active": "Y",
+  "created_by": "system",
+  "created_dttm": "2023-08-03T05:38:31.000Z",
+  "updated_by": "system",
+  "updated_dttm": "2023-08-03T05:39:26.000Z"
+}
