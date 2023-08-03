@@ -162,6 +162,7 @@ if __name__ == "__main__":
         except Exception as error:
             logging.exception("error in reading paths json %s.", str(error))
             raise error
+        print("downloading of files started from this branch: %s", git_branch)
         load_dotenv(config_paths["folder_path"]+"env") 
         github_repo_name=config_paths["github_repo_name"]
         repo_path=config_paths["repo_path"]
@@ -182,14 +183,11 @@ if __name__ == "__main__":
             dir_path = Path(f"{home_path}{'/'}{config_paths['programs']}{project_name}{config_paths['pipeline_log_path']}")
             dir_path.mkdir(parents=True, exist_ok=True)
         pipeline_log_path = str(home_path)+"/"+config_paths["programs"] + project_name +config_paths['pipeline_log_path']
-
-
         # check if the task log path exists if not create log folder
         if not Path(f"{home_path}{'/'}{config_paths['programs']}{project_name}{config_paths['task_log_path']}").exists():
             dir_path = Path(f"{home_path}{'/'}{config_paths['programs']}{project_name}{config_paths['task_log_path']}")
             dir_path.mkdir(parents=True, exist_ok=True)
         task_log_path =str(home_path)+"/"+config_paths["programs"] + project_name +config_paths['task_log_path']
-
         # Download the download.py from git.
         if not Path(f'{home_path}{"/"}{"download.py"}').exists():
             print("download.py file downloading operation started...")
