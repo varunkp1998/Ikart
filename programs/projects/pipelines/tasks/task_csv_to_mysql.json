@@ -17,7 +17,7 @@
       "encoding": "utf-8",
       "delimiter": ",",
       "file_name": "sales",
-      "file_path": "/home/puneeths/ingestion/Program/ingestion_kart/Pipeline/Task/source_files/",
+      "file_path": "/home/nandishms/backend_project/Program/ingestion_kart/Pipeline/Task/target_files/",
       "file_type": "csv",
       "chunk_size": 1000,
       "quote_char": "\"",
