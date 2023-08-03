@@ -203,7 +203,7 @@ if __name__ == "__main__":
             audit_state = execute_query(config_paths,pipeline_name)
             if audit_state:
                 for audit_data in audit_state:
-                    if audit_data['audit_value'] != 'COMPLETED':
+                    if audit_data['audit_value'] != 'COMPLETED' and restart is True:
                         run_id = audit_data['run_id']
                         ITER_VALUE = str(int(audit_data['iteration']) + 1)
                         MODE = "RESTART"
