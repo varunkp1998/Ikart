@@ -1,0 +1,13 @@
+{
+  "id": null,
+  "pipeline_id": 118,
+  "task_name": "Aws_mysql",
+  "task_description": "Aws_mysql",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "is_active": "Y",
+  "created_by": "admin",
+  "created_dttm": "2023-07-07T08:16:57.000Z",
+  "updated_by": "admin",
+  "updated_dttm": "2023-07-07T08:16:57.000Z"
+}
