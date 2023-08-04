@@ -31,10 +31,11 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
     try:
         source = json_data["task"]["source"]
         task_logger.info("reading csv initiated...")
-        path = source["file_path"]+\
-        source["file_name"]
+        path = source["file_path"]+source["file_name"]
         # function for reading files present in a folder with different csv formats
-        all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}*.csv',
+        # all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}*.csv',
+        # f'{path}*.csv.zip', f'{path}*.gz', f'{path}*.bz2') ] for f in f_]
+        all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}',
         f'{path}*.csv.zip', f'{path}*.gz', f'{path}*.bz2') ] for f in f_]
         task_logger.info("list of files which were read")
         task_logger.info(all_files)
@@ -54,6 +55,8 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
             default_skip_footer = skip_footer if "skip_footer" not in source else source["skip_footer"]
             default_quotechar = quotechar if "quote_char" not in source else source["quote_char"]
             default_escapechar=escapechar if "escape_char" not in source else source["escape_char"]
+            default_escapechar = "\t" if default_escapechar == "\\t" else default_escapechar
+            default_escapechar = "\n" if default_escapechar == "\\n" else default_escapechar
             default_select_cols = None if "select_columns" not in source else list(source["select_columns"].split(","))
             default_alias_cols = None if "alias_columns" not in source else list(source["alias_columns"].split(","))
             default_encoding = "utf-8" if "encoding" not in source else source["encoding"]
@@ -64,7 +67,7 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
                 iter_value)
                 row_count = data.shape[0]-default_skip_header-default_skip_footer
                 count1 = 0
-                if default_select_cols != None and default_alias_cols != None:
+                if default_select_cols is not None and default_alias_cols is None:
                     default_header = 0
                     for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
                     header = default_header,engine='python',sep = default_delimiter,
@@ -75,9 +78,9 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
                         count1 = 1 + count1
                         task_logger.info(ITERATION , str(count1))
                         yield chunk
-                elif (default_select_cols != None and default_alias_cols == None) or \
-                (default_select_cols == None and default_alias_cols != None):
-                    default_header = 'infer' if default_alias_cols == None else 0
+                elif (default_select_cols is not None and default_alias_cols is None) or \
+                (default_select_cols is None and default_alias_cols is not None):
+                    default_header = 'infer' if default_alias_cols is None else 0
                     for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
                     header = default_header,sep = default_delimiter, usecols = default_select_cols,
                     skiprows = default_skip_header,nrows = row_count,
@@ -87,8 +90,8 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
                         count1 = 1 + count1
                         task_logger.info(ITERATION , str(count1))
                         yield chunk
-                elif default_select_cols == None and default_alias_cols == None:
-                    default_header ='infer' if default_alias_cols == None else None
+                elif default_select_cols is None and default_alias_cols is None:
+                    default_header ='infer' if default_alias_cols is None else None
                     # print(row_count)
                     for chunk in pd.read_csv(filepath_or_buffer = file, names = default_alias_cols,
                     header = default_header,sep = default_delimiter, usecols = default_select_cols,
