@@ -16,7 +16,7 @@
       "source_type": "aws_s3_read",
       "encoding": "utf-8",
       "delimiter": ",",
-      "file_name": "organizations-1000.csv",
+      "file_name": "userdata.csv",
       "file_path": "ingest/",
       "file_type": "csv",
       "chunk_size": 1000,
@@ -55,7 +55,7 @@
         "seq_no": "1",
         "check": "column_values_to_not_be_null",
         "parameters": {
-          "column": "Organization"
+          "column": "gender"
         },
         "active": "Y",
         "ignore_bad_records": "Y",
