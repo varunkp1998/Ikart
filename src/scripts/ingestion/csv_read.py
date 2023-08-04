@@ -33,9 +33,7 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
         task_logger.info("reading csv initiated...")
         path = source["file_path"]+source["file_name"]
         # function for reading files present in a folder with different csv formats
-        # all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}*.csv',
-        # f'{path}*.csv.zip', f'{path}*.gz', f'{path}*.bz2') ] for f in f_]
-        all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}',
+        all_files = [f for f_ in [glob.glob(e) for e in (f'{path}*.zip',f'{path}*.csv',
         f'{path}*.csv.zip', f'{path}*.gz', f'{path}*.bz2') ] for f in f_]
         task_logger.info("list of files which were read")
         task_logger.info(all_files)
