@@ -23,10 +23,8 @@
       "quote_char": "\"",
       "escape_char": "none",
       "skip_footer": 0,
-      "skip_header": 1,
-      "alias_columns": "no",
+      "skip_header": 0,
       "parameter_type": "AWS S3",
-      "select_columns": "*",
       "connection_name": "new_AWSS3_connection_new"
     },
     "target": {
