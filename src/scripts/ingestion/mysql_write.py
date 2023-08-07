@@ -37,11 +37,12 @@ WITH_OUT_AUDIT_COLUMNS = "data ingesting with out audit columns"
 #         task_logger.exception("establish_conn() is %s", str(error))
 #         raise error
 
-def db_table_exists(sessions: dict, tablename: str)-> bool:
+def db_table_exists(sessions: dict, schema: str, tablename: str)-> bool:
     """ function for checking whether a table exists or not in mysql """
     try:
         # checking whether the table exists in database or not
-        sql = text(f"select table_name from information_schema.tables where table_name='{tablename}'")
+        sql = text(f"select table_name from information_schema.tables where table_name='{tablename}'"\
+            f"and table_schema='{schema}'")
         connection = sessions.connection()
         result = connection.execute(sql)
         return bool(result.rowcount)
@@ -60,7 +61,7 @@ def insert_data(json_data,conn_details,dataframe,sessions):
             dataframe['UPDT_BY']= " "
             dataframe['UPDT_DTTM']= " "
             task_logger.info(WITH_AUDIT_COLUMNS)
-            dataframe.to_sql(target["table_name"], connection,
+            dataframe.to_sql(target["table_name"], connection, schema = target["schema"],
             index = False, if_exists = "append")
             task_logger.info(MYSQL_LOG_STATEMENT)
         else:
@@ -79,7 +80,7 @@ def create(json_data: dict, conn, dataframe,conn_details:str)-> bool:
     """if table is not present , it will create"""
     try:
         target = json_data["task"]["target"]
-        if db_table_exists(conn, target["table_name"]) is False:
+        if db_table_exists(conn, target["schema"],target["table_name"]) is False:
             task_logger.info('%s does not exists so creating a new table',
             target["table_name"])
             insert_data(json_data,conn_details,dataframe,conn)
@@ -100,7 +101,7 @@ def append(json_data: dict, conn: dict, dataframe, conn_details) -> bool:
     """if table exists, it will append"""
     try:
         target = json_data["task"]["target"]
-        if db_table_exists(conn, target["table_name"]) is True:
+        if db_table_exists(conn, target["schema"], target["table_name"]) is True:
             task_logger.info("%s table exists, started appending the data to table",
             target["table_name"])
             insert_data(json_data,conn_details,dataframe,conn)
@@ -120,12 +121,12 @@ def replace(json_data: dict, conn: dict, dataframe,counter: int, conn_details) -
     """if table exists, it will drop and replace data"""
     try:
         target = json_data["task"]["target"]
-        if db_table_exists(conn, target["table_name"]) is True:
+        if db_table_exists(conn, target["schema"], target["table_name"]) is True:
             if counter == 1:
                 task_logger.info("%s table exists, started replacing the table",
                 target["table_name"])
-                replace_query = sqlalchemy.text(f'DROP TABLE '
-                f'{target["table_name"]}')
+                replace_query = sqlalchemy.text(f'DROP TABLE'
+                f'{target["schema"]}.{target["table_name"]}')
                 conn.execution_options(autocommit=False).execute(replace_query)
                 task_logger.info(" table replace finished, started inserting data into "
                  "%s table", target["table_name"])
@@ -145,12 +146,12 @@ def truncate(json_data: dict, conn: dict,dataframe,counter: int, conn_details) -
     """if table exists, it will truncate"""
     try:
         target = json_data["task"]["target"]
-        if db_table_exists(conn, target["table_name"]) is True:
+        if db_table_exists(conn, target["schema"], target["table_name"]) is True:
             if counter == 1:
                 task_logger.info("%s table exists, started truncating the table",
                 target["table_name"])
-                truncate_query = sqlalchemy.text(f'TRUNCATE TABLE '
-                f'{target["table_name"]}')
+                truncate_query = sqlalchemy.text(f'TRUNCATE TABLE'
+                f'{target["schema"]}.{target["table_name"]}')
                 conn.execution_options(autocommit=True).execute(truncate_query)
                 task_logger.info("mysql truncating table finished, started inserting data into "
                 "%s table", target["table_name"])
@@ -175,10 +176,10 @@ def drop(json_data: dict, conn: dict) -> bool:
     """if table exists, it will drop"""
     try:
         target = json_data["task"]["target"]
-        if db_table_exists(conn, target["table_name"]) is True:
+        if db_table_exists(conn, target["schema"], target["table_name"]) is True:
             task_logger.info("%s table exists, started dropping the table",
             target["table_name"])
-            drop_query = sqlalchemy.text(f'DROP TABLE '
+            drop_query = sqlalchemy.text(f'DROP TABLE {target["schema"]}.'
             f'{target["table_name"]}')
             conn.execution_options(autocommit=True).execute(drop_query)
             task_logger.info("mysql dropping table completed")
@@ -208,8 +209,10 @@ def write_to_txt(task_id,status,file_path):
 
 def trgt_record_count(json_data,status,sessions,task_id,run_id,iter_value,audit):
     """function to get target record count"""
+    target = json_data["task"]["target"]
     if json_data["task"]["target"]["operation"] != "drop" and status is not False:
-        sql =text(f'SELECT count(0) from  {json_data["task"]["target"]["table_name"]};')
+        schema = json_data['task']['target']['schema']
+        sql = text(f'SELECT count(0) from {schema}.{target["table_name"]};')
         record_count = sessions.execute(sql).fetchall()
         audit(json_data, task_id,run_id,'TRGT_RECORD_COUNT',record_count[-1][-1],
         iter_value)
