@@ -16,7 +16,7 @@
       "source_type": "aws_s3_read",
       "encoding": "utf-8",
       "delimiter": ",",
-      "file_name": "organizations-1000.csv",
+      "file_name": "organizations-1000",
       "file_path": "ingest/",
       "file_type": "csv",
       "chunk_size": 1000,
@@ -29,7 +29,7 @@
     },
     "target": {
       "target_type": "postgres_write",
-      "schema": "karttest",
+      "schema_name": "karttest",
       "encoding": "utf-8",
       "delimiter": ",",
       "file_name": "target.json",
