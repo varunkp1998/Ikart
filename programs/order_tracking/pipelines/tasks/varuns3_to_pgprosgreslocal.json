@@ -24,7 +24,7 @@
       "skip_footer": 0,
       "skip_header": 0,
       "parameter_type": "AWS S3",
-      "connection_name": "new_AWSS3_connection_new"
+      "connection_name": "new_awss3_connection_new"
     },
     "target": {
       "target_type": "mysql_write",
