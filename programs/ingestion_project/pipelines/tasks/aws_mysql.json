@@ -24,7 +24,7 @@
       "escape_char": "",
       "skip_footer": 0,
       "skip_header": 0,
-      "alias_columns": "no",
+      "select_columns":"",
       "parameter_type": "AWS S3",
       "connection_name": "aws_connection_pra"
     },
