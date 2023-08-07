@@ -46,7 +46,7 @@ def get_files_from_bucket(conn, bucket_name, path, json_data):
             'excel': '.xlsx',
             'json': '.json',
             'xml': '.xml'}
-        # extension = extensions.get(source['file_type'], '')
+        extension = extensions.get(source['file_type'], '')
     # Filter the objects based on extension mentioned files
     return [obj['Key'] for obj in objects if obj['Key'].lower().endswith(extensions.get(
         source['file_type'], ''))]
@@ -115,11 +115,17 @@ def read_data_with_or_without_chunk(json_data,src_file,default_header,row_count,
     default_delimiter = delimiter if "delimiter" not in source else source["delimiter"]
     default_skip_header = skip_header if "skip_header" not in source else source["skip_header"]
     default_quotechar = quotechar if "quote_char" not in source else source["quote_char"]
+    default_quotechar = '"' if default_quotechar == "" else default_quotechar
     default_escapechar=escapechar if "escape_char" not in source else source["escape_char"]
     default_escapechar = "\t" if default_escapechar == "\\t" else default_escapechar
     default_escapechar = "\n" if default_escapechar == "\\n" else default_escapechar
-    default_select_cols = None if "select_columns" not in source else list(source["select_columns"].split(","))
-    default_alias_cols = None if "alias_columns" not in source else list(source["alias_columns"].split(","))
+    default_escapechar = None if default_escapechar == "" else default_escapechar
+    default_select_cols = None if "select_columns" not in source else \
+    list(source["select_columns"].split(","))
+    default_select_cols = None if source["select_columns"] == "" else \
+    list(source["select_columns"].split(","))
+    default_alias_cols = None if source["alias_columns"] not in source else \
+    list(source["alias_columns"].split(","))
     default_encoding = "utf-8" if "encoding" not in source else source["encoding"]
     count1 = 0
     if source['chunk_size'] == "None":
