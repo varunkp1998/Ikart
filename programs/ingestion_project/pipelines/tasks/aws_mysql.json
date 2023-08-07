@@ -25,6 +25,7 @@
       "skip_footer": 0,
       "skip_header": 0,
       "select_columns":"",
+      "alias_clumns":"",
       "parameter_type": "AWS S3",
       "connection_name": "aws_connection_pra"
     },
