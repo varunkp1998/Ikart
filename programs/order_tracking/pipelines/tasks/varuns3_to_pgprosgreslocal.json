@@ -28,7 +28,7 @@
     },
     "target": {
       "target_type": "mysql_write",
-      "schema_name": "karttest",
+      "schema": "karttest",
       "encoding": "utf-8",
       "delimiter": ",",
       "file_name": "target.json",
