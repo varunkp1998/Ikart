@@ -32,9 +32,10 @@
       "operation": "create",
       "skip_footer": "0",
       "skip_header": "0",
+      "table_name": "organizations",
       "audit_columns": "inactive",
       "parameter_type": "MySQL",
-      "connection_name": "mysql_localconnection"
+      "connection_name": "mysorganizations-1000ql_localconnection"
     },
     "data_quality_execution": {
       "pre_check_enable": "Y",
