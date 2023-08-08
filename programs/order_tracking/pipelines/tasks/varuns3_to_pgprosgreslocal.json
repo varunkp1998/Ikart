@@ -22,7 +22,7 @@
       "chunk_size": 1000,
       "quote_char": "\"",
       "skip_footer": 0,
-      "skip_header": 0,
+      "skip_header": 1,
       "parameter_type": "AWS S3",
       "connection_name": "new_awss3_connection_new"
     },
