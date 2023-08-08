@@ -35,7 +35,7 @@
       "table_name": "organizations",
       "audit_columns": "inactive",
       "parameter_type": "MySQL",
-      "connection_name": "mysorganizations-1000ql_localconnection"
+      "connection_name": "mysql_localconnection"
     },
     "data_quality_execution": {
       "pre_check_enable": "Y",
