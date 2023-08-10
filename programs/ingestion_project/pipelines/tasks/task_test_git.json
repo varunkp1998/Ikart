@@ -1,0 +1,46 @@
+{
+  "id": 239,
+  "project_name": "ingestion_project",
+  "pipeline_name": "order_ingestion_pipeline",
+  "project_id": 41,
+  "pipeline_id": 106,
+  "task_name": "task_test_git",
+  "task_description": "task_test_git",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "MySQL",
+  "target": "Local Server",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "mysql_read",
+      "query": "select full_name,login_id,password from tbl_user",
+      "schema": "config",
+      "chunk_size": 1000,
+      "table_name": "tbl_user",
+      "parameter_type": "MySQL",
+      "select_columns": "full_name,login_id,password",
+      "connection_name": "mysql_connection",
+      "skip_footer": null,
+      "skip_header": null
+    },
+    "target": {
+      "target_type": "csv_write",
+      "index": "True",
+      "header": "True",
+      "schema": "config",
+      "encoding": "utf-16",
+      "file_type": "csv",
+      "operation": "create",
+      "quote_char": "\"",
+      "table_name": "tbl_new_task",
+      "audit_columns": "active",
+      "parameter_type": "Local Server",
+      "connection_name": "local_connection_pra"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "N",
+      "post_check_enable": "N"
+    }
+  }
+}
