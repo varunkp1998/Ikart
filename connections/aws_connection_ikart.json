@@ -5,9 +5,9 @@
   "connection_name": "aws_connection_ikart",
   "connection_details": {
     "iam_role": "varun",
-    "access_key": "AKIAQUXXD3MCPAFIM3GT",
+    "access_key": "8b0ad01bb79745f3ddf61e1b12442cc18607fc8c07b486eb7ac61b1682b7ca05c7fe30ad",
     "bucket_name": "pg-mystoreinventory-6134",
     "region_name": "ap-south-1",
-    "secret_access_key": "EMCT5IStm/7S4Uv81vKWu+6h8f8TPmb4v68S0oRb"
+    "secret_access_key": "8f0cda0ed38b4edff4ea640b76501cb0fa42f08f26650bf9f920f95b1c86468f1d542d039149665f88cc6e4176a0cc237fe27ea089f81d0c"
   }
 }
