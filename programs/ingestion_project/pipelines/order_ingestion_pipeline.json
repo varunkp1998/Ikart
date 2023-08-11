@@ -1,0 +1,26 @@
+{
+  "pipeline_id": 106,
+  "project_id": 41,
+  "pipeline_name": "order_ingestion_pipeline",
+  "pipeline_cd": "OIP213",
+  "pipeline_description": "order_ingestion_pipeline description",
+  "is_active": "Y",
+  "tasks_details": null,
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    }
+  ],
+  "edges": null,
+  "created_dttm": "2023-08-11T05:19:09.168Z",
+  "updated_dttm": "2023-08-11T05:19:09.168Z"
+}
