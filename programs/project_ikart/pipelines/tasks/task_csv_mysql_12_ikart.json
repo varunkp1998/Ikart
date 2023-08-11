@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 109,
+  "task_name": "task_csv_mysql_12_ikart",
+  "task_description": "task_csv_mysql_12_ikart",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
