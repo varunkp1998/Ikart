@@ -1,0 +1,38 @@
+{
+  "pipeline_id": 110,
+  "project_id": 44,
+  "pipeline_name": "pipeline_ikart_testing",
+  "pipeline_cd": "1",
+  "pipeline_description": "pipeline_ikart_testing",
+  "is_active": "Y",
+  "tasks_details": null,
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    },
+    {
+      "id": "254",
+      "data": {
+        "label": "254-task_csv_mysql_ikart_testing"
+      },
+      "position": {
+        "x": 50,
+        "y": 550
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    }
+  ],
+  "edges": null,
+  "created_dttm": "2023-08-18T06:03:52.565Z",
+  "updated_dttm": "2023-08-18T06:03:52.565Z"
+}
