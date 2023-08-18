@@ -1,0 +1,82 @@
+{
+  "id": 255,
+  "project_name": "project_ikart_testing",
+  "pipeline_name": "pipeline_ikart_testing",
+  "project_id": 44,
+  "pipeline_id": 110,
+  "task_name": "dataquality_check_testing1",
+  "task_description": "dataquality_check_testing1",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "source": "Local Server",
+  "target": "MySQL",
+  "is_active": "Y",
+  "task": {
+    "source": {
+      "source_type": "csv_read",
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "file_name": "organizations-1000.csv",
+      "file_path": "/home/madhu/Ingestion_code2/",
+      "file_type": "csv",
+      "chunk_size": 1000,
+      "quote_char": "\"",
+      "escape_char": null,
+      "skip_footer": 0,
+      "skip_header": 0,
+      "alias_columns": null,
+      "parameter_type": "Local Server",
+      "select_columns": null,
+      "connection_name": "localserver_ikart_testing"
+    },
+    "target": {
+      "target_type": "mysql_write",
+      "schema": "ikart",
+      "operation": "create",
+      "table_name": "tbl_dataqualitycheck1",
+      "audit_columns": "active",
+      "parameter_type": "MySQL",
+      "connection_name": "mysql_ikart_testing"
+    },
+    "data_quality_execution": {
+      "pre_check_enable": "Y",
+      "post_check_enable": "N"
+    },
+    "data_quality": [
+      {
+        "seq_no": "1",
+        "check": "column_values_to_be_unique",
+        "parameters": {
+          "column": "Index"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "pre_check"
+      },
+      {
+        "seq_no": "2",
+        "check": "column_values_to_not_be_null",
+        "parameters": {
+          "column": "Name"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 40,
+        "type": "pre_check"
+      },
+      {
+        "seq_no": "3",
+        "check": "column_values_to_be_increasing",
+        "parameters": {
+          "set": "",
+          "column": "Index"
+        },
+        "active": "Y",
+        "ignore_bad_records": "Y",
+        "threshold_bad_records": 10,
+        "type": "pre_check"
+      }
+    ]
+  }
+}
