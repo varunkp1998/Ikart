@@ -48,7 +48,7 @@
 	"dq_scripts_path": "scripts/dq_scripts/",
 	"audit_api_url":"http://localhost:8080/api/audit",
 	"mysql_audit_json_conn_nm":"mysql_audit_config.json",
-	"gh_download_file_path": "src/scripts/engine_main/download.py",	
+	"gh_download_file_path": "download.py",	
 	"gh_source_ingestion_path": "src/scripts/ingestion/",
 	"gh_target_ingestion_path": "src/scripts/ingestion/",
 	"gh_engine_path":"src/scripts/engine_main/engine_code.py",
