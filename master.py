@@ -1,3 +1,4 @@
+'''below code is to setup the logger and runs the code based on command'''
 import logging
 import argparse
 import sys
@@ -59,12 +60,12 @@ def get_config_section(config_path:str) -> dict:
         logging.exception("get_config_section() is %s.", str(err))
         raise err
 
-def execute_query(config_paths, pip_nm):
+def execute_query(config_path, pip_nm):
     """Gets audit status from the audit table for the given pipeline."""
     result = None  # Initialize result variable outside the try block
     try:
         logging.info("task name from API: %s", pip_nm)
-        url = f"{config_paths['audit_api_url']}/executeTaskOrPiplineQuery/{pip_nm}"
+        url = f"{config_path['audit_api_url']}/executeTaskOrPiplineQuery/{pip_nm}"
         logging.info("URL from API: %s", url)
         response = requests.get(url, timeout=100)
         if response.status_code == 200:
@@ -85,7 +86,7 @@ def get_file_in_gitrepo(repo, path, file_or_dir, branch):
         auth = Auth.Token(auth_token)
         g = Github(auth=auth)
         repo=g.get_repo(repo)
-        content_list = [file.name for file in repo.get_contents(path, ref=branch) 
+        content_list = [file.name for file in repo.get_contents(path, ref=branch)
                         if file.type == file_or_dir]
         return content_list
     except Exception as err:
@@ -93,17 +94,17 @@ def get_file_in_gitrepo(repo, path, file_or_dir, branch):
         raise err
 
 
-def log_creation(logging_path, task_name, pipeline_name, run_id):
+def log_creation(logging_path, taskname, pipelinename, runid):
     """function to create run id and log"""
     try:
         main_logger.info("logging operation started.")
         if task_name:
-            log_file_name = str(task_name) + "_taskLog_" + run_id + '.log'
+            log_filename = str(taskname) + "_taskLog_" + runid + '.log'
         elif pipeline_name:
-            log_file_name = str(pipeline_name) + "_pipelineLog_" + run_id + '.log'
-        setup_logger('main_logger', str(logging_path) + str(log_file_name))
-        logging.info("The json file %s exists in the GITHUB repository", task_name
-                     or pipeline_name)
+            log_filename = str(pipelinename) + "_pipelineLog_" + runid + '.log'
+        setup_logger('main_logger', str(logging_path) + str(log_filename))
+        logging.info("The json file %s exists in the GITHUB repository", taskname
+                     or pipelinename)
     except Exception as err:
         logging.info("error in log_creation %s", str(err))
         raise err
@@ -112,8 +113,8 @@ def downlaod_file_from_git(repo,branch,file_path,save_dir):
     '''function to download the file from git'''
     auth_token = os.getenv("AUTH")
     auth = Auth.Token(auth_token)
-    g = Github(auth=auth)
-    repo = g.get_repo(repo)
+    git = Github(auth=auth)
+    repo = git.get_repo(repo)
     file_contents = repo.get_contents(file_path,ref=branch).decoded_content
     file_name = Path(file_path).name
     save_path = Path(save_dir).joinpath(file_name)
@@ -127,8 +128,8 @@ def downlaod_latest_file_from_git(repository_name,
     try:
         auth_token = os.getenv("AUTH")
         auth = Auth.Token(auth_token)
-        g = Github(auth=auth)
-        repo = g.get_repo(repository_name)
+        git = Github(auth=auth)
+        repo = git.get_repo(repository_name)
         file_contents = repo.get_contents(file_path,ref=branch)
         # Get the SHA of the file on GitHub
         github_sha = hashlib.sha1(file_contents.decoded_content).hexdigest()
@@ -153,11 +154,11 @@ def downlaod_latest_file_from_git(repository_name,
         raise err
 
 
-def get_download_from_git(configs_path,repo,task_name,run_id,home_path,branch):
+def get_download_from_git(configs_path,repo,homepath,branch):
     '''function to get the download.py from git'''
     try:
         file_path = configs_path['gh_download_file_path']
-        save_dir = home_path
+        save_dir = homepath
         downlaod_file_from_git(repo,branch,file_path,save_dir)
         main_logger.info("download.py file downloading completed")
     except Exception as err:
@@ -166,16 +167,22 @@ def get_download_from_git(configs_path,repo,task_name,run_id,home_path,branch):
 
 def parse_arguments():
     '''function to parse cli arguments'''
-    parser = argparse.ArgumentParser(description="IngKart framework orchestration master execution cli.")
-    parser.add_argument('-p', dest='project_name',required=True, type=str ,help='Provide the PROJECT Name')
+    parser = argparse.ArgumentParser(
+        description="IngKart framework orchestration master execution cli.")
+    parser.add_argument('-p', dest='project_name',required=True, type=str ,
+                        help='Provide the PROJECT Name')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-t', dest='task_name', type=str ,help='Provide the Task Name')
-    group.add_argument('-b', dest='pipeline_name', type=str ,help='Provide the Pipeline(Batch) Name')
-    parser.add_argument('-gitbranch', dest='git_branch', type=str ,default='main', help="Git Envirnoment to use.")
-    parser.add_argument('-r', dest='restart',default=False, type=bool ,help="Provide the Restart values like : \
+    group.add_argument('-t', dest='task_name', type=str ,
+                       help='Provide the Task Name')
+    group.add_argument('-b', dest='pipeline_name', type=str ,
+                       help='Provide the Pipeline(Batch) Name')
+    parser.add_argument('-gitbranch', dest='git_branch', type=str ,default='main',
+                        help="Git Envirnoment to use.")
+    parser.add_argument('-r', dest='restart',default=False, type=bool,
+                        help="Provide the Restart values like : \
     ('true', 'True', 'TRUE', 'FALSE','false', 'False')")
-    args = parser.parse_args()
-    return args
+    arguments = parser.parse_args()
+    return arguments
 
 if __name__ == "__main__":
     try:
@@ -186,7 +193,7 @@ if __name__ == "__main__":
         pipeline_name = args.pipeline_name
         task_name = args.task_name
         restart = args.restart
-        run_id= str(uuid.uuid4())
+        RUNID= str(uuid.uuid4())
         try:
             with open("config.json",'r', encoding='utf-8') as jsonfile:
                 # reading paths json data started
@@ -199,44 +206,59 @@ if __name__ == "__main__":
         load_dotenv(f'{home_path}{"/"}{".env"}')
         github_repo_name=config_paths["github_repo_name"]
         repo_path=config_paths["repo_path"]
-        if  project_name not in get_file_in_gitrepo(repo=github_repo_name, path = repo_path,file_or_dir='dir', branch=git_branch):
+        if  project_name not in get_file_in_gitrepo(
+            repo=github_repo_name, path = repo_path,file_or_dir='dir', branch=git_branch):
             print('Project not available. create a project and restart...')
             sys.exit()
-        elif pipeline_name and (pipeline_name+JSON) not in get_file_in_gitrepo(repo=github_repo_name, path= f'{repo_path}/{project_name}/pipelines',file_or_dir='file',  branch=git_branch):
+        elif pipeline_name and (pipeline_name+JSON) not in get_file_in_gitrepo(
+            repo=github_repo_name,path= f'{repo_path}/{project_name}/pipelines',file_or_dir='file',
+            branch=git_branch):
             print('Pipeline not available. check pipeline job and restart...')
             sys.exit()
-        elif task_name and (task_name+JSON) not in get_file_in_gitrepo(repo=github_repo_name, path=f'{repo_path}/{project_name}/pipelines/tasks',file_or_dir='file',  branch=git_branch):
+        elif task_name and (task_name+JSON) not in get_file_in_gitrepo(
+            repo=github_repo_name, path=f'{repo_path}/{project_name}/pipelines/tasks',
+            file_or_dir='file',branch=git_branch):
             print('Task not available. check task job and restart...')
             sys.exit()
-        log_file_name = str(task_name)+"_taskLog_"+run_id+'.log'
+        log_file_name = str(task_name)+"_taskLog_"+RUNID+'.log'
         main_logger = logging.getLogger('main_logger')
         # check if the task log path exists if not create log folder
-        if not Path(f"{home_path}{'/'}{config_paths['local_repo']}{config_paths['programs']}{project_name}{config_paths['pipeline_log_path']}").exists():
-            dir_path = Path(f"{home_path}{'/'}{config_paths['local_repo']}{config_paths['programs']}{project_name}{config_paths['pipeline_log_path']}")
+        if not Path(f"{home_path}/{config_paths['local_repo']}"
+                    f"{config_paths['programs']}{project_name}"
+                    f"{config_paths['pipeline_log_path']}").exists():
+            dir_path = Path(f"{home_path}{'/'}{config_paths['local_repo']}"
+                            f"{config_paths['programs']}{project_name}"
+                            f"{config_paths['pipeline_log_path']}")
             dir_path.mkdir(parents=True, exist_ok=True)
-        pipeline_log_path = str(home_path)+"/"+config_paths['local_repo']+config_paths["programs"] + project_name +config_paths['pipeline_log_path']
-
+        pipeline_log_path = str(home_path)+"/"+config_paths['local_repo']+config_paths[ \
+            "programs"] + project_name +config_paths['pipeline_log_path']
 
         # check if the task log path exists if not create log folder
-        if not Path(f"{home_path}{'/'}{config_paths['local_repo']}{config_paths['programs']}{project_name}{config_paths['task_log_path']}").exists():
-            dir_path = Path(f"{home_path}{'/'}{config_paths['local_repo']}{config_paths['programs']}{project_name}{config_paths['task_log_path']}")
+        if not Path(f"{home_path}{'/'}{config_paths['local_repo']}"
+                    f"{config_paths['programs']}{project_name}"
+                    f"{config_paths['task_log_path']}").exists():
+            dir_path = Path(f"{home_path}{'/'}{config_paths['local_repo']}"
+                            f"{config_paths['programs']}{project_name}"
+                            f"{config_paths['task_log_path']}")
             dir_path.mkdir(parents=True, exist_ok=True)
-        task_log_path =str(home_path)+"/"+config_paths['local_repo']+config_paths["programs"] + project_name +config_paths['task_log_path']
+        task_log_path =str(home_path)+"/"+config_paths['local_repo']+config_paths[ \
+            "programs"] + project_name +config_paths['task_log_path']
 
         # Download the download.py from git.
         if not Path(f'{home_path}{"/"}{"download.py"}').exists():
             print("download.py file downloading operation started...")
-            get_download_from_git(config_paths,github_repo_name,task_name,run_id,str(home_path),git_branch)
+            get_download_from_git(config_paths,github_repo_name,str(home_path),git_branch)
             print("download.py file downloading operation Completed.")
         # else:
-        #     downlaod_latest_file_from_git(github_repo_name,git_branch,config_paths["gh_download_file_path"],
-        #                                   f'{home_path}{"/"}{"download.py"}',"download.py")
+        #     downlaod_latest_file_from_git(github_repo_name,git_branch,
+        # config_paths["gh_download_file_path"],f'{home_path}{"/"}{"download.py"}',"download.py")
 
         if task_name:
-            log_creation(task_log_path, task_name, pipeline_name, run_id)
+            log_creation(task_log_path, task_name, pipeline_name, RUNID)
             download = importlib.import_module("download")
             main_logger.info("Master execution started")
-            download.execute_pipeline_download(project_name, config_paths, task_name, pipeline_name, run_id, task_log_path, log_file_name, MODE,git_branch)
+            download.execute_pipeline_download(project_name, config_paths, task_name, pipeline_name,
+                                               RUNID, task_log_path, log_file_name, MODE,git_branch)
         elif pipeline_name:
             audit_state = execute_query(config_paths,pipeline_name)
             if audit_state:
@@ -248,7 +270,8 @@ if __name__ == "__main__":
             log_creation(pipeline_log_path, task_name, pipeline_name, run_id)
             download = importlib.import_module("download")
             main_logger.info("Master execution started")
-            download.execute_pipeline_download(project_name, config_paths, task_name, pipeline_name, run_id, task_log_path, log_file_name, MODE,git_branch)
+            download.execute_pipeline_download(project_name, config_paths, task_name, pipeline_name,
+                                            run_id, task_log_path, log_file_name, MODE,git_branch)
     except Exception as error:
         main_logger.error("exception occured %s", error)
         raise error
