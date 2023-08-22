@@ -10,7 +10,6 @@
 	"repo_path": "programs",
     "folder_path": "/home/puneeths/dev_ingestion3/",
 	"github_repo_name":"shrikhaparul/Ikart",
-	"env_path":"/home/puneeths/dev_ingestion3/.env",
 	"local_repo":"repo/",
 	"programs":"programs/",
 	"tasks":"tasks/",
