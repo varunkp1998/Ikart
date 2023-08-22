@@ -26,10 +26,11 @@ def create_folder_structure(prj_nm, path: str, paths_data: str):
         folder_structure = [
             (repo_path, [paths_data["programs"]]),
             (program_path, []),
-            (os.path.join(task_path, paths_data["tasks"]), [paths_data["archive"], paths_data["json"],
-                                                           paths_data["logs"], paths_data["rejected"],
-                                                           paths_data["source_files"], paths_data["target_files"],
-                                                           paths_data["reports"]]),
+            (os.path.join(task_path, paths_data["tasks"]),
+             [paths_data["archive"], paths_data["json"],
+            paths_data["logs"], paths_data["rejected"],
+            paths_data["source_files"], paths_data["target_files"],
+            paths_data["reports"]]),
             (os.path.join(task_path, paths_data["json"]), []),
             (os.path.join(task_path, paths_data["logs"]), []),
             (os.path.join(task_path, paths_data["text"]), []),
@@ -59,9 +60,8 @@ def required_files_download(paths_data:str,repo_name,branch):
         home_path = str(Path(paths_data["folder_path"]).expanduser())
         home_path = home_path+"/"
         path_src = home_path+paths_data["src"]
-        # print("engine_pathhhhhhhhhhhh", Path(path_src+paths_data["engine_path"]+'engine_code.py'))
-        # print("save_dir engine_path", path_src+paths_data["engine_path"])
-        if not Path(home_path+paths_data["src"]+paths_data["engine_path"]+'engine_code.py').exists():
+        if not Path(home_path+paths_data["src"]+paths_data["engine_path"]+
+                    'engine_code.py').exists():
             try:
                 main_logger.info("downloading of engine_code started...")
                 download_file_from_github(repo_name,branch, file_path=paths_data["gh_engine_path"],
@@ -71,32 +71,24 @@ def required_files_download(paths_data:str,repo_name,branch):
         # else:
         #     downlaod_latest_file_from_git(repo_name,branch,paths_data["gh_engine_path"],
         #     home_path+paths_data["engine_path"]+'engine_code.py',"engine_code.py")
-        # print("checks_mapping path", Path(path_src+ paths_data["dq_scripts_path"]+'checks_mapping.json'))
-        # print("save_dir checks_mapping path", path_src+ paths_data["dq_scripts_path"])
         if not Path(path_src+ paths_data["dq_scripts_path"]+'checks_mapping.json').exists():
             main_logger.info("downloading of checks_mapping json started...")
-            download_file_from_github(repo_name,branch, file_path=paths_data["gh_checks_mapping_path"],
-                                save_dir =path_src+ paths_data["dq_scripts_path"])
+            download_file_from_github(repo_name,branch, file_path=paths_data[
+            "gh_checks_mapping_path"],save_dir =path_src+ paths_data["dq_scripts_path"])
             main_logger.info("downloading of checks_mapping json completed!")
         # else:
         #     downlaod_latest_file_from_git(repo_name,branch,paths_data["gh_engine_path"],
         #     home_path+paths_data["engine_path"]+'engine_code.py',"engine_code.py")
-        # print("engine_mapping path", Path(path_src+paths_data["engine_path"]+'mapping'+JSON))
-        # print("save_dir engine_mapping path", path_src+paths_data["engine_path"])
         if not Path(path_src+paths_data["engine_path"]+'mapping'+JSON).exists():
             main_logger.info("downloading of mapping json started...")
             download_file_from_github(repo_name,branch, file_path=paths_data[
                 "gh_mapping_path"],save_dir =path_src+paths_data["engine_path"])
             main_logger.info("downloading of mapping json completed!")
-        # print("definitionqc path", Path(path_src+paths_data["dq_scripts_path"]+'definitions_qc.py'))
-        # print("save_dir definitionqc path", path_src+paths_data["dq_scripts_path"])
         if not Path(path_src+paths_data["dq_scripts_path"]+'definitions_qc.py').exists():
             main_logger.info("downloading of definitions_qc code started...")
             download_file_from_github(repo_name,branch, file_path=paths_data[
                 "gh_definitions_qc_path"],save_dir =path_src+paths_data["dq_scripts_path"])
             main_logger.info("downloading of definitions_qc code completed!")
-        # print("utility path", Path(path_src+paths_data["ingestion_path"]+'utility.py'))
-        # print("save_dir utility path", path_src+paths_data["ingestion_path"])
         if not Path(path_src+paths_data["ingestion_path"]+'utility.py').exists():
             try:
                 main_logger.info("downloading of utility code started...")
@@ -105,8 +97,6 @@ def required_files_download(paths_data:str,repo_name,branch):
                 main_logger.info("downloading of utility code completed!")
             except Exception as error:
                 main_logger.info("error in downloading of utility code %s", str(error))
-        # print("connections path", Path(path_src+paths_data["ingestion_path"]+'connections.py'))
-        # print("save_dir connections path", path_src+paths_data["ingestion_path"])
         if not Path(path_src+paths_data["ingestion_path"]+'connections.py').exists():
             try:
                 main_logger.info("downloading of connections code started...")
@@ -115,8 +105,6 @@ def required_files_download(paths_data:str,repo_name,branch):
                 main_logger.info("downloading of connections code completed!")
             except Exception as error:
                 main_logger.info("error in downloading of connections code %s", str(error))
-        # print("orchestration_path", Path(path_src+paths_data["orchestration_path"]+'orchestrate.py'))
-        # print("save_dir orchestration_path", path_src+paths_data["orchestration_path"])
         if not Path(path_src+paths_data["orchestration_path"]+'orchestrate.py').exists():
             main_logger.info("downloading of orchestarte code started...")
             download_file_from_github(repo_name,branch, file_path=paths_data[
@@ -135,17 +123,21 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
         #to download task json from git
         task_name = re.sub(r'^\d+_?', '', task_name)
         try:
-            # if not Path(f'{homepath}{"/"}{config_path["local_repo"]}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}{task_name}{JSON}').exists():
+            # if not Path(f'{homepath}{"/"}{config_path["local_repo"]}{config_path["programs"]}
+            # {prj_nm}{config_path["task_json_path"]}{task_name}{JSON}').exists():
             download_file_from_github(repo_name, branch,
-            file_path=f'{config_path["programs"]}{prj_nm}{config_path["gh_tasks_path"]}{task_name}{JSON}',
-            save_dir = f'{homepath}{"/"}{config_path["local_repo"]}{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}')
+            file_path=f'{config_path["programs"]}{prj_nm}{config_path["gh_tasks_path"]}'
+            f'{task_name}{JSON}',
+            save_dir = f'{homepath}{"/"}{config_path["local_repo"]}'
+            f'{config_path["programs"]}{prj_nm}{config_path["task_json_path"]}')
         except Exception:
             main_logger.error("Task name not found in the git hub: %s",task_name)
-            main_logger.warning("Process Aborted.")
+            main_logger.warning("Process got Aborted.")
             sys.exit()
         try:
-            with open(r""+os.path.expanduser(config_path["folder_path"])+config_path["local_repo"]+config_path[
-            "programs"]+prj_nm+config_path["task_json_path"]+task_name+JSON,"r",
+            with open(r""+os.path.expanduser(config_path["folder_path"])+config_path[
+            "local_repo"]+config_path["programs"]+prj_nm+config_path["task_json_path"]+
+            task_name+JSON,"r",
             encoding='utf-8') as jsonfile:
                 task_json = json.load(jsonfile)
         except FileNotFoundError as exc:
@@ -155,26 +147,32 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
         if (task_json['task']['source']['source_type'])  not in ("csv_read","csvfile_read",
         "excel_read","parquet_read","json_read","xml_read","text_read"):
             source_conn_file_name = task_json['task']['source']['connection_name']
-            # if not Path(f'{config_path["folder_path"]}{config_path["conn_path"]}{source_conn_file_name}{JSON}').exists():
+            # if not Path(f'{config_path["folder_path"]}{config_path["conn_path"]}
+            # {source_conn_file_name}{JSON}').exists():
             try:
                 download_file_from_github(repo_name, branch,
-                file_path = f'{config_path["gh_connections_json_path"]}{source_conn_file_name}{JSON}',
+                file_path = f'{config_path["gh_connections_json_path"]}'
+                f'{source_conn_file_name}{JSON}',
                 save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
             except Exception:
-                task_logger.error("source connection file not found in the git hub: %s", source_conn_file_name)
+                task_logger.error("source connection file not found in the git hub: %s",
+                                  source_conn_file_name)
                 task_logger.warning("Process Aborted.")
                 sys.exit()
         #to download task target connection files
         if (task_json['task']['target']['target_type'])  not in ("csv_write","csvfile_write",
         "parquet_write","excel_write","json_write","xml_write","text_write"):
             target_conn_file_name = task_json['task']['target']['connection_name']
-            # if not Path(f'{config_path["folder_path"]}{config_path["conn_path"]}{target_conn_file_name}{JSON}').exists():
+            # if not Path(f'{config_path["folder_path"]}{config_path["conn_path"]}
+            # {target_conn_file_name}{JSON}').exists():
             try:
                 download_file_from_github(repo_name, branch,
-                file_path = f'{config_path["gh_connections_json_path"]}{target_conn_file_name}{JSON}',
+                file_path = f'{config_path["gh_connections_json_path"]}'
+                f'{target_conn_file_name}{JSON}',
                 save_dir = f'{config_path["folder_path"]}{config_path["conn_path"]}')
             except Exception:
-                task_logger.error("target connection file not found in the git hub: %s",target_conn_file_name)
+                task_logger.error("target connection file not found in the git hub: %s",
+                                  target_conn_file_name)
                 task_logger.warning("Process Aborted.")
                 sys.exit()
         # to download read and write script files
@@ -221,8 +219,10 @@ def execute_pipeline_download(prj_nm,config_path:str,task_name:str,pipeline_name
             config_path["folder_path"]),config_path)
         if task_name is None :
             download_file_from_github(repo_name, git_branch,
-            file_path= f'{config_path["programs"]}{prj_nm}{config_path["gh_pipeline_path"]}{pipeline_name}{JSON}',
-            save_dir =f'{homepath}{"/"}{config_path["local_repo"]}{config_path["programs"]}{prj_nm}{config_path["task_pipeline_path"]}')
+            file_path= f'{config_path["programs"]}{prj_nm}'
+            f'{config_path["gh_pipeline_path"]}{pipeline_name}{JSON}',
+            save_dir =f'{homepath}{"/"}{config_path["local_repo"]}'
+            f'{config_path["programs"]}{prj_nm}{config_path["task_pipeline_path"]}')
         main_logger.info("calling the common_files_downloads function")
         required_files_download(config_path,repo_name,git_branch)
         orchestration_script=path_src+config_path["orchestration_path"]
