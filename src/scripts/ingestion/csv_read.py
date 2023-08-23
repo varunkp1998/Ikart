@@ -51,20 +51,24 @@ def read(json_data: dict,task_id,run_id,paths_data,file_path,iter_value,
             audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
             sys.exit()
         else:
-            default_delimiter = delimiter if "delimiter" not in source else source["delimiter"]
-            default_skip_header = skip_header if "skip_header" not in source else source["skip_header"]
-            default_skip_footer = skip_footer if "skip_footer" not in source else source["skip_footer"]
-            default_quotechar = quotechar if "quote_char" not in source else source["quote_char"]
-            default_quotechar = None if default_quotechar in ["","None","none"] else default_quotechar
-            default_escapechar=escapechar if "escape_char" not in source else source["escape_char"]
+            default_delimiter = delimiter if source["delimiter"]==None else\
+            source["delimiter"]
+            default_skip_header = skip_header if source["skip_header"]\
+            ==None else source["skip_header"]
+            default_skip_footer = skip_footer if source["skip_footer"]\
+            ==None else source["skip_footer"]
+            default_quotechar = quotechar if source["quote_char"] in {None,"None","none",""}  else\
+            source["quote_char"]
+            default_escapechar=escapechar if source["escape_char"] in {None,"None","none",""}  \
+            else source["escape_char"]
             default_escapechar = "\t" if default_escapechar == "\\t" else default_escapechar
             default_escapechar = "\n" if default_escapechar == "\\n" else default_escapechar
-            default_escapechar = None if default_escapechar in {"","None","none"} else default_escapechar
-            default_select_cols = None if "select_columns" not in source else list(source["select_columns"].split(","))
-            default_select_cols = None if source['select_columns'] == "" else default_select_cols
-            default_alias_cols = None if "alias_columns" not in source else list(source["alias_columns"].split(","))
-            default_alias_cols = None if default_alias_cols in ["","None","none"] else default_alias_cols
-            default_encoding = "utf-8" if "encoding" not in source else source["encoding"]
+            default_select_cols = None if source["select_columns"]==None else\
+            list(source["select_columns"].split(","))
+            default_alias_cols = None if source["alias_columns"] in {None,"None","none",""} else\
+            list(source["alias_columns"].split(","))
+            default_encoding = "utf-8" if source["encoding"]in {None,"None","none",""} else\
+            source["encoding"]
             task_logger.info("default_select_cols : %s", default_select_cols)
             for file in all_files:
                 data = pd.read_csv(filepath_or_buffer = file,encoding=default_encoding,
