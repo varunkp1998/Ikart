@@ -268,11 +268,11 @@ if __name__ == "__main__":
                         run_id = audit_data['run_id']
                         ITER_VALUE = str(int(audit_data['iteration']) + 1)
                         MODE = "RESTART"
-            log_creation(pipeline_log_path, task_name, pipeline_name, run_id)
+            log_creation(pipeline_log_path, task_name, pipeline_name, RUNID)
             download = importlib.import_module("download")
             main_logger.info("Master execution started")
             download.execute_pipeline_download(project_name, config_paths, task_name, pipeline_name,
-                                            run_id, task_log_path, log_file_name, MODE,git_branch)
+                                            RUNID, task_log_path, log_file_name, MODE,git_branch)
     except Exception as error:
         main_logger.error("exception occured %s", error)
         raise error

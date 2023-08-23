@@ -6,10 +6,10 @@ import os
 from datetime import datetime
 import zipfile
 import importlib
+import re
 import requests
 import urllib3
 import pandas as pd
-import re
 from sqlalchemy.orm import sessionmaker
 
 task_logger = logging.getLogger('task_logger')
@@ -65,7 +65,8 @@ def task_json_read(paths_data,task_id,prj_nm):
     """function to read task json"""
     task_id = re.sub(r'^\d+_?', '', task_id)
     try:
-        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data["local_repo"]+paths_data["programs"]+prj_nm+\
+        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data[
+            "local_repo"]+paths_data["programs"]+prj_nm+\
         paths_data["task_json_path"]+task_id+".json","r",encoding='utf-8') as jsonfile:
             task_logger.info("reading TASK JSON data started %s",task_id)
             json_data = json.load(jsonfile)
@@ -78,7 +79,8 @@ def task_json_read(paths_data,task_id,prj_nm):
 def checks_mapping_read(paths_data):
     """function to read checks_mapping json"""
     try:
-        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data['src']+paths_data["dq_scripts_path"]+\
+        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data[
+            'src']+paths_data["dq_scripts_path"]+\
         "checks_mapping.json","r",encoding='utf-8') as json_data_new:
             task_logger.info("reading checks mapping json data started")
             json_checks = json.load(json_data_new)
@@ -93,7 +95,8 @@ def read_write_imports(paths_data,json_data):
     try:
         source = json_data["task"]["source"]
         target = json_data["task"]["target"]
-        py_scripts_path=os.path.expanduser(paths_data["folder_path"])+paths_data['src']+paths_data["ingestion_path"]
+        py_scripts_path=os.path.expanduser(paths_data["folder_path"])+paths_data[
+            'src']+paths_data["ingestion_path"]
         #task_logger.info(py_scripts_path)
         sys.path.insert(0, py_scripts_path)
         task_logger.info("read imports started")
@@ -267,7 +270,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
             session = begin_transaction(paths_data,json_data,config_file_path)
         # Precheck script execution starts here
         if dq_execution["pre_check_enable"] == 'Y' and\
-        source["source_type"] in ('csv_read','postgres_read','mysql_read',
+        source["source_type"] in ('csv_read','parquet_read','postgres_read','mysql_read',
         'snowflake_read','mssql_read','sqlserver_read','aws_s3_read'):
             pre_check = definitions_qc.qc_pre_check(prj_nm,json_data,json_checks,
             paths_data,config_file_path,task_id,run_id,file_path,iter_value)
@@ -310,8 +313,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     if value is False:
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
                         return False
-        elif source["source_type"] in ("csv_read"):
-            # task_logger.info(json_data)
+        elif source["source_type"] in ("csv_read", "parquet_read"):
             data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
             counter=0
             for i in data_fram :
@@ -368,7 +370,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
                         return False
         elif source["source_type"] in ("csvfile_read"
-            ,"json_read" ,"xml_read","parquet_read","excel_read"):
+            ,"json_read" ,"xml_read","excel_read"):
             data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
             counter=0
             for i in data_fram :
