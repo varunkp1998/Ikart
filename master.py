@@ -249,10 +249,10 @@ if __name__ == "__main__":
             print("download.py file downloading operation started...")
             get_download_from_git(config_paths,github_repo_name,str(home_path),git_branch)
             print("download.py file downloading operation Completed.")
-        else:
-            downlaod_latest_file_from_git(github_repo_name,git_branch,
-        config_paths["gh_download_file_path"],f'{home_path}{"/"}{"download.py"}',
-        "download.py",main_logger)
+        # else:
+        #     downlaod_latest_file_from_git(github_repo_name,git_branch,
+        # config_paths["gh_download_file_path"],f'{home_path}{"/"}{"download.py"}',
+        # "download.py",main_logger)
 
         if task_name:
             log_creation(task_log_path, task_name, pipeline_name, RUNID)
