@@ -123,7 +123,7 @@ def downlaod_file_from_git(repo,branch,file_path,save_dir):
     return file
 
 def downlaod_latest_file_from_git(repository_name,
-                            branch,file_path,local_file_path,filename):
+    branch,file_path,local_file_path,filename,log_name):
     '''function to get the updated file from git'''
     try:
         auth_token = os.getenv("AUTH")
@@ -137,8 +137,8 @@ def downlaod_latest_file_from_git(repository_name,
         with open(local_file_path, "rb") as file:
             local_file_data = file.read()
             local_sha = hashlib.sha1(local_file_data).hexdigest()
-        main_logger.info("github sha: %s", github_sha)
-        main_logger.info("local_sha: %s", local_sha)
+        # log_name.info("github sha: %s", github_sha)
+        # log_name.info("local_sha: %s", local_sha)
         # Compare the shas
         if github_sha != local_sha:
             # File has been updated, proceed with downloading
@@ -146,9 +146,9 @@ def downlaod_latest_file_from_git(repository_name,
             response = requests.get(file_url, timeout=60)
             with open(local_file_path, "wb") as file:
                 file.write(response.content)
-            print(f"File: {filename} has been updated and downloaded.")
+            log_name.info(f"File: {filename} has been updated and downloaded.")
         else:
-            print(f"File: {filename} is already up to date.")
+            log_name.info(f"File: {filename} is already up to date.")
     except Exception as err:
         main_logger.info("error in get_the_updated_file_from_git() %s",str(err))
         raise err
@@ -251,7 +251,8 @@ if __name__ == "__main__":
             print("download.py file downloading operation Completed.")
         # else:
         #     downlaod_latest_file_from_git(github_repo_name,git_branch,
-        # config_paths["gh_download_file_path"],f'{home_path}{"/"}{"download.py"}',"download.py")
+        # config_paths["gh_download_file_path"],f'{home_path}{"/"}{"download.py"}',
+        # "download.py",main_logger)
 
         if task_name:
             log_creation(task_log_path, task_name, pipeline_name, RUNID)
@@ -275,5 +276,5 @@ if __name__ == "__main__":
     except Exception as error:
         main_logger.error("exception occured %s", error)
         raise error
-    finally:
-        sys.exit()
+    # finally:
+    #     sys.exit()
