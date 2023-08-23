@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 109,
+  "task_name": "demo_testing",
+  "task_description": "ingest csv to mysql",
+  "task_type": "Ingestion",
+  "task_sequence": "12",
+  "Input": "AVRO",
+  "Output": "ORC"
+}
