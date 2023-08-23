@@ -276,5 +276,5 @@ if __name__ == "__main__":
     except Exception as error:
         main_logger.error("exception occured %s", error)
         raise error
-    finally:
-        sys.exit()
+    # finally:
+    #     sys.exit()

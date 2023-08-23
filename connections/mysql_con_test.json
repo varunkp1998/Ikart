@@ -4,10 +4,10 @@
   "connection_subtype": "MySQL",
   "connection_name": "mysql_con_test",
   "connection_details": {
-    "password": "b82ef62efa0ad8406ca92872bf984c40200a9da3",
     "username": "root",
+    "password": "b82ef62efa0ad8406ca92872bf984c40200a9da3",
     "hostname": "localhost",
-    "database": "config",
+    "database": "karttest",
     "port": "6603"
   }
 }

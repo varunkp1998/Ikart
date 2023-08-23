@@ -5,7 +5,12 @@
   "pipeline_cd": "1",
   "pipeline_description": "pipeline_ikart123",
   "is_active": "Y",
-  "tasks_details": null,
+  "tasks_details": {
+    "257_demo_testing": 0,
+    "258_parquet_to_myql": [
+      "257_demo_testing"
+    ]
+  },
   "nodes": [
     {
       "id": "0",
@@ -20,9 +25,9 @@
       "sourcePosition": "right"
     },
     {
-      "id": "244",
+      "id": "257",
       "data": {
-        "label": "244-task_aws_mysql_ikart"
+        "label": "257-demo_testing"
       },
       "position": {
         "x": 50,
@@ -32,9 +37,9 @@
       "targetPosition": "left"
     },
     {
-      "id": "245",
+      "id": "258",
       "data": {
-        "label": "245-task09_aws_mysql"
+        "label": "258-parquet_to_myql"
       },
       "position": {
         "x": 50,
@@ -44,7 +49,18 @@
       "targetPosition": "left"
     }
   ],
-  "edges": null,
-  "created_dttm": "2023-08-11T04:48:40.346Z",
-  "updated_dttm": "2023-08-11T04:48:40.346Z"
+  "edges": [
+    {
+      "id": "flow-0-257",
+      "source": "0",
+      "target": "257"
+    },
+    {
+      "id": "flow-257-258",
+      "source": "257",
+      "target": "258"
+    }
+  ],
+  "created_dttm": "2023-08-23T14:41:47.750Z",
+  "updated_dttm": "2023-08-23T14:41:47.750Z"
 }
