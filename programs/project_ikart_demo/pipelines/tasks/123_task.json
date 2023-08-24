@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 111,
+  "task_name": "123_task",
+  "task_description": "123_task",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
