@@ -5,10 +5,11 @@ import os
 from datetime import datetime
 import importlib
 from sqlalchemy.exc import OperationalError
-import sqlalchemy
 import pandas as pd
 import pymysql
+import sqlalchemy
 from sqlalchemy import text
+
 module = importlib.import_module("utility")
 get_config_section = getattr(module, "get_config_section")
 decrypt = getattr(module, "decrypt")
@@ -20,22 +21,6 @@ CURRENT_TIMESTAMP = "%Y-%m-%d %H:%M:%S"
 MYSQL_LOG_STATEMENT = "mysql ingestion completed"
 WITH_AUDIT_COLUMNS = "data ingesting with audit columns"
 WITH_OUT_AUDIT_COLUMNS = "data ingesting with out audit columns"
-
-# defestablish_conn(json_data: dict, json_section: str,config_file_path:str):
-#     """establishes connection for the mysql database
-#        you pass it through the json"""
-#     try:
-#         connection_details = get_config_section(config_file_path+json_data["task"][json_section]\
-#         ["connection_name"]+'.json')
-#         password = decrypt(connection_details["password"])
-#         conn = sqlalchemy.create_engine(f'mysql+pymysql://{connection_details["username"]}'
-#         f':{password.replace("@", "%40")}@{connection_details["hostname"]}'
-#         f':{int(connection_details["port"])}/{connection_details["database"]}', encoding='utf-8')
-#         # logging.info("connection established")
-#         return conn,connection_details
-#     except Exception as error:
-#         task_logger.exception("establish_conn() is %s", str(error))
-#         raise error
 
 def db_table_exists(sessions: dict, schema: str, tablename: str)-> bool:
     """ function for checking whether a table exists or not in mysql """
@@ -68,7 +53,7 @@ def insert_data(json_data,conn_details,dataframe,sessions):
             task_logger.info(MYSQL_LOG_STATEMENT)
         else:
             task_logger.info(WITH_OUT_AUDIT_COLUMNS)
-            dataframe.to_sql(target["table_name"], connection,
+            dataframe.to_sql(target["table_name"], connection, schema = target["schema"],
             index = False, if_exists = "append")
             task_logger.info(MYSQL_LOG_STATEMENT)
     except sqlalchemy.exc.OperationalError as error:
@@ -179,27 +164,6 @@ def truncate(json_data: dict, conn: dict,dataframe,counter: int, conn_details) -
             task_logger.exception("append() is %s", str(error))
             raise error
 
-def drop(json_data: dict, conn: dict) -> bool:
-    """if table exists, it will drop"""
-    try:
-        target = json_data["task"]["target"]
-        if db_table_exists(conn, target["schema"], target["table_name"]) is True:
-            task_logger.info("%s table exists, started dropping the table",
-            target["table_name"])
-            drop_query = sqlalchemy.text(f'DROP TABLE {target["schema"]}.'
-            f'{target["table_name"]}')
-            conn.execute(drop_query)
-            task_logger.info("mysql dropping table completed")
-            return True
-        else:
-            # if table is not there, then it will say table does not exist
-            task_logger.error('%s does not exists, give correct table name to drop',
-            target["table_name"])
-            return False
-    except Exception as error:
-        task_logger.exception("drop() is %s", str(error))
-        raise error
-
 def write_to_txt(task_id,status,file_path):
     """Generates a text file with statuses for orchestration"""
     try:
@@ -250,12 +214,10 @@ def write(json_data,datafram,counter,config_file_path,task_id,run_id,paths_data,
             status=append(json_data, sessions, datafram,conn_details)
         elif target["operation"] == "truncate":
             status=truncate(json_data, sessions, datafram, counter,conn_details)
-        elif target["operation"] == "drop":
-            status=drop(json_data, sessions)
         elif target["operation"] == "replace":
             status=replace(json_data, sessions, datafram, counter,conn_details)
         elif target["operation"] not in ("create", "append",
-            "truncate", "drop","replace"):
+            "truncate","replace"):
             task_logger.error("give propper input for operation condition")
             status = False
         trgt_record_count(json_data,status,sessions,task_id,run_id,iter_value,audit)
