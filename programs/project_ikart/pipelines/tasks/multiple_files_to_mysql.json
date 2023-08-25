@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 114,
+  "task_name": "multiple_files_to_mysql",
+  "task_description": "multiple_files_to_mysql description",
+  "task_type": "Ingestion",
+  "task_sequence": "3",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
