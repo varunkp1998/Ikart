@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 113,
+  "task_name": "conversion",
+  "task_description": "to convert parquet to csv",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
