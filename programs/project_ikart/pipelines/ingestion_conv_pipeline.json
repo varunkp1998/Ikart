@@ -1,0 +1,12 @@
+{
+  "created_dttm": "2023-08-25T10:08:09.074Z",
+  "updated_dttm": "2023-08-25T10:08:09.074Z",
+  "id": 114,
+  "project_id": 47,
+  "pipeline_name": "ingestion_conv_pipeline",
+  "pipeline_cd": "1",
+  "pipeline_description": "ingestion_conv_pipeline description",
+  "pipeline_sequence": "1",
+  "is_active": "Y",
+  "created_by": "system"
+}
