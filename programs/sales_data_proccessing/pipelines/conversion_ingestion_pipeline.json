@@ -1,0 +1,12 @@
+{
+  "created_dttm": "2023-08-25T06:47:17.804Z",
+  "updated_dttm": "2023-08-25T06:47:17.804Z",
+  "id": 113,
+  "project_id": 46,
+  "pipeline_name": "conversion_ingestion_pipeline",
+  "pipeline_cd": "1",
+  "pipeline_description": "Pipeline to create multiple projects",
+  "pipeline_sequence": "1",
+  "is_active": "Y",
+  "created_by": "system"
+}
