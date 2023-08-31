@@ -1,0 +1,13 @@
+{
+  "id": null,
+  "pipeline_id": 115,
+  "task_name": "excel_to_json",
+  "task_description": "conversion from excel to json",
+  "task_type": "Ingestion",
+  "task_sequence": "16",
+  "is_active": "Y",
+  "created_by": "admin",
+  "created_dttm": "2023-08-31T07:44:52.000Z",
+  "updated_by": "admin",
+  "updated_dttm": "2023-08-31T07:44:52.000Z"
+}
