@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 115,
+  "task_name": "excel_to_csv",
+  "task_description": "conversion from excel to csv",
+  "task_type": "Ingestion",
+  "task_sequence": "14",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
