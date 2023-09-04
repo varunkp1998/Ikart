@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 114,
+  "task_name": "mysql_to_postgres",
+  "task_description": "ingesting data from mysql to postgres",
+  "task_type": "Ingestion",
+  "task_sequence": "21",
+  "Input": "ORC",
+  "Output": "ORC"
+}
