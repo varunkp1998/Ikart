@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 114,
+  "task_name": "json_to_mssql",
+  "task_description": "ingesting mssql table using json source file",
+  "task_type": "Ingestion",
+  "task_sequence": "9",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
