@@ -1,0 +1,11 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 117,
+  "task_name": "test_large_file",
+  "task_description": "to test large file processing",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "Input": "JDBC",
+  "Output": "JDBC"
+}
