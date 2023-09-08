@@ -1,0 +1,13 @@
+{
+  "id": 114,
+  "project_id": 44,
+  "pipeline_name": "pipeline909",
+  "pipeline_cd": null,
+  "pipeline_description": "pipeline909 Updated",
+  "pipeline_sequence": 1,
+  "is_active": "Y",
+  "created_by": "jjones",
+  "created_dttm": "2023-09-06T06:54:09.000Z",
+  "updated_by": null,
+  "updated_dttm": "2023-09-08T06:09:22.000Z"
+}
