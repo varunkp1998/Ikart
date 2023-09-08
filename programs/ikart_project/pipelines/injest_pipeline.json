@@ -1,0 +1,26 @@
+{
+  "pipeline_id": 128,
+  "project_id": 48,
+  "pipeline_name": "injest_pipeline",
+  "pipeline_cd": null,
+  "pipeline_description": "injest_pipeline_123",
+  "is_active": "Y",
+  "tasks_details": {},
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    }
+  ],
+  "edges": null,
+  "created_dttm": "2023-09-08T06:46:24.974Z",
+  "updated_dttm": "2023-09-08T06:46:24.974Z"
+}
