@@ -1,0 +1,13 @@
+{
+  "id": null,
+  "pipeline_id": 117,
+  "task_name": "dq_threshold_test",
+  "task_description": "to test dataquality threshold",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "is_active": "Y",
+  "created_by": "admin",
+  "created_dttm": "2023-09-08T07:49:28.000Z",
+  "updated_by": "admin",
+  "updated_dttm": "2023-09-08T07:49:28.000Z"
+}
