@@ -1,0 +1,38 @@
+{
+  "pipeline_id": 128,
+  "project_id": 48,
+  "pipeline_name": "injest_pipeline",
+  "pipeline_cd": null,
+  "pipeline_description": "injest_pipeline_122",
+  "is_active": "Y",
+  "tasks_details": {},
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    },
+    {
+      "id": "272",
+      "data": {
+        "label": "272-task_run_ikart"
+      },
+      "position": {
+        "x": 50,
+        "y": 1350
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    }
+  ],
+  "edges": null,
+  "created_dttm": "2023-09-08T07:30:25.478Z",
+  "updated_dttm": "2023-09-08T07:30:25.478Z"
+}
