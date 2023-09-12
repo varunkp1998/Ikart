@@ -188,6 +188,7 @@
 	},
 	{
 		"func_name" : "expect_reconciliation",
+		"parameters" : "",
 		"type":"custom_checks"
 	},
 	{

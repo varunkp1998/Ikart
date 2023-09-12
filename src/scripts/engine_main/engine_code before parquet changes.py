@@ -6,10 +6,10 @@ import os
 from datetime import datetime
 import zipfile
 import importlib
-import re
 import requests
 import urllib3
 import pandas as pd
+import re
 from sqlalchemy.orm import sessionmaker
 
 task_logger = logging.getLogger('task_logger')
@@ -63,9 +63,9 @@ def audit(json_data, task_name,run_id,status,value,itervalue,seq_no=None):
 
 def task_json_read(paths_data,task_id,prj_nm):
     """function to read task json"""
+    task_id = re.sub(r'^\d+_?', '', task_id)
     try:
-        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data[
-            "local_repo"]+paths_data["programs"]+prj_nm+\
+        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data["local_repo"]+paths_data["programs"]+prj_nm+\
         paths_data["task_json_path"]+task_id+".json","r",encoding='utf-8') as jsonfile:
             task_logger.info("reading TASK JSON data started %s",task_id)
             json_data = json.load(jsonfile)
@@ -78,8 +78,7 @@ def task_json_read(paths_data,task_id,prj_nm):
 def checks_mapping_read(paths_data):
     """function to read checks_mapping json"""
     try:
-        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data[
-            'src']+paths_data["dq_scripts_path"]+\
+        with open(r""+os.path.expanduser(paths_data["folder_path"])+paths_data['src']+paths_data["dq_scripts_path"]+\
         "checks_mapping.json","r",encoding='utf-8') as json_data_new:
             task_logger.info("reading checks mapping json data started")
             json_checks = json.load(json_data_new)
@@ -94,8 +93,7 @@ def read_write_imports(paths_data,json_data):
     try:
         source = json_data["task"]["source"]
         target = json_data["task"]["target"]
-        py_scripts_path=os.path.expanduser(paths_data["folder_path"])+paths_data[
-            'src']+paths_data["ingestion_path"]
+        py_scripts_path=os.path.expanduser(paths_data["folder_path"])+paths_data['src']+paths_data["ingestion_path"]
         #task_logger.info(py_scripts_path)
         sys.path.insert(0, py_scripts_path)
         task_logger.info("read imports started")
@@ -124,6 +122,7 @@ def task_failed(task_id,file_path,json_data,run_id,iter_value):
 def task_success(task_id,file_path,json_data,run_id,iter_value):
     """function to log and audit if task is success"""
     try:
+        task_id = re.sub(r'^\d+_?', '', task_id)
         write_to_txt1(task_id,'SUCCESS',file_path)
         audit(json_data,task_id,run_id,'STATUS','COMPLETED',
                 iter_value)
@@ -168,8 +167,7 @@ def precheck_status(paths_json_data,task_json_data,run_id):
         seq_nos = [item['seq_no'] for item in task_json_data['task']['data_quality']
                    if item['type'] == 'pre_check']
         seq_nos_str = ','.join(seq_nos)
-        taskorpipelinename = task_json_data['task_name']
-        url = f"{paths_json_data['audit_api_url']}/getPostCheckResult/{taskorpipelinename}/{run_id}/{seq_nos_str}"
+        url = f"{paths_json_data['audit_api_url']}/getPostCheckResult/{run_id}/{seq_nos_str}"
         task_logger.info("URL from API: %s", url[:30]+"...")
         response = requests.get(url, timeout=100)
         if response.status_code == 200:
@@ -188,8 +186,7 @@ def postcheck_status(paths_json_data,task_json_data,run_id):
         seq_nos = [item['seq_no'] for item in task_json_data['task']['data_quality']
                    if item['type'] == 'post_check']
         seq_nos_str = ','.join(seq_nos)
-        taskorpipelinename = task_json_data['task_name']
-        url = f"{paths_json_data['audit_api_url']}/getPostCheckResult/{taskorpipelinename}/{run_id}/{seq_nos_str}"
+        url = f"{paths_json_data['audit_api_url']}/getPostCheckResult/{run_id}/{seq_nos_str}"
         task_logger.info("URL from API: %s", url[:30]+" ...")
         response = requests.get(url, timeout=100)
         if response.status_code == 200:
@@ -235,7 +232,7 @@ def begin_transaction(paths_data,json_data,config_file_path):
     elif target['target_type']=='postgres_write':
         establish_conn_for_postgres = getattr(module, "establish_conn_for_postgres")
         engine,_ = establish_conn_for_postgres(json_data,'target',config_file_path)
-    elif target['target_type']=='mssql_write':
+    elif target['target_type']=='sqlserver_write':
         establish_conn_for_sqlserver = getattr(module, "establish_conn_for_sqlserver")
         engine,_ = establish_conn_for_sqlserver(json_data,'target',config_file_path)
     # Create a session object
@@ -250,6 +247,7 @@ def begin_transaction(paths_data,json_data,config_file_path):
 def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
     """function consists of pre_checks,conversion,ingestion,post_checks, qc report"""
     try:
+        task_id = re.sub(r'^\d+_?', '', task_id)
         task_logger.info("entered into engine_main")
         json_data = task_json_read(paths_data,task_id,prj_nm)
         write_to_txt1(task_id,'STARTED',file_path)
@@ -265,13 +263,12 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
         source = json_data["task"]["source"]
         target = json_data["task"]["target"]
         if target['target_type'] in {'mysql_write','postgres_write','snowflake_write',
-                                     'mssql_write'}:
+                                     'sqlserver_write'}:
             session = begin_transaction(paths_data,json_data,config_file_path)
-
         # Precheck script execution starts here
         if dq_execution["pre_check_enable"] == 'Y' and\
-        source["source_type"] in ('csv_read','parquet_read','postgres_read','mysql_read',
-        'snowflake_read','mssql_read','mssql_read','aws_s3_read'):
+        source["source_type"] in ('csv_read','postgres_read','mysql_read',
+        'snowflake_read','mssql_read','sqlserver_read','aws_s3_read'):
             pre_check = definitions_qc.qc_pre_check(prj_nm,json_data,json_checks,
             paths_data,config_file_path,task_id,run_id,file_path,iter_value)
         elif source["source_type"] == "csv_read" and \
@@ -293,7 +290,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
         read, write =read_write_imports(paths_data,json_data)
 
         if source["source_type"] in ("postgres_read","mysql_read",
-        "snowflake_read","mssql_read", "aws_s3_read"):
+        "snowflake_read","sqlserver_read", "aws_s3_read"):
             data_fram = read(json_data,config_file_path,task_id,run_id,paths_data,
             file_path,iter_value)
             counter=0
@@ -313,8 +310,8 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     if value is False:
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
                         return False
-        elif source["source_type"] in ("csv_read", "parquet_read", "json_read",
-                                       "xml_read", "xlsx_read"):
+        elif source["source_type"] in ("csv_read"):
+            # task_logger.info(json_data)
             data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
             counter=0
             for i in data_fram :
@@ -336,8 +333,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     if value is True:
                         task_success(task_id,file_path,json_data,run_id,iter_value)
                         return False
-                elif target["target_type"] not in ("csv_write", "parquet_write", "json_write",
-                                                   "xml_write", "xlsx_write"):
+                elif target["target_type"] != "csv_write":
                     value=write(json_data, i,counter,config_file_path,task_id,run_id,
                     paths_data,file_path,iter_value,session)
                     if value is False:
@@ -347,7 +343,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                         task_success(task_id,file_path,json_data,run_id,iter_value)
                         return False
                 else:
-                    # task_logger.info(type(i))
+                    task_logger.info(type(i))
                     value=write(json_data, i,counter)
                     if value is False:
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
@@ -371,25 +367,25 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     if value is False:
                         task_failed(task_id,file_path,json_data,run_id,iter_value)
                         return False
-        # elif source["source_type"] in ("csvfile_read"
-        #     ,"json_read" ,"xml_read","excel_read"):
-        #     data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
-        #     counter=0
-        #     for i in data_fram :
-        #         counter+=1
-        #         if target["target_type"] == "csvfile_write":
-        #             value=write(json_data, i,counter)
-        #             if value=='Fail':
-        #                 task_failed(task_id,file_path,json_data,run_id,iter_value)
-        #                 return False
-        #         elif target["target_type"] == "aws_s3_write":
-        #             value=write(json_data, i,config_file_path,task_id,run_id,
-        #             paths_data,file_path,iter_value)
-        #             if value=='Fail':
-        #                 task_failed(task_id,file_path,json_data,run_id,iter_value)
-        #                 return False
-        #         else:
-        #             value=write(json_data, i)
+        elif source["source_type"] in ("csvfile_read"
+            ,"json_read" ,"xml_read","parquet_read","excel_read"):
+            data_fram=read(json_data,task_id,run_id,paths_data,file_path,iter_value)
+            counter=0
+            for i in data_fram :
+                counter+=1
+                if target["target_type"] == "csvfile_write":
+                    value=write(json_data, i,counter)
+                    if value=='Fail':
+                        task_failed(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                elif target["target_type"] == "aws_s3_write":
+                    value=write(json_data, i,config_file_path,task_id,run_id,
+                    paths_data,file_path,iter_value)
+                    if value=='Fail':
+                        task_failed(task_id,file_path,json_data,run_id,iter_value)
+                        return False
+                else:
+                    value=write(json_data, i)
         else:
             task_logger.info("only ingestion available currently")
 
@@ -400,13 +396,12 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
             post_check=definitions_qc.qc_post_check(prj_nm,json_data, json_checks,paths_data,
             config_file_path,task_id,run_id,file_path,iter_value,None)
         elif target["target_type"] in ('postgres_write' ,'mysql_write',
-            "snowflake_write",'mssql_write' ) and \
+            "snowflake_write",'sqlserver_write' ) and \
         dq_execution["post_check_enable"] == 'Y':
             post_check=definitions_qc.qc_post_check(prj_nm,json_data, json_checks,paths_data,
             config_file_path,task_id,run_id,file_path,iter_value,session)
         #qc report generation
-        new_path=os.path.expanduser(paths_data["folder_path"])+paths_data[
-            "local_repo"]+paths_data["programs"]+prj_nm+\
+        new_path=os.path.expanduser(paths_data["folder_path"])+paths_data["local_repo"]+paths_data["programs"]+prj_nm+\
         paths_data["qc_reports_path"]
         if dq_execution["pre_check_enable"] == 'Y' and dq_execution["post_check_enable"] == 'N':
             post_check = pd.DataFrame()
@@ -426,7 +421,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
 
         #session related script execution starts here
         if target['target_type'] in {'mysql_write',
-            'snowflake_write','postgres_write', 'csv_write','mssql_write'}:
+            'snowflake_write','postgres_write', 'csv_write','sqlserver_write'}:
             if dq_execution['post_check_enable'] == 'Y':
                 result = postcheck_status(paths_data,json_data,run_id)
                 # Checking if all results are 'PASS'
@@ -434,7 +429,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                 all_pass = all(item.get('audit_value', '') == 'PASS' for item in result)
                 if all_pass:
                     if target['target_type'] in {'mysql_write',
-                    'snowflake_write','postgres_write','mssql_write'}:
+                    'snowflake_write','postgres_write','sqlserver_write'}:
                         session.commit()
                         task_logger.info("Transaction commited successfully!")
                 else:
@@ -457,7 +452,7 @@ def engine_main(prj_nm,task_id,paths_data,run_id,file_path,iter_value):
                     write_to_txt1(task_id,'FAILED',file_path)
                     sys.exit()
             else:
-                if target['target_type'] not in {'csv_write','aws_s3_write','parquet_write'}:
+                if target['target_type'] not in {'csv_write','aws_s3_write'}:
                     session.commit()
                     task_logger.info("Transaction commited successfully!")
         task_logger.info(TASK_LOG,task_id)

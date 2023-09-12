@@ -1,9 +1,8 @@
 """script for general purpose methods like log, audit, connections etc..."""
 import logging
 import json
-import base64
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
+import datetime
+import re
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 # custom log function for framework
@@ -43,40 +42,6 @@ def get_config_section(config_path:str) -> dict:
         logging.exception("get_config_section() is %s.", str(error))
         raise error
 
-# # reading the connection.json file and passing the connection details as dictionary
-# def get_config_section(config_path:str, conn_nm: str) -> dict:
-#     """reads the connection file and returns connection details as dict for
-#        connection name you pass it through the json
-#     """
-#     try:
-#         with open(config_path,'r', encoding='utf-8') as jsonfile:
-#             logging.info("fetching connection details")
-#             json_data = json.load(jsonfile)
-#             logging.info("reading connection details completed")
-#             # print("connection established")
-#             return dict(json_data[conn_nm].items())
-#     except Exception as error:
-#         logging.exception("get_config_section() is %s.", str(error))
-#         raise error
-
-# def decrypt(edata):
-#     """password decryption function"""
-#     try:
-#         crypto_key= '8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
-#         crypto_iv= 'rBEssDfxofOveRxR'
-#         block_size=16
-
-#         key = bytes(crypto_key, 'utf-8')
-#         value = bytes(crypto_iv, 'utf-8')
-
-#         # Add "=" padding back before decoding
-#         edata = base64.urlsafe_b64decode(edata + '=' * (-len(edata) % 4))
-#         aes = AES.new(key, AES.MODE_CBC, value)
-#         return unpad(aes.decrypt(edata), block_size).decode("utf-8")
-#     except Exception as error:
-#         logging.exception("decrypt() is %s.", str(error))
-#         raise error
-
 def decrypt(data):
     '''function to decrypt the data'''
     KEY = b'8ookgvdIiH2YOgBnAju6Nmxtp14fn8d3'
@@ -84,3 +49,27 @@ def decrypt(data):
     aesgcm = AESGCM(KEY)
     decrypted = aesgcm.decrypt(IV, bytes.fromhex(data), None)
     return decrypted.decode('utf-8')
+
+def replace_date_placeholders(file_name):
+    """function to replace the date for target filenames"""
+    #Define the regular expression pattern to match date placeholders
+    date_pattern = r"%[DdMmYy]+%"
+
+    # Find all date placeholders in the input string
+    date_placeholders = re.findall(date_pattern, file_name)
+
+    # Get today's date components
+    today_date = datetime.datetime.now()
+    year = today_date.strftime("%Y")
+    month = today_date.strftime("%m")
+    day = today_date.strftime("%d")
+
+    # Replace each date placeholder with the corresponding date component
+    for placeholder in date_placeholders:
+        if "YYYY" in placeholder:
+            file_name = file_name.replace(placeholder, year)
+        elif "MM" in placeholder:
+            file_name = file_name.replace(placeholder, month)
+        elif "DD" in placeholder:
+            file_name = file_name.replace(placeholder, day)
+    return file_name

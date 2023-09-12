@@ -90,7 +90,7 @@ def establish_conn_for_sqlserver(json_data: dict, json_section: str, config_file
         password = decrypt(connection_details["password"])
         sqlserver_conn=sqlalchemy.create_engine(f'mssql+pymssql://{connection_details["username"]}'
         f':{password.replace("@", "%40")}@{connection_details["hostname"]}'
-        f':{connection_details["port"]}/{connection_details["database"]}', encoding='utf-8')
+        f':{connection_details["port"]}/{connection_details["database"]}')
         logging.info("connection established")
         return sqlserver_conn,connection_details
     except Exception as error:
