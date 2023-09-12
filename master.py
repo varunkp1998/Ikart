@@ -10,6 +10,7 @@ from pathlib import Path
 import hashlib
 import requests
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import github
 from github import Github
 from github import Auth
 from dotenv import load_dotenv
@@ -20,8 +21,8 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     """Function to initiate logging for framework by creating logger objects"""
     try:
         logger = logging.getLogger(logger_name)
-        formatter = logging.Formatter('%(asctime)s | %(name)-10s | %(processName)-12s |\
-        %(funcName)-22s | %(levelname)-5s | %(message)s')
+        formatter = logging.Formatter('%(asctime)s | %(name)-10s | %(processName)-12s | '
+                              '%(funcName)-22s | %(levelname)-5s | %(message)s')
         file_handler = logging.FileHandler(log_file, mode='w')
         file_handler.setFormatter(formatter)
         file_handler.setLevel(logging.INFO)
@@ -89,6 +90,13 @@ def get_file_in_gitrepo(repo, path, file_or_dir, branch):
         content_list = [file.name for file in repo.get_contents(path, ref=branch)
                         if file.type == file_or_dir]
         return content_list
+    except github.GithubException as err:
+        # Handle GitHub-related exceptions here
+        if "Bad credentials" in str(err):
+            print(f"Bad credentials exception: {err}")
+            # You might want to re-authenticate or take corrective actions here.
+        else:
+            print(f"GitHub exception: {err}")
     except Exception as err:
         logging.exception("get_file_in_gitrepo() error: %s", str(err))
         raise err
@@ -126,29 +134,28 @@ def downlaod_latest_file_from_git(repository_name,
     branch,file_path,local_file_path,filename,log_name):
     '''function to get the updated file from git'''
     try:
-        auth_token = os.getenv("AUTH")
-        auth = Auth.Token(auth_token)
-        git = Github(auth=auth)
-        repo = git.get_repo(repository_name)
-        file_contents = repo.get_contents(file_path,ref=branch)
-        # Get the SHA of the file on GitHub
-        github_sha = hashlib.sha1(file_contents.decoded_content).hexdigest()
-        # Calculate the sha of the local file (assuming it already exists)
-        with open(local_file_path, "rb") as file:
-            local_file_data = file.read()
-            local_sha = hashlib.sha1(local_file_data).hexdigest()
-        # log_name.info("github sha: %s", github_sha)
-        # log_name.info("local_sha: %s", local_sha)
-        # Compare the shas
-        if github_sha != local_sha:
-            # File has been updated, proceed with downloading
-            file_url = file_contents.download_url
-            response = requests.get(file_url, timeout=60)
-            with open(local_file_path, "wb") as file:
-                file.write(response.content)
-            log_name.info(f"File: {filename} has been updated and downloaded.")
-        else:
-            log_name.info(f"File: {filename} is already up to date.")
+        if local_file_path.exists():
+            auth_token = os.getenv("AUTH")
+            auth = Auth.Token(auth_token)
+            git = Github(auth=auth)
+            repo = git.get_repo(repository_name)
+            file_contents = repo.get_contents(file_path,ref=branch)
+            # Get the SHA of the file on GitHub
+            github_sha = hashlib.sha1(file_contents.decoded_content).hexdigest()
+            # Calculate the sha of the local file (assuming it already exists)
+            with open(local_file_path, "rb") as file:
+                local_file_data = file.read()
+                local_sha = hashlib.sha1(local_file_data).hexdigest()
+            # Compare the shas
+            if github_sha != local_sha:
+                # File has been updated, proceed with downloading
+                file_url = file_contents.download_url
+                response = requests.get(file_url, timeout=60)
+                with open(local_file_path, "wb") as file:
+                    file.write(response.content)
+                log_name.info(f"File: {filename} has been updated and downloaded.")
+            else:
+                log_name.info(f"File: {filename} is already up to date.")
     except Exception as err:
         main_logger.info("error in get_the_updated_file_from_git() %s",str(err))
         raise err
@@ -276,5 +283,5 @@ if __name__ == "__main__":
     except Exception as error:
         main_logger.error("exception occured %s", error)
         raise error
-    # finally:
-    #     sys.exit()
+    finally:
+        sys.exit()

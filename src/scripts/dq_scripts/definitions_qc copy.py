@@ -311,19 +311,8 @@ def ge_checks(func_name,default_parameters_dtypes,inputs_required,output_df,inde
         ge_df_func = ge_df_func.format(*inputs_required)
         task_logger.info('GE function generated - %s', ge_df_func)
         res = eval(ge_df_func)
-        if 'unexpected_percent' in res['result'] and control_table_df.at[
-            index, 'threshold_bad_records'] is not None:
-            if control_table_df.at[index, 'threshold_bad_records'] < int(res[
-                'result']['unexpected_percent']):
-                task_logger.warning("Percentage of bad records count is:%s which is exceeding "
-                "Percentage of Threshold:%s",
-                int(res['result']['unexpected_percent']),
-                control_table_df.at[index, 'threshold_bad_records'])
-            output_df.at[index, 'result'] = 'PASS' if control_table_df.at[
-            index, 'threshold_bad_records'] >= int(res['result']['unexpected_percent']) or res[
-            'success'] is True else 'FAIL'
-        else:
-            output_df.at[index, 'result'] = 'PASS' if res['success'] is True else 'FAIL'
+        # Update output_df with result of QA check
+        output_df.at[index, 'result'] = 'PASS' if res['success'] is True else 'FAIL'
         task_logger.info('QC for %s check has been %s', control_table_df.at[
             index, "check"], output_df.at[index, "result"])
         # Handle bad records if ignore_bad_records flag is set
@@ -351,10 +340,10 @@ def ge_checks(func_name,default_parameters_dtypes,inputs_required,output_df,inde
             index, "check"],iter_value,seq_no)
         audit(main_json_file, task_id,run_id,'RESULT',output_df.at[
             index, 'result'],iter_value,seq_no)
-        # audit(main_json_file, task_id,run_id,'GOOD_RECORD_COUNT',output_df.at[
-        #     index, 'good_records_count'],iter_value,seq_no)
-        # audit(main_json_file, task_id,run_id,'BAD_RECORD_COUNT',output_df.at[
-        #     index, 'bad_records_count'],iter_value,seq_no)
+        audit(main_json_file, task_id,run_id,'GOOD_RECORD_COUNT',output_df.at[
+            index, 'good_records_count'],iter_value,seq_no)
+        audit(main_json_file, task_id,run_id,'BAD_RECORD_COUNT',output_df.at[
+            index, 'bad_records_count'],iter_value,seq_no)
     except Exception as err:
         task_logger.info("error in GE_check function")
         raise err
@@ -432,11 +421,6 @@ main_json_file,task_id,run_id, file_path,iter_value):
             else:
                 custom_checks(control_table_df,main_json_file,index,inputs_required,output_df,ge_df)
         return output_df
-    except KeyError as error:
-        task_logger.error("Key Error Occured %s", str(error))
-        write_to_txt1(task_id,'FAILED',file_path)
-        audit(main_json_file, task_id,run_id,'STATUS','FAILED',iter_value)
-    # Add a return statement here to handle the exception
     except ValueError:
         task_logger.error("func name(check_name) mentioned in the json is \
                           incorrect please check it.")
@@ -456,7 +440,7 @@ def connections(ing_type, conn_str, password, main_json_file,task_id,file_path,
         if ing_type in {'postgres_read', 'postgres_write'}:
             conn = sqlalchemy.create_engine(f'postgresql://{conn_str["username"]}'
                 f':{password.replace("@", "%40")}@{conn_str["hostname"]}'
-                f':{int(conn_str["port"])}/{conn_str["database"]}')
+                f':{int(conn_str["port"])}/{conn_str["database"]}', encoding='utf-8')
             task_logger.info("Postgres connection established successfully!")
         elif ing_type in {'mysql_read', 'mysql_write'}:
             conn = sqlalchemy.create_engine(f'mysql+pymysql://{conn_str["username"]}'
@@ -475,10 +459,10 @@ def connections(ing_type, conn_str, password, main_json_file,task_id,file_path,
                 f':{conn_str["database"]}/{main_json_file["task"]["target"]["schema"]}'
                 f'?warehouse={conn_str["warehouse"]}&role={conn_str["role"]}')
                 task_logger.info("snowflake connection established successfully!")
-        elif ing_type in {'mssql_read', 'mssql_write'}:
+        elif ing_type in {'sqlserver_read', 'sqlserver_write'}:
             conn = sqlalchemy.create_engine(f'mssql+pymssql://{conn_str["username"]}'
             f':{password.replace("@", "%40")}@{conn_str["hostname"]}'
-            f':{conn_str["port"]}/{conn_str["database"]}')
+            f':{conn_str["port"]}/{conn_str["database"]}', encoding='utf-8')
         else:
             task_logger.info("only ingestion available currently!")
         return conn
@@ -496,7 +480,7 @@ def connections(ing_type, conn_str, password, main_json_file,task_id,file_path,
     except Exception as error:
         write_to_txt1(task_id,'FAILED',file_path)
         audit(main_json_file, task_id,run_id,'STATUS','FAILED', iter_value)
-        task_logger.exception("error in connections function %s.", str(error))
+        task_logger.exception("error in qc_check function %s.", str(error))
         raise error
 
 def aws_s3_conn(ing_type,paths_data,conn_str):
@@ -521,7 +505,6 @@ def file_reading_df(ing_type, encoding, loc,task_id,file_path,sheetnum,
     try:
         if ing_type in {'csv_read', 'csv_write'}:
             pd_df = pd.read_csv(loc, encoding=encoding)
-            # print(pd_df.columns)
             ge_df = ge.from_pandas(pd_df)
             task_logger.info('Reading csv file started at %s', loc)
         elif ing_type in {'parquet_read', 'parquet_write'}:
@@ -586,7 +569,7 @@ def sqlserver_conn(conn_str, password, loc,ing_type,main_json_file,task_id,
         task_logger.info("entered into sqlserver read")
         conn = connections(ing_type, conn_str, password, main_json_file,
                 task_id,file_path,iter_value, run_id)
-        if ing_type == 'mssql_read':
+        if ing_type == 'sqlserver_read':
             connection = conn.raw_connection()
             cursor = connection.cursor()
             if main_json_file['task']['source']['query'] == " ":
@@ -600,7 +583,7 @@ def sqlserver_conn(conn_str, password, loc,ing_type,main_json_file,task_id,
                 task_logger.info(sql)
             cursor.execute(sql)
             myresult = cursor.fetchall()
-        if ing_type == 'mssql_write':
+        if ing_type == 'sqlserver_write':
             conn = sessions.connection()
             pd_df = pd.read_sql(f'select * from {loc};', conn)
             sql = f'SELECT count(0) from {loc}'
@@ -723,10 +706,10 @@ sessions, dq_output_loc=None):
             ge_df = aws_s3_read(conn_str, ing_type, main_json_file,paths_data)
         else:
             if ing_type in {'postgres_read', 'postgres_write', 'mysql_read', 'mysql_write',
-                            'snowflake_read','snowflake_write','mssql_read',
-                            'mssql_write'}:
-                decrypt_path=os.path.expanduser(paths_data["folder_path"])+paths_data[
-                    "src"]+paths_data["ingestion_path"]
+                            'snowflake_read','snowflake_write','sqlserver_read',
+                            'sqlserver_write'}:
+                decrypt_path=os.path.expanduser(paths_data["folder_path"])+paths_data["src"]+paths_data[
+                    "ingestion_path"]
                 sys.path.insert(0, decrypt_path)
                 module = importlib.import_module("utility")
                 decrypt = getattr(module, "decrypt")
@@ -740,7 +723,7 @@ sessions, dq_output_loc=None):
                 elif ing_type in {'snowflake_read', 'snowflake_write'}:
                     ge_df = snowflake_conn(conn_str, password, ing_type, main_json_file, loc,
                task_id,file_path,iter_value, run_id,sessions)
-                elif ing_type in {'mssql_read', 'mssql_write'}:
+                elif ing_type in {'sqlserver_read', 'sqlserver_write'}:
                     ge_df = sqlserver_conn(conn_str, password, loc,ing_type,main_json_file,task_id,
                   file_path,iter_value, run_id,sessions)
         datasets = pool.map(
@@ -753,13 +736,13 @@ sessions, dq_output_loc=None):
         resultset['unexpected_index_list'] = resultset['unexpected_index_list'].replace(np.nan,'')
         bad_records_indexes = list({
             item for sublist in resultset['unexpected_index_list'].tolist() for item in sublist})
-        bad_file_loc = os.path.expanduser(paths_data["folder_path"])+paths_data[
-            "local_repo"]+paths_data["programs"]+prj_nm+paths_data["rejected_path"]
+        bad_file_loc = os.path.expanduser(paths_data["folder_path"])+paths_data["local_repo"]+paths_data["programs"]+prj_nm+\
+        paths_data["rejected_path"]
         if 'FAIL' in resultset.result.values:
             indexes = list(set(bad_records_indexes))
             bad_records_df = ge_df[ge_df.index.isin(indexes)]
-            # no_of_bad_records = bad_records_df.shape[0]
-            # task_logger.info('Total number of bad records are %s', no_of_bad_records)
+            no_of_bad_records = bad_records_df.shape[0]
+            task_logger.info('Total number of bad records are %s', no_of_bad_records)
             bad_records_df.to_csv(
                 bad_file_loc + src_file_name +'_' + 'rejected_records_' +
                     datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + '.csv', index=False)
@@ -769,8 +752,8 @@ sessions, dq_output_loc=None):
                     dq_output_loc + src_file_name + '.csv', index=False)
             else:
                 good_records_df = ge_df[~ge_df.index.isin(indexes)]
-                # no_of_good_records = good_records_df.shape[0]
-                # task_logger.info('Total number of good records are %s', no_of_good_records)
+                no_of_good_records = good_records_df.shape[0]
+                task_logger.info('Total number of good records are %s', no_of_good_records)
                 good_records_df.to_csv(
                     dq_output_loc + src_file_name + '.csv', index=False)
         else:
@@ -880,13 +863,13 @@ def get_source_connection_details(main_json_file, config_file_path, paths_data):
     try:
         src_conn_str = ''
         source_type = main_json_file['task']['source']['source_type']
-        get_config_section_path=os.path.expanduser(paths_data["folder_path"])+paths_data[
-            "src"]+paths_data["ingestion_path"]
+        get_config_section_path=os.path.expanduser(paths_data["folder_path"])+paths_data["src"]+paths_data[
+        "ingestion_path"]
         sys.path.insert(0, get_config_section_path)
         module = importlib.import_module("utility")
         get_config_section = getattr(module, "get_config_section")
         if source_type in {'postgres_read','mysql_read','snowflake_read',
-                           'mssql_read','aws_s3_read'}:
+                           'sqlserver_read','aws_s3_read'}:
             if main_json_file['task']['source']['connection_name'] != '':
                 src_conn_str = get_config_section(config_file_path + main_json_file[
                 'task']['source']['connection_name'] + JSON)
@@ -935,8 +918,8 @@ def qc_check_function_calling(prj_nm,main_json_file,paths_data,task_id,
     '''function to call the qc_check function based on source type'''
     control_table = pd.DataFrame(main_json_file['task']['data_quality'])
     checks_mapping = pd.DataFrame(cm_json_file['checks_mapping'])
-    output_loc = os.path.expanduser(paths_data["folder_path"])+paths_data[
-    "local_repo"]+paths_data["programs"]+prj_nm+paths_data["source_files_path"]
+    output_loc = os.path.expanduser(paths_data["folder_path"])+paths_data["local_repo"]+paths_data["programs"]+prj_nm+\
+    paths_data["source_files_path"]
     conn_str = get_source_connection_details(main_json_file,
                                             config_file_path, paths_data)
     default_encoding = get_default_encoding(main_json_file)
@@ -951,16 +934,15 @@ def qc_check_function_calling(prj_nm,main_json_file,paths_data,task_id,
         all_files = glob.glob(pattern)
         if all_files:
             for file in all_files:
-                data = pd.read_csv(file)  
                 # if source['source_type'] in {'csv_read', 'parquet_read', \
                 #                     'xlsx_read', 'xml_read', 'json_read','aws_s3_read'}:
-                pre_check_result = qc_check(
-                prj_nm,control_table, checks_mapping, source[
-                'file_name'],'pre_check', source['source_type'],
-                file, default_encoding, default_sheetnum,conn_str,
-                main_json_file,task_id,run_id,paths_data,file_path,iter_value,None,output_loc)
+                    pre_check_result = qc_check(
+                    prj_nm,control_table, checks_mapping, source[
+                    'file_name'],'pre_check', source['source_type'],
+                    file, default_encoding, default_sheetnum,conn_str,
+                    main_json_file,task_id,run_id,paths_data,file_path,iter_value,None,output_loc)
     if source['source_type'] in {'postgres_read', 'mysql_read',
-                                    'snowflake_read', 'mssql_read'}:
+                                    'snowflake_read', 'sqlserver_read'}:
         src_tbl_name = get_table_or_query(main_json_file)
         pre_check_result = qc_check(
         prj_nm, control_table, checks_mapping, source[
@@ -1039,13 +1021,13 @@ def qc_pre_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path,
 def get_target_connection_details(main_json_file, config_file_path, paths_data):
     '''function to get the connection strings for source and targets'''
     try:
-        get_config_section_path=os.path.expanduser(paths_data["folder_path"])+paths_data[
-        'src']+paths_data["ingestion_path"]
+        get_config_section_path=os.path.expanduser(paths_data["folder_path"])+paths_data['src']+paths_data[
+        "ingestion_path"]
         sys.path.insert(0, get_config_section_path)
         module = importlib.import_module("utility")
         get_config_section = getattr(module, "get_config_section")
         if main_json_file['task']['target']['target_type'] in {'postgres_write', 'mysql_write',
-        'snowflake_write','mssql_write'}:
+        'snowflake_write','sqlserver_write'}:
             tgt_conn_str =  get_config_section(
                 config_file_path+main_json_file["task"]['target']["connection_name"]+JSON
                 ) if main_json_file['task']['target']['connection_name'] != '' else ''
@@ -1114,8 +1096,8 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
         default_encoding = def_encoding(main_json_file)
         default_sheetnum = def_sheetnum(main_json_file)
         task_logger.info("Post_check operation started")
-        output_loc = os.path.expanduser(paths_data["folder_path"])+paths_data[
-        "local_repo"]+paths_data["programs"]+prj_nm+paths_data["rejected_path"]
+        output_loc = os.path.expanduser(paths_data["folder_path"])+paths_data["local_repo"]+paths_data["programs"]+prj_nm+\
+        paths_data["rejected_path"]
         target = main_json_file['task']['target']
         # Reprocessing of bad records file
         if "task" in main_json_file and "data_quality_features" in main_json_file["task"]:
@@ -1129,7 +1111,7 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
                     'file_name'], default_encoding, default_sheetnum,tgt_conn_str,
                     main_json_file,task_id,run_id, paths_data,file_path,iter_value,None,output_loc)
                 elif target['target_type'] in {'postgres_write',
-                'mysql_write','mssql_write'}:
+                'mysql_write','sqlserver_write'}:
                     post_check_result = qc_check(prj_nm, control_table, checks_mapping, target[
                     'table_name'],'post_check', target['target_type'], target[
                     'table_name'], default_encoding, default_sheetnum,tgt_conn_str,
@@ -1154,7 +1136,7 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
                     tgt_conn_str, main_json_file, task_id, run_id,output_file_path,
                     file_path, iter_value,sessions, output_loc)
                 elif target_type in {'postgres_write', 'mysql_write', 'snowflake_write',
-                                     'mssql_write'}:
+                                     'sqlserver_write'}:
                     target_table = target['table_name']
                     post_check_result = qc_check(control_table, checks_mapping, target_table,
                     'post_check',target_type, target_table,default_encoding, default_sheetnum,
@@ -1170,7 +1152,7 @@ def qc_post_check(prj_nm,main_json_file,cm_json_file,paths_data,config_file_path
                 'file_path']+target[
                 'file_name'], default_encoding, default_sheetnum,tgt_conn_str,
                 main_json_file,task_id,run_id, paths_data,file_path,iter_value,None,output_loc)
-            elif target['target_type'] in {'postgres_write','mysql_write','mssql_write'}:
+            elif target['target_type'] in {'postgres_write','mysql_write','sqlserver_write'}:
                 post_check_result = qc_check(
                 prj_nm, control_table, checks_mapping, target[
                 'table_name'],'post_check', main_json_file['task'][

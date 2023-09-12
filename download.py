@@ -145,7 +145,6 @@ def download_task_files(prj_nm,task_name:str, config_path:str, repo_name,branch)
         homepath = str(Path(config_path['folder_path']).expanduser())
         task_logger.info("entered into downloading task related files")
         #to download task json from git
-        task_name = re.sub(r'^\d+_?', '', task_name)
         try:
             # if not Path(f'{homepath}{"/"}{config_path["local_repo"]}{config_path["programs"]}'
             # f'{prj_nm}{config_path["task_json_path"]}{task_name}{JSON}').exists():

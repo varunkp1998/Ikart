@@ -1,9 +1,9 @@
-""" script for reading data from parquet"""
+""" script for reading data from xml"""
 import logging
 import sys
 import os
-import importlib
 import glob
+import importlib
 import pandas as pd
 
 task_logger = logging.getLogger('task_logger')
@@ -24,11 +24,11 @@ def write_to_txt(task_id,status,file_path):
         task_logger.exception("write_to_txt: %s.", str(error))
         raise error
 
-def read(json_data : dict,task_id,run_id,paths_data,file_path,iter_value) -> bool:
-    """ function for readinging data from parquet  """
+def read(json_data : dict,task_id,run_id,paths_data,file_path,iter_value):
+    """ function for reading data from json  """
     try:
+        task_logger.info("json  reading started")
         source = json_data["task"]["source"]
-        task_logger.info("reading csv initiated...")
         file_path = source["file_path"]
         file_name = source["file_name"]
         pattern = f'{file_path}{file_name}'
@@ -50,13 +50,15 @@ def read(json_data : dict,task_id,run_id,paths_data,file_path,iter_value) -> boo
             sys.exit()
         else:
             for file in all_files:
-                dataframe = pd.read_parquet(file,engine='auto')
+                datafram = pd.read_json(file,encoding = json_data["task"]["source"]["encoding"],
+                                        nrows = None)
+                datafram.columns = datafram.columns.astype(str)
                 count1 = 1 + count1
                 task_logger.info(ITERATION , str(count1))
-                yield dataframe
+                yield datafram
         # return True
     except Exception as error:
         write_to_txt(task_id,'FAILED',file_path)
         audit(json_data, task_id,run_id,'STATUS','FAILED',iter_value)
-        task_logger.exception("reading_parquet_() is %s", str(error))
+        task_logger.exception("reading json() is %s", str(error))
         raise error
