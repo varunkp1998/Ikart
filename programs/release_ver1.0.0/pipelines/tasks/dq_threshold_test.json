@@ -50,7 +50,7 @@
         "seq_no": "1",
         "check": "column_values_to_not_be_null",
         "parameters": {
-          "column": "ID"
+          "column": "id"
         },
         "active": "Y",
         "ignore_bad_records": "N",
