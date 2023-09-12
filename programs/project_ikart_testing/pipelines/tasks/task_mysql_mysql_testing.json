@@ -7,10 +7,12 @@
   "task_name": "task_mysql_mysql_testing",
   "task_description": "task_mysql_mysql_testing",
   "task_type": "Ingestion",
-  "task_sequence": "1",
+  "task_sequence": "\"0\"",
   "source": "MySQL",
   "target": "MySQL",
   "is_active": "Y",
+  "created_by": "admin",
+  "updated_by": "admin",
   "task": {
     "source": {
       "source_type": "mysql_read",

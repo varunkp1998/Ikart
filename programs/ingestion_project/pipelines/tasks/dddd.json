@@ -7,7 +7,7 @@
   "task_name": "dddd",
   "task_description": "ddd",
   "task_type": "Ingestion",
-  "task_sequence": "d",
+  "task_sequence": "\"0\"",
   "source": "MySQL",
   "target": "MySQL",
   "is_active": "Y",
@@ -20,14 +20,12 @@
       "table_name": "tbl_user",
       "parameter_type": "MySQL",
       "select_columns": "login_id,user_email",
-      "connection_name": "mysql_con_test",
-      "skip_footer": null,
-      "skip_header": null
+      "connection_name": "mysql_con_test"
     },
     "target": {
       "target_type": "mysql_write",
-      "schema": "public",
-      "operation": "create",
+      "schema": "ikart",
+      "operation": "replace",
       "table_name": "tbl_user12",
       "audit_columns": "active",
       "parameter_type": "MySQL",

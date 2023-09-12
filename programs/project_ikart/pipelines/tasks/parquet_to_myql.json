@@ -7,7 +7,7 @@
   "task_name": "parquet_to_myql",
   "task_description": "ingest parquet to mysql",
   "task_type": "Ingestion",
-  "task_sequence": "12",
+  "task_sequence": "\"1\"",
   "source": "Local Server",
   "target": "MySQL",
   "is_active": "Y",

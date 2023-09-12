@@ -6,8 +6,7 @@
   "pipeline_description": "injest_pipeline_1",
   "is_active": "Y",
   "tasks_details": {
-    "task_run_ikart": 0,
-    "task_run_ikart_copy": 0
+    "task_run_ikart": 0
   },
   "nodes": [
     {
@@ -29,19 +28,7 @@
       },
       "position": {
         "x": 50,
-        "y": 1400
-      },
-      "sourcePosition": "right",
-      "targetPosition": "left"
-    },
-    {
-      "id": "273",
-      "data": {
-        "label": "273-task_run_ikart_copy"
-      },
-      "position": {
-        "x": 50,
-        "y": 1450
+        "y": 1350
       },
       "sourcePosition": "right",
       "targetPosition": "left"
@@ -52,13 +39,8 @@
       "id": "flow-0-272",
       "source": "0",
       "target": "272"
-    },
-    {
-      "id": "flow-0-273",
-      "source": "0",
-      "target": "273"
     }
   ],
-  "created_dttm": "2023-09-11T07:47:01.245Z",
-  "updated_dttm": "2023-09-11T07:47:01.245Z"
+  "created_dttm": "2023-09-11T06:18:12.786Z",
+  "updated_dttm": "2023-09-11T06:18:12.786Z"
 }

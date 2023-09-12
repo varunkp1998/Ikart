@@ -7,7 +7,7 @@
   "task_name": "demo_testing",
   "task_description": "ingest csv to mysql",
   "task_type": "Ingestion",
-  "task_sequence": "12",
+  "task_sequence": "\"0\"",
   "source": "Local Server",
   "target": "MySQL",
   "is_active": "Y",

@@ -6,11 +6,35 @@
   "pipeline_description": "pipeline_ikart_testing",
   "is_active": "Y",
   "tasks_details": {
-    "256_task_mysql_mysql_testing": 0,
-    "255_dataquality_check_testing1": 0,
-    "254_task_csv_mysql_ikart_testing": 0
+    "task_mysql_mysql_testing": 0,
+    "dataquality_check_testing1": 0,
+    "task_csv_mysql_ikart_testing": 0
   },
   "nodes": [
+    {
+      "id": "258",
+      "data": {
+        "label": "258-task_csvmysql"
+      },
+      "position": {
+        "x": 50,
+        "y": 750
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
+    {
+      "id": "268",
+      "data": {
+        "label": "268-tasktest"
+      },
+      "position": {
+        "x": 50,
+        "y": 1150
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    },
     {
       "id": "0",
       "data": {
@@ -24,25 +48,13 @@
       "sourcePosition": "right"
     },
     {
-      "id": "254",
+      "id": "257",
       "data": {
-        "label": "254-task_csv_mysql_ikart_testing"
+        "label": "257-task_mysql_mysql_testing_copy"
       },
       "position": {
         "x": 50,
-        "y": 550
-      },
-      "sourcePosition": "right",
-      "targetPosition": "left"
-    },
-    {
-      "id": "255",
-      "data": {
-        "label": "255-dataquality_check_testing1"
-      },
-      "position": {
-        "x": 50,
-        "y": 600
+        "y": 700
       },
       "sourcePosition": "right",
       "targetPosition": "left"
@@ -60,25 +72,25 @@
       "targetPosition": "left"
     },
     {
-      "id": "257",
+      "id": "255",
       "data": {
-        "label": "257-task_mysql_mysql_testing_copy"
+        "label": "255-dataquality_check_testing1"
       },
       "position": {
         "x": 50,
-        "y": 700
+        "y": 600
       },
       "sourcePosition": "right",
       "targetPosition": "left"
     },
     {
-      "id": "258",
+      "id": "254",
       "data": {
-        "label": "258-task_csvmysql"
+        "label": "254-task_csv_mysql_ikart_testing"
       },
       "position": {
         "x": 50,
-        "y": 750
+        "y": 550
       },
       "sourcePosition": "right",
       "targetPosition": "left"
@@ -86,9 +98,9 @@
   ],
   "edges": [
     {
-      "id": "flow-0-254",
+      "id": "flow-0-256",
       "source": "0",
-      "target": "254"
+      "target": "256"
     },
     {
       "id": "flow-0-255",
@@ -96,11 +108,11 @@
       "target": "255"
     },
     {
-      "id": "flow-0-256",
+      "id": "flow-0-254",
       "source": "0",
-      "target": "256"
+      "target": "254"
     }
   ],
-  "created_dttm": "2023-08-23T11:49:25.434Z",
-  "updated_dttm": "2023-08-23T11:49:25.434Z"
+  "created_dttm": "2023-09-11T04:36:12.067Z",
+  "updated_dttm": "2023-09-11T04:36:12.067Z"
 }

@@ -4,7 +4,7 @@
   "connection_subtype": "Local Server",
   "connection_name": "local_con_new",
   "connection_details": {
-    "file_name": "sales.csv",
-    "file_path": "/home/madhu/Ingestion_code2/"
+    "file_path": "/home/puneeths/Sample Data/",
+    "file_name": "sales.csv"
   }
 }

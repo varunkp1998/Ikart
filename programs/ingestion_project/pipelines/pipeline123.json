@@ -1,12 +1,46 @@
 {
-  "created_dttm": "2023-08-09T17:35:50.750Z",
-  "updated_dttm": "2023-08-09T17:35:50.750Z",
-  "id": 107,
+  "pipeline_id": 107,
   "project_id": 41,
   "pipeline_name": "pipeline123",
   "pipeline_cd": "1",
   "pipeline_description": "Pipeline_data",
-  "pipeline_sequence": "1",
   "is_active": "Y",
-  "created_by": "system"
+  "tasks_details": {
+    "task_csv_mysql_pipelinetest": 0
+  },
+  "nodes": [
+    {
+      "id": "0",
+      "data": {
+        "label": "Start"
+      },
+      "type": "input",
+      "position": {
+        "x": "10",
+        "y": "10"
+      },
+      "sourcePosition": "right"
+    },
+    {
+      "id": "259",
+      "data": {
+        "label": "259-task_csv_mysql_pipelinetest"
+      },
+      "position": {
+        "x": 50,
+        "y": 800
+      },
+      "sourcePosition": "right",
+      "targetPosition": "left"
+    }
+  ],
+  "edges": [
+    {
+      "id": "flow-0-259",
+      "source": "0",
+      "target": "259"
+    }
+  ],
+  "created_dttm": "2023-09-08T06:38:37.339Z",
+  "updated_dttm": "2023-09-08T06:38:37.339Z"
 }
