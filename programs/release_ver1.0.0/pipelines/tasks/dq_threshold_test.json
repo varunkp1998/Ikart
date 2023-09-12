@@ -29,7 +29,7 @@
       "skip_header": 0,
       "alias_columns": "ID,FirstName,LastName,Gender,,DOB,PhoneNumber,Occupation,Company",
       "parameter_type": "Local Server",
-      "select_columns": "id,FirstName,DOB,PhoneNumber,Occupation,Company",
+      "select_columns": "ID,FirstName,DOB,PhoneNumber,Occupation,Company",
       "connection_name": "local_server_connection"
     },
     "target": {
@@ -50,7 +50,7 @@
         "seq_no": "1",
         "check": "column_values_to_not_be_null",
         "parameters": {
-          "column": "id"
+          "column": "ID"
         },
         "active": "Y",
         "ignore_bad_records": "N",
