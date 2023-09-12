@@ -27,7 +27,7 @@
       "escape_char": "\\",
       "skip_footer": 0,
       "skip_header": 0,
-      "alias_columns": "ID,FirstName,LastName,Gender,,DOB,PhoneNumber,Occupation,Company",
+      "alias_columns": "ID,FirstName,LastName,Gender,DOB,PhoneNumber,Occupation,Company",
       "parameter_type": "Local Server",
       "select_columns": "ID,FirstName,DOB,PhoneNumber,Occupation,Company",
       "connection_name": "local_server_connection"
