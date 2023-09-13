@@ -29,7 +29,7 @@
       "skip_header": 0,
       "alias_columns": "",
       "parameter_type": "Local Server",
-      "select_columns": "",
+      "select_columns": null,
       "connection_name": "local_server_connection"
     },
     "target": {
