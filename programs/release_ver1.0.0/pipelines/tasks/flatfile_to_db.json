@@ -1,0 +1,9 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 117,
+  "task_name": "flatfile_to_db",
+  "task_description": "Ingest data from flatfile to db",
+  "task_type": "Ingestion",
+  "task_sequence": "8"
+}
