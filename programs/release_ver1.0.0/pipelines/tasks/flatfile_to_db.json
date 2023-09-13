@@ -29,13 +29,13 @@
       "skip_header": 0,
       "alias_columns": null,
       "parameter_type": "Local Server",
-      "select_columns": "",
+      "select_columns": null,
       "connection_name": "local_server_connection"
     },
     "target": {
       "target_type": "mysql_write",
       "schema": "karttest",
-      "operation": "create",
+      "operation": "replace",
       "table_name": "table1",
       "audit_columns": "active",
       "parameter_type": "MySQL",
