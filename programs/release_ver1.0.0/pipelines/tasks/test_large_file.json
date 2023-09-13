@@ -42,7 +42,7 @@
       "connection_name": "mysql_connection"
     },
     "data_quality_execution": {
-      "pre_check_enable": "N",
+      "pre_check_enable": "Y",
       "post_check_enable": "N"
     },
     "data_quality": [
