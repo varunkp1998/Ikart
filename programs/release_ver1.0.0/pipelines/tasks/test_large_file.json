@@ -74,10 +74,8 @@
         "seq_no": "3",
         "check": "column_pair_values_A_to_be_greater_than_B",
         "parameters": {
-          "column1": "Unit Price",
-          "column2": "Unit Cost",
-          "column_a": "Unit Price",
-          "column_b": "Unit Cost"
+          "column_A": "Unit Price",
+          "column_B": "Unit Cost"
         },
         "active": "Y",
         "ignore_bad_records": "N",
