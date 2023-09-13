@@ -27,7 +27,7 @@
       "escape_char": "\\n",
       "skip_footer": 0,
       "skip_header": 0,
-      "alias_columns": null,
+      "alias_columns": "",
       "parameter_type": "Local Server",
       "select_columns": null,
       "connection_name": "local_server_connection"
