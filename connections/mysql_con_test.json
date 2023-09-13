@@ -1,0 +1,13 @@
+{
+  "project_id": 43,
+  "connection_type": "RDBMS DB",
+  "connection_subtype": "MySQL",
+  "connection_name": "mysql_con_test",
+  "connection_details": {
+    "hostname": "localhost",
+    "port": "3306",
+    "database": "config",
+    "username": "root",
+    "password": "b82ef62efa0ad8406ca92872bf984c40200a9da3"
+  }
+}
