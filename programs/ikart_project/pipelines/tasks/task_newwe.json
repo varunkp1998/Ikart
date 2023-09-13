@@ -1,0 +1,10 @@
+{
+  "is_active": "Y",
+  "id": 0,
+  "pipeline_id": 128,
+  "task_name": "task_newwe",
+  "task_description": "task_newwe",
+  "task_type": "Ingestion",
+  "task_sequence": "1",
+  "created_by": "jjones"
+}
