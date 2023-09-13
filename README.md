@@ -1,4 +1,8 @@
-# Ikart
+# IngKart - NextGen Ingestion Framework
+
+# Setting up Python backend code for IngKart - NextGen Ingestion Framework
+
+## Prerequisites
 
 1. **Setting up your system:**
 
@@ -65,6 +69,5 @@
     
     ```bash
     python3 master.py --help
-
 
 
