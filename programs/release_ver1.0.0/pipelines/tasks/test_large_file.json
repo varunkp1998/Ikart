@@ -22,7 +22,7 @@
       "file_name": "sales_1000000_0.97gb.csv",
       "file_path": "/home/puneeths/sample_data/",
       "file_type": "csv",
-      "chunk_size": 50000,
+      "chunk_size": 1000000,
       "quote_char": "\"",
       "escape_char": "\\",
       "skip_footer": 0,
