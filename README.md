@@ -35,11 +35,10 @@
 
     Download and install the required Python libraries listed in a requirements.txt file. Ensure you are within the activated virtual environment when you run this command.
     Use the following command to install the libraries:
-
+    (The below command will install all the necessary Python packages specified in the requirements.txt file.)
+    
    ```bash
    pip install -r requirements.txt
-
-   The above command will install all the necessary Python packages specified in the requirements.txt file.
 
 5. **Organize Files:**
 
@@ -57,11 +56,9 @@
 7. **Execute the Job:**
 
    Run the following command to execute the job:
-
+   (please make sure to replace the published project name and task name for the below command)
    ```bash
    python3 master.py -p <project name> -t <task name>  
-   
-   (please make sure to replace the published project name and task name)
 
 8. **Additional Information:**
 
