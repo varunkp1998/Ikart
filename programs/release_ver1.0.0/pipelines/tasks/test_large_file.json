@@ -19,7 +19,7 @@
       "header": "Y",
       "encoding": "utf-8",
       "delimiter": ",",
-      "file_name": "sales_5000000.csv",
+      "file_name": "sales_1000000_0.97gb.csv",
       "file_path": "/home/puneeths/sample_data/",
       "file_type": "csv",
       "chunk_size": 50000,
@@ -29,7 +29,7 @@
       "skip_header": 0,
       "alias_columns": null,
       "parameter_type": "Local Server",
-      "select_columns": "Region,Country,Item Type,Sales Channel,Order Priority,Units Sold,Unit Price,Unit Cost,Order Date",
+      "select_columns": null,
       "connection_name": "local_server_connection"
     },
     "target": {
@@ -74,10 +74,8 @@
         "seq_no": "3",
         "check": "column_pair_values_A_to_be_greater_than_B",
         "parameters": {
-          "column1": "Unit Price",
-          "column2": "Unit Cost",
-          "column_a": "Unit Price",
-          "column_b": "Unit Cost"
+          "column_A": "Unit Price",
+          "column_B": "Unit Cost"
         },
         "active": "Y",
         "ignore_bad_records": "N",
