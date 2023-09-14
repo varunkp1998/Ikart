@@ -29,7 +29,7 @@
       "skip_header": 0,
       "alias_columns": "ID,FirstName,LastName,Gender,DOB,PhoneNumber,Occupation,Company",
       "parameter_type": "Local Server",
-      "select_columns": "ID,FirstName,DOB,PhoneNumber,Occupation,Company",
+      "select_columns": "",
       "connection_name": "local_server_connection"
     },
     "target": {
