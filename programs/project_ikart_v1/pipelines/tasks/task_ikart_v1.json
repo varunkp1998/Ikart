@@ -1,9 +1,0 @@
-{
-  "is_active": "Y",
-  "id": 0,
-  "pipeline_id": 134,
-  "task_name": "task_ikart_v1",
-  "task_description": "task_ikart_v1",
-  "task_type": "Ingestion",
-  "task_sequence": "1"
-}
