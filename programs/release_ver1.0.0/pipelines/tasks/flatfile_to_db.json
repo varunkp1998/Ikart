@@ -20,7 +20,7 @@
       "encoding": "utf-8",
       "delimiter": ",",
       "file_name": "sales_1000000_0.97gb.csv",
-      "file_path": "/home/puneeths/sample_data/",
+      "file_path": "/home/prajwalkp/ing1/",
       "file_type": "csv",
       "chunk_size": 100000,
       "quote_char": "\"",
@@ -34,12 +34,12 @@
     },
     "target": {
       "target_type": "mysql_write",
-      "schema": "karttest",
-      "operation": "replace",
+      "schema": "ikart",
+      "operation": "create",
       "table_name": "table1",
       "audit_columns": "active",
       "parameter_type": "MySQL",
-      "connection_name": "mysql_connection"
+      "connection_name": "mysql_pra_test"
     },
     "data_quality_execution": {
       "pre_check_enable": "N",
