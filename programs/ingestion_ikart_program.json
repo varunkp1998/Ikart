@@ -1,0 +1,11 @@
+{
+  "created_dttm": "2023-09-19T06:07:49.877Z",
+  "updated_dttm": "2023-09-19T06:07:49.877Z",
+  "id": 248,
+  "program_name": "ingestion_ikart_program",
+  "program_description": "ingestion_ikart_program",
+  "primary_stakeholder": "jjones",
+  "secondary_stakeholder": "admin",
+  "is_active": "Y",
+  "created_by": "jjones"
+}
