@@ -1,0 +1,13 @@
+{
+  "id": 136,
+  "project_id": 50,
+  "pipeline_name": "ingestion_ikart_pipeline",
+  "pipeline_cd": null,
+  "pipeline_description": "ingestion_ikart_pipeline1",
+  "pipeline_sequence": 1,
+  "is_active": "Y",
+  "created_by": "jjones",
+  "created_dttm": "2023-09-19T06:09:45.000Z",
+  "updated_by": "Madhu",
+  "updated_dttm": "2023-09-19T06:32:57.000Z"
+}
