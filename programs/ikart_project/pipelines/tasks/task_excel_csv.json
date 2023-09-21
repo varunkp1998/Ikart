@@ -27,9 +27,9 @@
       "escape_char": null,
       "skip_footer": 0,
       "skip_header": 0,
-      "alias_columns": "ID,NAME,school_name,address,city,county,postal,phone,email",
+      "alias_columns": null,
       "parameter_type": "Local Server",
-      "select_columns": "ID,NAME,school_name,address",
+      "select_columns": null,
       "connection_name": "ikart_local_server_connection"
     },
     "target": {
